@@ -55,7 +55,65 @@ import { cn } from 'uibyte'
 
 The package has a single entry point. Everything supported is exported from it;
 deep imports into the source tree are not a supported interface and may change
-without a major version.
+without a major version. The one exception is the stylesheet, which is imported
+by path.
+
+## The tokens
+
+Import the stylesheet once, alongside Tailwind:
+
+```css
+@import "tailwindcss";
+@import "uibyte/theme.css";
+```
+
+That declares four surface roles (`ink`, `paper`, `band`, `console`), five
+status roles (`ontrack`, `blocked`, `approaching`, `late`, `idle`) and two type
+roles (`sans`, `mono`), so the usual utilities work: `bg-paper`, `text-ink`,
+`bg-status-late-bg`, `font-mono`.
+
+Roles are named for what they mean, never for what colour they happen to be.
+`status-late` is the role for something past its planned end; the fact that it
+is currently red is a value, not a name.
+
+**A status is never colour alone.** Every status is rendered as colour *and* an
+icon *and* a text label. That is a requirement, not a style preference.
+
+### Repointing the palette
+
+Each status role is set by a **single** value — the saturated one, used for the
+dot. Its background, foreground and border are derived from that value, with the
+foreground darkened until it clears 4.5:1 against the background it will
+actually sit on. One value in, a legible set out.
+
+Repoint through the theme builder so the derived values move with it:
+
+```ts
+import { buildTheme, themeCss } from 'uibyte'
+
+const css = themeCss(
+  buildTheme({
+    surfaces: { paper: '#FFFFFF' },
+    status: { ontrack: '#3B5BDB' },
+  }),
+)
+```
+
+Write that where your build can import it. Overwriting the custom properties
+directly in a stylesheet changes the dots but leaves the values derived from
+them as they were, so the two stop matching.
+
+A host that needs one exact pair can supply it, and it is used verbatim:
+
+```ts
+buildTheme({ overrides: { late: { background: '#FFF1F0', foreground: '#7A1512' } } })
+```
+
+An explicit pair opts out of the derivation, and with it the legibility
+guarantee — that is the host's call to make.
+
+The reasoning behind the colour maths is in
+[docs/color-derivation.md](docs/color-derivation.md).
 
 ## Development
 
@@ -67,6 +125,10 @@ npm run gate      # typecheck + tests + library build
 The individual steps are `npm run typecheck`, `npm run test` and
 `npm run build`. Tests sit beside the source they cover. The library build is a
 compile check — the published package is the source.
+
+`npm run theme` regenerates the stylesheet from the token definitions. It is
+generated rather than hand-written so the published values cannot disagree with
+the rule that produced them; a test fails if the file is out of date.
 
 ## Versioning
 

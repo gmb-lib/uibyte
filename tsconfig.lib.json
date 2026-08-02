@@ -9,5 +9,9 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
+  // Tests are typed separately, with node available to them. Keeping them out
+  // here is what stops a component quietly reaching for a node API and only
+  // failing in a browser.
+  "exclude": ["src/**/*.test.ts"]
 }
