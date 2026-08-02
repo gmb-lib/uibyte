@@ -24,6 +24,9 @@ npm install github:gmb-lib/uibyte#v0.1.0
 
 Pin a tag. There is no registry release and no floating version.
 
+Full adoption guide, including the failure modes that are easy to hit and hard
+to diagnose: [docs/consuming.md](docs/consuming.md).
+
 ## Host configuration
 
 Because the package ships source rather than a prebuilt bundle, two host
