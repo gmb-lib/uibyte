@@ -41,13 +41,15 @@ describe('the shipped stylesheet', () => {
     }
   })
 
-  it('names no colour and no product', () => {
-    // A role name that leaks a colour or a product is the failure this whole
-    // layer exists to prevent, so it is checked rather than trusted.
+  it('names roles, never colours', () => {
+    // The reason this package ships role names at all is that a colour name
+    // means two different things in two different applications. A token named
+    // for its hue is the failure the whole layer exists to prevent, so it is
+    // checked rather than trusted. (Consumer vocabulary is covered repo-wide by
+    // the source-hygiene suite, so it is not re-checked here.)
     const declarations = stylesheet.match(/--[a-z0-9-]+(?=:)/g) ?? []
-    const forbidden =
-      /(green|red|amber|yellow|blue|grey|gray|orange)|(sign|envelope|project|weld|estimate|invoice)/
-    expect(declarations.filter((name) => forbidden.test(name))).toEqual([])
+    const hues = /green|red|amber|yellow|blue|grey|gray|orange|purple|teal/
+    expect(declarations.filter((name) => hues.test(name))).toEqual([])
   })
 
   it('reaches the contrast floor as published, not merely as computed', () => {
