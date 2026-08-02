@@ -15,6 +15,17 @@ doing together.
 "uibyte": "github:gmb-lib/uibyte#v0.1.0"
 ```
 
+**Upgrading is not just editing the tag.** Changing the version in
+`package.json` and running `npm install` can leave the lockfile resolved to the
+*old* commit — npm treats the existing resolution as still satisfying the
+range, so the build succeeds, CI agrees with itself, and you are running code
+you think you replaced. Use `npm update uibyte`, then check what you actually
+got:
+
+```
+npm ls uibyte     # must show the version you asked for, not the old one
+```
+
 **2. Keep the dependency optimiser away from it.** This package ships source,
 and Vite's optimiser cannot parse single-file components.
 
