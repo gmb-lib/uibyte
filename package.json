@@ -1,0 +1,63 @@
+{
+  "name": "uibyte",
+  "version": "0.0.0",
+  "description": "The gmb design system as code — role-named tokens, the application shell and the accessible primitives every gmb SPA is built from.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gmb-lib/uibyte.git"
+  },
+  "files": [
+    "src",
+    "!src/**/*.test.ts",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./theme.css": "./src/theme/theme.css",
+    "./fonts.css": "./src/theme/fonts.css"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "gate": "npm run typecheck && npm run test && npm run build",
+    "theme": "vite-node scripts/generate-theme.ts",
+    "typecheck": "vue-tsc -b",
+    "test": "vitest run",
+    "build": "vite build"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.13"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "reka-ui": "^2.10.1",
+    "tailwind-merge": "^2.6.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/node": "^22.10.5",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.7.0",
+    "jsdom": "^25.0.1",
+    "tailwindcss": "^4.0.0",
+    "typescript": "~5.7.2",
+    "vite": "^6.0.7",
+    "vite-node": "^3.2.4",
+    "vitest": "^3.2.4",
+    "vue": "^3.5.13",
+    "vue-tsc": "^2.2.0"
+  }
+}

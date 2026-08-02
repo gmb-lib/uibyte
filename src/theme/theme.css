@@ -1,0 +1,58 @@
+/* Generated — run `npm run theme` after changing a token or the derivation.
+   Every status role's background, foreground and border is derived from its
+   single role colour; the foreground is darkened until it clears 4.5:1 against
+   the background it will actually sit on. */
+
+@theme {
+  --color-ink: #16181b;
+  --color-paper: #f4f3ef;
+  --color-band: #fbfaf7;
+  --color-console: #0e1114;
+
+  --color-status-ontrack: #0e9e6b;
+  --color-status-ontrack-bg: #dee9de;
+  --color-status-ontrack-fg: #00764f;
+  --color-status-ontrack-border: #c0dcc9;
+
+  --color-status-blocked: #d79a2b;
+  --color-status-blocked-bg: #f1e9da;
+  --color-status-blocked-fg: #8e6100;
+  --color-status-blocked-border: #eddbbe;
+
+  --color-status-approaching: #e8b23a;
+  --color-status-approaching-bg: #f3ecdc;
+  --color-status-approaching-fg: #8b6500;
+  --color-status-approaching-border: #f1e2c3;
+
+  --color-status-late: #d2524d;
+  --color-status-late-bg: #f3e0db;
+  --color-status-late-fg: #b73937;
+  --color-status-late-border: #f0c7c0;
+
+  --color-status-idle: #9aa0a6;
+  --color-status-idle-bg: #e9e9e6;
+  --color-status-idle-fg: #646a6f;
+  --color-status-idle-border: #dadbda;
+
+  --font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", monospace;
+
+  --color-surface: #ffffff;
+  --color-line: #e6e3dc;
+  --color-muted: #6b7177;
+  --color-muted-strong: #5a5f66;
+  --color-faint: #9aa0a6;
+  --color-console-raised: #14181c;
+  --color-console-line: #20262b;
+  --color-console-text: #e8eae7;
+  --color-console-muted: #8a9298;
+  --color-console-accent: #2bd18c;
+  --color-focus: #0e9e6b;
+
+  --radius-pill: 999px;
+  --radius-card: 14px;
+  --radius-btn: 10px;
+  --radius-chip: 7px;
+
+  --shadow-console: 0 34px 70px -24px rgba(14, 17, 20, 0.5);
+}

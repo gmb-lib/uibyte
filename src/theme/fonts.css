@@ -1,0 +1,30 @@
+/*
+  The two typefaces the design system is drawn in, self-hosted. Importing this
+  is optional and separate from the tokens on purpose: a host that already
+  serves these files should keep serving them rather than ship a second copy,
+  and a host that wants a different typeface repoints the type roles instead.
+
+  Both faces are variable and cover the full weight axis, so headings and mono
+  labels render at their true cut weights with no synthetic bold. Nothing loads
+  from a third-party origin, so a content-security policy needs no font
+  exception.
+
+  Both are licensed under the SIL Open Font License 1.1; the licences sit beside
+  the files in fonts/.
+*/
+
+@font-face {
+  font-family: "Hanken Grotesk";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./fonts/HankenGrotesk-Variable.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url("./fonts/JetBrainsMono-Variable.woff2") format("woff2");
+}
