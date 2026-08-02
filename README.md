@@ -67,6 +67,19 @@ Import the stylesheet once, alongside Tailwind:
 @import "uibyte/theme.css";
 ```
 
+The typefaces are a **separate, optional import**, so a host already serving
+them does not ship a second copy:
+
+```css
+@import "uibyte/fonts.css";
+```
+
+Both are variable `woff2` files served from the package — nothing loads from a
+third-party origin, so a content-security policy needs no font exception. They
+are licensed under the SIL Open Font License 1.1, with the licence text beside
+each file. A host wanting a different typeface skips this import and repoints
+the type roles instead.
+
 That declares four surface roles (`ink`, `paper`, `band`, `console`), five
 status roles (`ontrack`, `blocked`, `approaching`, `late`, `idle`) and two type
 roles (`sans`, `mono`), so the usual utilities work: `bg-paper`, `text-ink`,
@@ -138,3 +151,7 @@ a migration note naming what each host has to do.
 ## Licence
 
 MIT — see [LICENSE](LICENSE).
+
+The two bundled typefaces are not covered by that licence: both are under the
+SIL Open Font License 1.1, and each ships with its own licence text in
+`src/theme/fonts/`.

@@ -27,3 +27,22 @@ export type {
 export { deriveRole, MINIMUM_CONTRAST } from './theme/derive'
 export type { DerivedRole, DeriveOptions, RoleOverride } from './theme/derive'
 export { contrastRatio } from './theme/color'
+export { radii, shadows, supportColors } from './theme/tokens'
+export type { SupportColor } from './theme/tokens'
+
+// The components.
+export { default as AppShell } from './components/AppShell.vue'
+export { default as SidebarContent } from './components/SidebarContent.vue'
+export { default as MobileDrawer } from './components/MobileDrawer.vue'
+export { default as StatusPill } from './components/StatusPill.vue'
+export { default as NavIcon } from './components/NavIcon.vue'
+export { default as OrderableList } from './components/OrderableList.vue'
+export { default as BrandMark } from './components/BrandMark.vue'
+export { Button, buttonVariants } from './components/ui/button'
+export type { ButtonVariants } from './components/ui/button'
+export type {
+  LinkComponent,
+  NavIconName,
+  NavItem,
+  ShellLabels,
+} from './components/types'

@@ -89,7 +89,7 @@ function darkenToContrast(
   // Contrast rises as lightness falls, so a binary search closes on the
   // boundary; the answer is the dark end of the bracket, which is the side
   // known to satisfy the ratio. Rounding makes the boundary slightly ragged, so
-  // the result is verified rather than assumed, and stepped down if the search
+  // the result is checked rather than assumed, and stepped down if the search
   // landed on the wrong side of a rounding edge.
   let tooLight = startingLightness
   let darkEnough = 0
