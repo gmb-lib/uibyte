@@ -42,6 +42,7 @@ export { Button, buttonVariants } from './components/ui/button'
 export type { ButtonVariants } from './components/ui/button'
 export type {
   LinkComponent,
+  NavGroup,
   NavIconName,
   NavItem,
   ShellLabels,

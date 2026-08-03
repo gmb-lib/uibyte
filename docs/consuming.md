@@ -92,9 +92,35 @@ const items: NavItem[] = [
 </AppShell>
 ```
 
+**Navigation can be flat or grouped.** Pass `items` for a single list under the
+optional `labels.section` eyebrow, or pass `groups` (each a labelled set of
+items) and the sidebar draws one eyebrow per group. The mobile bottom bar
+flattens groups into one row of tabs.
+
+```ts
+const groups: NavGroup[] = [
+  { key: 'work', label: t('nav.work'), items: workItems },
+  { key: 'registers', label: t('nav.registers'), items: registerItems },
+]
+```
+
+**A destination can be locked.** An item with `locked: true` is shown, never
+hidden — drawn dimmed with a lock glyph, stripped of navigation, and announced
+to assistive technology with the `labels.locked` suffix you supply. Use it for
+a capability a person may see exists but cannot open: an area their role does
+not reach, or a module not part of their plan. An optional `tag` string renders
+as a small uppercase chip after any item's label (locked or not), e.g. an
+access level.
+
+```ts
+{ key: 'catalogue', label: t('nav.catalogue'), icon: 'shield', locked: true, tag: t('nav.adminTag') }
+```
+
 **Anything specific to your product is a slot.** The brand mark, the sidebar
-footer and the top-bar actions are yours. Wanting to put one of your own nouns
-*inside* a component is the signal that it belongs in a slot instead.
+footer and the top-bar actions are yours. `sidebar-extra` renders between the
+navigation and the footer for content that belongs above the signed-in block —
+a notice, an upgrade card. Wanting to put one of your own nouns *inside* a
+component is the signal that it belongs in a slot instead.
 
 ## Repointing the palette
 
