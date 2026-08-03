@@ -2,7 +2,7 @@
 import { computed, defineAsyncComponent, ref, toRaw } from 'vue'
 import NavIcon from './NavIcon.vue'
 import SidebarContent from './SidebarContent.vue'
-import type { LinkComponent, NavItem, ShellLabels } from './types'
+import type { LinkComponent, NavGroup, NavItem, ShellLabels } from './types'
 
 // The application frame: a console sidebar on the left, a translucent top bar,
 // the page below it, and — on small screens — a bottom tab bar plus a drawer.
@@ -18,20 +18,29 @@ const MobileDrawer = defineAsyncComponent(() => import('./MobileDrawer.vue'))
 
 const props = withDefaults(
   defineProps<{
-    items: NavItem[]
+    /** Flat navigation. Ignored when `groups` is supplied. */
+    items?: NavItem[]
+    /** Grouped navigation, each group under its own eyebrow label. */
+    groups?: NavGroup[]
     labels: ShellLabels
     /** Component used to render navigation links. Defaults to a plain anchor. */
     linkComponent?: LinkComponent
     /** Class the link component applies to the active item. */
     activeClass?: string
   }>(),
-  { linkComponent: 'a', activeClass: 'bg-white/[0.07] !text-white' },
+  { items: () => [], linkComponent: 'a', activeClass: 'bg-white/[0.07] !text-white' },
 )
 
 const emit = defineEmits<{ navigate: [item: NavItem] }>()
 
 // Unwrapped before it is rendered — see SidebarContent for why.
 const link = computed(() => toRaw(props.linkComponent))
+
+// The bottom tab bar has no room for group structure; it gets every
+// destination in order, locked ones included — locked is never hidden.
+const flatItems = computed<NavItem[]>(() =>
+  props.groups?.length ? props.groups.flatMap((group) => group.items) : props.items,
+)
 
 const drawerOpen = ref(false)
 const drawerLoaded = ref(false)
@@ -64,13 +73,16 @@ function onNavigate(item: NavItem): void {
     >
       <SidebarContent
         :items="items"
+        :groups="groups"
         :link-component="link"
         :active-class="activeClass"
         :nav-label="labels.primaryNav"
         :section-label="labels.section"
+        :locked-label="labels.locked"
         @navigate="onNavigate"
       >
         <template #brand><slot name="brand" /></template>
+        <template #extra><slot name="sidebar-extra" /></template>
         <template #footer><slot name="sidebar-footer" /></template>
       </SidebarContent>
     </aside>
@@ -114,18 +126,28 @@ function onNavigate(item: NavItem): void {
       class="fixed inset-x-0 bottom-0 z-30 flex border-t border-console-line bg-console pb-[env(safe-area-inset-bottom)] lg:hidden"
       :aria-label="labels.primaryNav"
     >
-      <component
-        :is="link"
-        v-for="item in items"
-        :key="item.key"
-        v-bind="item.linkProps"
-        class="flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px] font-medium text-console-muted focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
-        active-class="!text-white"
-        @click="emit('navigate', item)"
-      >
-        <NavIcon :name="item.icon" :size="20" />
-        {{ item.label }}
-      </component>
+      <template v-for="item in flatItems" :key="item.key">
+        <a
+          v-if="item.locked"
+          aria-disabled="true"
+          class="flex flex-1 cursor-not-allowed flex-col items-center gap-1 py-2.5 text-[10px] font-medium text-console-muted opacity-55"
+        >
+          <NavIcon :name="item.icon" :size="20" />
+          {{ item.label }}
+          <span v-if="labels.locked" class="sr-only">{{ labels.locked }}</span>
+        </a>
+        <component
+          :is="link"
+          v-else
+          v-bind="item.linkProps"
+          class="flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px] font-medium text-console-muted focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+          active-class="!text-white"
+          @click="emit('navigate', item)"
+        >
+          <NavIcon :name="item.icon" :size="20" />
+          {{ item.label }}
+        </component>
+      </template>
     </nav>
 
     <MobileDrawer
@@ -138,12 +160,15 @@ function onNavigate(item: NavItem): void {
       <SidebarContent
         hide-brand
         :items="items"
+        :groups="groups"
         :link-component="link"
         :active-class="activeClass"
         :nav-label="labels.primaryNav"
         :section-label="labels.section"
+        :locked-label="labels.locked"
         @navigate="onNavigate"
       >
+        <template #extra><slot name="sidebar-extra" /></template>
         <template #footer><slot name="sidebar-footer" /></template>
       </SidebarContent>
     </MobileDrawer>

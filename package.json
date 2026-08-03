@@ -1,6 +1,6 @@
 {
   "name": "uibyte",
-  "version": "0.0.0",
+  "version": "0.2.0",
   "description": "The gmb design system as code — role-named tokens, the application shell and the accessible primitives every gmb SPA is built from.",
   "license": "MIT",
   "type": "module",

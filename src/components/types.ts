@@ -10,6 +10,7 @@ export type NavIconName =
   | 'mail'
   | 'clock'
   | 'people'
+  | 'lock'
 
 /**
  * One navigation destination.
@@ -28,6 +29,27 @@ export interface NavItem {
   icon: NavIconName
   /** Props handed verbatim to the link component, e.g. `{ to: { name: 'home' } }`. */
   linkProps?: Record<string, unknown>
+  /**
+   * A locked destination is shown, never hidden: drawn dimmed with a lock
+   * glyph, stripped of navigation, and announced as unavailable. For a
+   * capability a person may see exists but cannot open — an area their role
+   * does not reach, or a module not part of their plan.
+   */
+  locked?: boolean
+  /**
+   * Small uppercase chip rendered after the label, e.g. an access level or an
+   * availability note. Already translated.
+   */
+  tag?: string
+}
+
+/** A labelled group of navigation destinations. */
+export interface NavGroup {
+  /** Stable identity for the group. */
+  key: string
+  /** The visible group label, drawn as a small uppercase eyebrow. Already translated. */
+  label: string
+  items: NavItem[]
 }
 
 /** A link component, or the name of an intrinsic element. Defaults to `a`. */
@@ -51,4 +73,9 @@ export interface ShellLabels {
   primaryNav: string
   /** Small uppercase label above the sidebar navigation. Optional. */
   section?: string
+  /**
+   * Announced after a locked item's name, for assistive technology
+   * (e.g. "not available"). Optional but recommended when any item is locked.
+   */
+  locked?: string
 }

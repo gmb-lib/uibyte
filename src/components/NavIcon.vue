@@ -47,6 +47,10 @@ defineProps<{ name: NavIconName; size?: number }>()
       <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke-linecap="round" />
       <path d="M16 5.2a3.5 3.5 0 0 1 0 5.6M17.5 14.4A6 6 0 0 1 21 20" stroke-linecap="round" />
     </template>
+    <template v-else-if="name === 'lock'">
+      <rect x="4.5" y="10.5" width="15" height="10" rx="2" />
+      <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+    </template>
     <template v-else>
       <path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6l7-3z" stroke-linejoin="round" />
       <path d="M9 11.5l2 2 4-4.5" stroke-linecap="round" stroke-linejoin="round" />

@@ -19,10 +19,13 @@ provides the toolchain:
 ## Install
 
 ```
-npm install github:gmb-lib/uibyte#v0.1.0
+npm install github:gmb-lib/uibyte#v0.2.0
 ```
 
 Pin a tag. There is no registry release and no floating version.
+
+Full adoption guide, including the failure modes that are easy to hit and hard
+to diagnose: [docs/consuming.md](docs/consuming.md).
 
 ## Host configuration
 
