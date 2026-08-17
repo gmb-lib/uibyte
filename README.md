@@ -98,9 +98,11 @@ icon *and* a text label. That is a requirement, not a style preference.
 ### Repointing the palette
 
 Each status role is set by a **single** value — the saturated one, used for the
-dot. Its background, foreground and border are derived from that value, with the
-foreground darkened until it clears 4.5:1 against the background it will
-actually sit on. One value in, a legible set out.
+dot. Its background, foreground, border and the solid look's fill are derived
+from that value, each moved only as far as legibility demands. One value in, a
+legible set out — in every look the pill can render. The page accent and the
+focus rings derive the same way (`accent` → `accent-deep` for text; `focus` →
+`console-focus` for dark surfaces).
 
 Repoint through the theme builder so the derived values move with it:
 

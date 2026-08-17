@@ -122,12 +122,37 @@ navigation and the footer for content that belongs above the signed-in block —
 a notice, an upgrade card. Wanting to put one of your own nouns *inside* a
 component is the signal that it belongs in a slot instead.
 
+**A status pill has three looks.** The look is volume, never meaning — the
+status role carries the meaning. `soft` (the default) is the familiar derived
+pair; `solid` is the loud form — saturated background, white label — for the
+one loudest thing on a row; `outline` is the quiet form — bordered surface,
+ink label, a dot in the role colour. The solid pair is derived like everything
+else (the role colour darkens only as far as white legibility demands), so a
+repointed role stays readable in every look.
+
+```vue
+<StatusPill status="late" :label="t('status.late')" look="solid" />
+<StatusPill status="ontrack" :label="t('status.inWork')" look="outline" />
+```
+
 ## Repointing the palette
 
 Each status role is set by a **single** value — the saturated one used for the
 dot. Its background, foreground and border are derived from it, with the
 foreground darkened until it clears 4.5:1 against the background it will
 actually sit on. One value in, a readable set out.
+
+Beside the status roles, two more families derive the same way:
+
+- **The page accent** — one `accent` value in, two out: `--color-accent` for
+  graphics and fills, and `--color-accent-deep`, darkened until it reads as
+  text against the page background. Use `-deep` for anything textual
+  (eyebrows, links); the base is deliberately not text-safe.
+- **The focus pair** — `--color-focus` is the ring on light surfaces;
+  `--color-console-focus` is derived from it for dark surfaces, lightened
+  until it is unmistakable against the console colour (the floor there is far
+  above the text ratio, because a technically-passing dark ring still
+  disappears in practice). The kit's own dark-surface controls already use it.
 
 Repoint through the builder, so the derived values move with it:
 
@@ -138,6 +163,8 @@ const css = themeCss(
   buildTheme({
     surfaces: { paper: '#FFFFFF' },
     status: { ontrack: '#3B5BDB' },
+    accent: '#3B5BDB',
+    focus: '#3B5BDB',
   }),
 )
 ```

@@ -102,7 +102,7 @@ const sections = computed<NavGroup[]>(() =>
             :is="link"
             v-else
             v-bind="item.linkProps"
-            class="flex items-center gap-[11px] rounded-[9px] px-3 py-2.5 text-sm font-medium text-console-muted hover:bg-white/[0.07] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus"
+            class="flex items-center gap-[11px] rounded-[9px] px-3 py-2.5 text-sm font-medium text-console-muted hover:bg-white/[0.07] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-console-focus"
             :active-class="activeClass"
             @click="emit('navigate', item)"
           >

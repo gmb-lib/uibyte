@@ -1,5 +1,12 @@
 import { formatHex, parseHex } from './color'
-import { deriveRole, type DerivedRole, type RoleOverride } from './derive'
+import {
+  adjustToContrast,
+  CONSOLE_RING_CONTRAST,
+  deriveRole,
+  MINIMUM_CONTRAST,
+  type DerivedRole,
+  type RoleOverride,
+} from './derive'
 
 /**
  * The four surface roles. A host may repoint any of them; what each surface is
@@ -39,6 +46,19 @@ export const referenceStatus: Record<StatusRole, string> = {
   late: '#D2524D',
   idle: '#9AA0A6',
 }
+
+/**
+ * The page accent — eyebrows, links, small fills in the content area. One
+ * value in, two out: the base is for graphics and fills (it does not reach
+ * text contrast on the page background, by design), and `deep` is the base
+ * darkened until it reads as text against `paper`, so every accented word is
+ * legible by construction.
+ *
+ * Deliberately its own role even while it shares the family green with
+ * `ontrack` and `focus` today: an accent, a status and a focus indicator are
+ * three meanings, and a host repoints each without dragging the others along.
+ */
+export const referenceAccent = '#0E9E6B'
 
 /**
  * The two type roles. The split is semantic rather than decorative: if a value
@@ -119,6 +139,9 @@ export interface ThemeInput {
   surfaces?: Partial<Record<SurfaceRole, string>>
   status?: Partial<Record<StatusRole, string>>
   type?: Partial<Record<TypeRole, string>>
+  accent?: string
+  /** The focus-ring colour; the dark-surface ring is derived from it. */
+  focus?: string
   /** Exact pairs, per role, for a host that needs a specific one. */
   overrides?: Partial<Record<StatusRole, RoleOverride>>
 }
@@ -127,6 +150,11 @@ export interface Theme {
   surfaces: Record<SurfaceRole, string>
   status: Record<StatusRole, DerivedRole>
   type: Record<TypeRole, string>
+  accent: { base: string; deep: string }
+  /** The focus ring on light surfaces — as given, or the reference value. */
+  focus: string
+  /** The focus ring as it must appear on the console surface — derived. */
+  consoleFocus: string
 }
 
 /**
@@ -140,6 +168,8 @@ export interface Theme {
 export function buildTheme(input: ThemeInput = {}): Theme {
   const surfaces = { ...referenceSurfaces, ...input.surfaces }
   const status = { ...referenceStatus, ...input.status }
+  const accent = input.accent ?? referenceAccent
+  const focus = input.focus ?? supportColors.focus
 
   return {
     surfaces,
@@ -153,6 +183,14 @@ export function buildTheme(input: ThemeInput = {}): Theme {
         }),
       ]),
     ) as Record<StatusRole, DerivedRole>,
+    accent: {
+      base: formatHex(parseHex(accent)),
+      deep: adjustToContrast(accent, surfaces.paper, MINIMUM_CONTRAST),
+    },
+    focus: formatHex(parseHex(focus)),
+    // The ring re-derives when either the focus colour or the console surface
+    // is repointed — the surface owns its ring.
+    consoleFocus: adjustToContrast(focus, surfaces.console, CONSOLE_RING_CONTRAST),
   }
 }
 
@@ -179,16 +217,25 @@ export function themeCss(theme: Theme = buildTheme()): string {
       `  --color-status-${role}-bg: ${derived.background};`,
       `  --color-status-${role}-fg: ${derived.foreground};`,
       `  --color-status-${role}-border: ${derived.border};`,
+      `  --color-status-${role}-solid-bg: ${derived.solidBackground};`,
+      `  --color-status-${role}-solid-fg: ${derived.solidForeground};`,
       '',
     )
   }
 
   lines.push(
+    `  --color-accent: ${theme.accent.base};`,
+    `  --color-accent-deep: ${theme.accent.deep};`,
+    '',
     ...typeRoles.map((role) => `  --font-${role}: ${theme.type[role]};`),
     '',
-    ...Object.entries(supportColors).map(
-      ([name, value]) => `  --color-${name}: ${formatHex(parseHex(value))};`,
-    ),
+    // The focus pair comes from the theme, not the static list: the light ring
+    // is whatever the host set, and the console ring is derived from it.
+    ...Object.entries(supportColors)
+      .filter(([name]) => name !== 'focus')
+      .map(([name, value]) => `  --color-${name}: ${formatHex(parseHex(value))};`),
+    `  --color-focus: ${theme.focus};`,
+    `  --color-console-focus: ${theme.consoleFocus};`,
     '',
     ...Object.entries(radii).map(([name, value]) => `  --radius-${name}: ${value};`),
     '',

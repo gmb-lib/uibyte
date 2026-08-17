@@ -45,4 +45,47 @@ describe('StatusPill', () => {
     expect(w.text()).toBe('Draft')
     expect(w.find('svg').exists()).toBe(true)
   })
+
+  // The three looks are volume, never meaning. Soft is the default and must
+  // render exactly as it always has; the two new looks are opt-in.
+  it('defaults to the soft look', () => {
+    const w = mount(StatusPill, { props: { status: 'late', label: 'Overdue' } })
+    expect(w.classes()).toContain('bg-status-late-bg')
+    expect(w.classes()).toContain('text-status-late-fg')
+  })
+
+  it('paints the solid look from the derived solid pair', () => {
+    const w = mount(StatusPill, {
+      props: { status: 'late', label: 'Overdue', look: 'solid' },
+    })
+    expect(w.classes()).toContain('bg-status-late-solid-bg')
+    expect(w.classes()).toContain('text-status-late-solid-fg')
+    // The loud look keeps the role glyph — loudness changes nothing about the
+    // never-colour-alone anatomy.
+    expect(w.find('svg').exists()).toBe(true)
+    expect(w.text()).toBe('Overdue')
+  })
+
+  it('draws the outline look as a bordered surface with a role-coloured dot', () => {
+    const w = mount(StatusPill, {
+      props: { status: 'ontrack', label: 'In work', look: 'outline' },
+    })
+    expect(w.classes()).toContain('bg-surface')
+    expect(w.classes()).toContain('border-line')
+    expect(w.classes()).toContain('text-ink')
+    // The quiet look swaps the glyph for a dot, and the dot stays out of the
+    // accessibility tree — the label carries the status.
+    expect(w.find('svg').exists()).toBe(false)
+    const dot = w.get('span[aria-hidden="true"]')
+    expect(dot.classes()).toContain('bg-status-ontrack')
+    expect(w.text()).toBe('In work')
+  })
+
+  it('keeps a visible mark and the label in every look', () => {
+    for (const look of ['soft', 'solid', 'outline'] as const) {
+      const w = mount(StatusPill, { props: { status: 'late', label: 'x', look } })
+      expect(w.text()).toBe('x')
+      expect(w.find('svg').exists() || w.find('span[aria-hidden="true"]').exists()).toBe(true)
+    }
+  })
 })
