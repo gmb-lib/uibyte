@@ -16,13 +16,29 @@ The direction is one-way: the role colour produces the rest, and nothing ever
 produces a role colour from a background. That is what keeps the unreadable
 combination unreachable rather than merely discouraged.
 
-## The three values
+## The derived values
 
 | Value | Rule |
 |---|---|
 | background | the role colour at 12% over the surface |
 | border | the role colour at 28% over the surface |
 | foreground | the role colour darkened until it clears 4.5:1 against that background |
+| solid background | the role colour darkened until **white** clears 4.5:1 against it (the loud look's fill; white is its fixed foreground) |
+
+Two further families use the same machinery:
+
+| Value | Rule |
+|---|---|
+| accent-deep | the accent colour darkened until it clears 4.5:1 against the page surface — the accent's text form |
+| console focus ring | the focus colour moved toward whichever extreme has more headroom against the console surface, until it clears **9:1** |
+
+**Why the ring's floor is 9:1 and not 4.5:1.** The number is empirical. A ring
+measuring 5.5:1 against a near-black surface was still reported hard to see in
+live use — a small area of a dark saturated hue disappears long before the
+ratio says it should — while the look that was accepted measures 9.6:1. The
+floor sits above the measured failure and just under the accepted look. The
+direction adapts: on a dark surface the ring lightens, on a light one it
+darkens, and a surface too middling for either direction fails loudly.
 
 ## The choices, and why
 

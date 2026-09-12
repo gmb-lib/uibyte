@@ -10,6 +10,7 @@ export type { ClassValue } from 'clsx'
 export {
   buildTheme,
   themeCss,
+  referenceAccent,
   referenceStatus,
   referenceSurfaces,
   referenceType,
@@ -24,7 +25,12 @@ export type {
   ThemeInput,
   TypeRole,
 } from './theme/tokens'
-export { deriveRole, MINIMUM_CONTRAST } from './theme/derive'
+export {
+  adjustToContrast,
+  CONSOLE_RING_CONTRAST,
+  deriveRole,
+  MINIMUM_CONTRAST,
+} from './theme/derive'
 export type { DerivedRole, DeriveOptions, RoleOverride } from './theme/derive'
 export { contrastRatio } from './theme/color'
 export { radii, shadows, supportColors } from './theme/tokens'
@@ -45,5 +51,6 @@ export type {
   NavGroup,
   NavIconName,
   NavItem,
+  PillLook,
   ShellLabels,
 } from './components/types'

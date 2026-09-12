@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { contrastRatio, formatHex, oklchToRgb, parseHex, rgbToOklch } from './color'
-import { deriveRole, MINIMUM_CONTRAST } from './derive'
+import {
+  adjustToContrast,
+  CONSOLE_RING_CONTRAST,
+  deriveRole,
+  MINIMUM_CONTRAST,
+} from './derive'
 import { buildTheme, referenceStatus, referenceSurfaces, statusRoles } from './tokens'
 
 const PAPER = referenceSurfaces.paper
@@ -93,6 +98,113 @@ describe('the derivation darkens no further than it has to', () => {
     // Yellow carries far more luminance than blue at the same lightness, so a
     // rule that darkened both by the same amount would fail one of them.
     expect(drop('#FFFF00')).toBeGreaterThan(drop('#0000FF'))
+  })
+})
+
+describe('the solid pair', () => {
+  it.each(statusRoles)('%s: white reads on the solid background', (role) => {
+    const { solidBackground, solidForeground } = deriveRole(referenceStatus[role], {
+      surface: PAPER,
+    })
+    expect(solidForeground).toBe('#ffffff')
+    expect(ratioOf(solidForeground, solidBackground)).toBeGreaterThanOrEqual(
+      MINIMUM_CONTRAST,
+    )
+  })
+
+  it('holds across the hue circle at every chroma and lightness', () => {
+    const failures: string[] = []
+    for (let hue = 0; hue < 360; hue += 5) {
+      for (const chroma of [0, 0.05, 0.12, 0.2, 0.32]) {
+        for (const lightness of [0.15, 0.35, 0.55, 0.75, 0.95]) {
+          const dot = hexFromOklch(lightness, chroma, hue)
+          const { solidBackground } = deriveRole(dot, { surface: PAPER })
+          const ratio = ratioOf('#ffffff', solidBackground)
+          if (ratio < MINIMUM_CONTRAST) {
+            failures.push(`${dot} (l=${lightness} c=${chroma} h=${hue}) → ${ratio.toFixed(2)}:1`)
+          }
+        }
+      }
+    }
+    expect(failures).toEqual([])
+  })
+
+  it('keeps the role colour itself when white already reads on it', () => {
+    const dot = '#0A2E1B'
+    const { solidBackground } = deriveRole(dot, { surface: PAPER })
+    expect(solidBackground.toUpperCase()).toBe(dot)
+  })
+
+  it('darkens no further than white legibility demands, holding hue', () => {
+    const dot = referenceStatus.late
+    const { solidBackground } = deriveRole(dot, { surface: PAPER })
+    const before = rgbToOklch(parseHex(dot))
+    const after = rgbToOklch(parseHex(solidBackground))
+    expect(after.l).toBeLessThan(before.l)
+    expect(Math.abs(after.h - before.h)).toBeLessThan(2)
+  })
+
+  it('is always derived from the dot — a quiet-pair override does not move it', () => {
+    const plain = deriveRole(referenceStatus.late, { surface: PAPER })
+    const overridden = deriveRole(referenceStatus.late, {
+      surface: PAPER,
+      override: { background: '#FFF9C4', foreground: '#111111' },
+    })
+    expect(overridden.solidBackground).toBe(plain.solidBackground)
+    expect(overridden.solidForeground).toBe('#ffffff')
+  })
+})
+
+describe('adjusting a colour to read on an arbitrary surface', () => {
+  it('leaves a colour alone when it already reaches the ratio', () => {
+    expect(adjustToContrast('#0E9E6B', '#0E1114', 4.5)).toBe('#0e9e6b')
+  })
+
+  it('lightens on a dark surface, holding hue', () => {
+    const adjusted = adjustToContrast('#0E9E6B', '#0E1114', CONSOLE_RING_CONTRAST)
+    const before = rgbToOklch(parseHex('#0E9E6B'))
+    const after = rgbToOklch(parseHex(adjusted))
+    expect(after.l).toBeGreaterThan(before.l)
+    expect(Math.abs(after.h - before.h)).toBeLessThan(2)
+    expect(ratioOf(adjusted, '#0E1114')).toBeGreaterThanOrEqual(CONSOLE_RING_CONTRAST)
+  })
+
+  it('darkens on a light surface, holding hue', () => {
+    const adjusted = adjustToContrast('#0E9E6B', PAPER, MINIMUM_CONTRAST)
+    const before = rgbToOklch(parseHex('#0E9E6B'))
+    const after = rgbToOklch(parseHex(adjusted))
+    expect(after.l).toBeLessThan(before.l)
+    expect(Math.abs(after.h - before.h)).toBeLessThan(2)
+    expect(ratioOf(adjusted, PAPER)).toBeGreaterThanOrEqual(MINIMUM_CONTRAST)
+  })
+
+  it('holds across the hue circle against dark and light surfaces alike', () => {
+    const failures: string[] = []
+    for (let hue = 0; hue < 360; hue += 5) {
+      for (const chroma of [0, 0.12, 0.32]) {
+        for (const lightness of [0.15, 0.55, 0.95]) {
+          const color = hexFromOklch(lightness, chroma, hue)
+          for (const [surface, minimum] of [
+            ['#0E1114', CONSOLE_RING_CONTRAST],
+            ['#14181C', CONSOLE_RING_CONTRAST],
+            [PAPER, MINIMUM_CONTRAST],
+            ['#FFFFFF', MINIMUM_CONTRAST],
+          ] as Array<[string, number]>) {
+            const ratio = ratioOf(adjustToContrast(color, surface, minimum), surface)
+            if (ratio < minimum) {
+              failures.push(`${color} on ${surface} → ${ratio.toFixed(2)}:1 (needs ${minimum})`)
+            }
+          }
+        }
+      }
+    }
+    expect(failures).toEqual([])
+  })
+
+  it('fails loudly when neither direction can reach the ratio', () => {
+    // A mid-grey surface has too little headroom toward either extreme for a
+    // ratio this high.
+    expect(() => adjustToContrast('#0E9E6B', '#808080', 21)).toThrow(/cannot reach/)
   })
 })
 

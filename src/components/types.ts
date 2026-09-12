@@ -1,5 +1,12 @@
 import type { Component } from 'vue'
 
+/**
+ * How loudly a status pill renders. Volume, never meaning — the status role
+ * carries the meaning. `soft` is the default derived pair; `solid` is the
+ * loud form, for the one loudest thing on a row; `outline` is the quiet form.
+ */
+export type PillLook = 'soft' | 'solid' | 'outline'
+
 /** The glyphs the navigation icon can draw, named for the shape. */
 export type NavIconName =
   | 'grid'

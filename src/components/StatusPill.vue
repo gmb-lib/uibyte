@@ -1,17 +1,61 @@
 <script setup lang="ts">
 import type { StatusRole } from '../theme/tokens'
+import type { PillLook } from './types'
 
-// A status, rendered as colour *and* an icon *and* a text label. Never colour
-// alone: the icon is what carries the meaning for a reader who cannot separate
-// the hues, and the label is what carries it for everyone else. It is not
-// optional, which is why it is not a prop.
+// A status, rendered as colour *and* a mark *and* a text label. Never colour
+// alone: the label is what carries the meaning for everyone, and the mark is
+// what carries it for a reader who cannot separate the hues. Neither is
+// optional, which is why neither is a prop.
 //
-// The colours come from the role's derived pair, so a host that repoints the
-// role still gets a readable pill.
-withDefaults(
-  defineProps<{ status: StatusRole; label: string; size?: 'default' | 'sm' }>(),
-  { size: 'default' },
+// The colours come from the role's derived set, so a host that repoints the
+// role still gets a readable pill in every look.
+//
+// The look is volume, never meaning: `soft` is the default pair, `solid` is
+// the loud form (one loudest thing on a row), `outline` is the quiet form.
+// The role-distinct glyph belongs to soft and solid; outline's mark is a
+// filled dot in the role colour, and its status is carried by the label plus
+// the look's own structure.
+const props = withDefaults(
+  defineProps<{
+    status: StatusRole
+    label: string
+    size?: 'default' | 'sm'
+    look?: PillLook
+  }>(),
+  { size: 'default', look: 'soft' },
 )
+
+// Written out as full literal strings so a consumer's utility scan sees every
+// class this component can render.
+const softByRole: Record<StatusRole, string> = {
+  ontrack: 'bg-status-ontrack-bg text-status-ontrack-fg',
+  blocked: 'bg-status-blocked-bg text-status-blocked-fg',
+  approaching: 'bg-status-approaching-bg text-status-approaching-fg',
+  late: 'bg-status-late-bg text-status-late-fg',
+  idle: 'bg-status-idle-bg text-status-idle-fg',
+}
+
+const solidByRole: Record<StatusRole, string> = {
+  ontrack: 'bg-status-ontrack-solid-bg text-status-ontrack-solid-fg',
+  blocked: 'bg-status-blocked-solid-bg text-status-blocked-solid-fg',
+  approaching: 'bg-status-approaching-solid-bg text-status-approaching-solid-fg',
+  late: 'bg-status-late-solid-bg text-status-late-solid-fg',
+  idle: 'bg-status-idle-solid-bg text-status-idle-solid-fg',
+}
+
+const dotByRole: Record<StatusRole, string> = {
+  ontrack: 'bg-status-ontrack',
+  blocked: 'bg-status-blocked',
+  approaching: 'bg-status-approaching',
+  late: 'bg-status-late',
+  idle: 'bg-status-idle',
+}
+
+const lookClass = (): string => {
+  if (props.look === 'solid') return solidByRole[props.status]
+  if (props.look === 'outline') return 'bg-surface text-ink border border-line'
+  return softByRole[props.status]
+}
 </script>
 
 <template>
@@ -19,16 +63,17 @@ withDefaults(
     class="inline-flex items-center gap-1.5 rounded-pill font-medium"
     :class="[
       size === 'sm' ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-[12px]',
-      {
-        'bg-status-ontrack-bg text-status-ontrack-fg': status === 'ontrack',
-        'bg-status-blocked-bg text-status-blocked-fg': status === 'blocked',
-        'bg-status-approaching-bg text-status-approaching-fg': status === 'approaching',
-        'bg-status-late-bg text-status-late-fg': status === 'late',
-        'bg-status-idle-bg text-status-idle-fg': status === 'idle',
-      },
+      lookClass(),
     ]"
   >
+    <span
+      v-if="look === 'outline'"
+      class="h-[7px] w-[7px] shrink-0 rounded-pill"
+      :class="dotByRole[status]"
+      aria-hidden="true"
+    />
     <svg
+      v-else
       width="12"
       height="12"
       viewBox="0 0 24 24"
