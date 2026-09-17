@@ -135,6 +135,36 @@ repointed role stays readable in every look.
 <StatusPill status="ontrack" :label="t('status.inWork')" look="outline" />
 ```
 
+**A file is described by a chip, and you describe it.** `FileChip` draws the
+mark its name implies, the name itself, a line of facts and an optional badge.
+It formats nothing: `meta` is a list of finished, already-translated strings,
+drawn in the order you give them and separated for the eye only. That is
+deliberate — a size written `1.8 MB` in one language and `1,8 MB` in another is
+your locale's decision, not this package's, and it is what lets one chip serve
+a list that shows a type and a size and a list that shows a size, a person and
+a date.
+
+The `badge` is a **string, never a state**. Whatever it reflects is something
+you have just read; the chip stores no copy of it, derives nothing from it and
+asks no one — it paints the words you pass, in a role colour proven to read on
+the chip's own background. Pass `badgeStatus` to choose the role; the words
+carry the meaning, so the colour is tone only.
+
+Anything a file can be *done to* is yours: put it in the `action` slot, where it
+keeps its own accessible name and focus ring.
+
+```vue
+<FileChip
+  name="north-bay-layout.pdf"
+  :meta="[formatSize(f.size), f.author, formatDate(f.at)]"
+  :badge="f.checked ? t('files.checked') : undefined"
+>
+  <template #action>
+    <button :aria-label="t('files.download', { name: f.name })" @click="download(f)">…</button>
+  </template>
+</FileChip>
+```
+
 ## Repointing the palette
 
 Each status role is set by a **single** value — the saturated one used for the
