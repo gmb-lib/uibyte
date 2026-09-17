@@ -122,12 +122,67 @@ navigation and the footer for content that belongs above the signed-in block —
 a notice, an upgrade card. Wanting to put one of your own nouns *inside* a
 component is the signal that it belongs in a slot instead.
 
+**A status pill has three looks.** The look is volume, never meaning — the
+status role carries the meaning. `soft` (the default) is the familiar derived
+pair; `solid` is the loud form — saturated background, white label — for the
+one loudest thing on a row; `outline` is the quiet form — bordered surface,
+ink label, a dot in the role colour. The solid pair is derived like everything
+else (the role colour darkens only as far as white legibility demands), so a
+repointed role stays readable in every look.
+
+```vue
+<StatusPill status="late" :label="t('status.late')" look="solid" />
+<StatusPill status="ontrack" :label="t('status.inWork')" look="outline" />
+```
+
+**A file is described by a chip, and you describe it.** `FileChip` draws the
+mark its name implies, the name itself, a line of facts and an optional badge.
+It formats nothing: `meta` is a list of finished, already-translated strings,
+drawn in the order you give them and separated for the eye only. That is
+deliberate — a size written `1.8 MB` in one language and `1,8 MB` in another is
+your locale's decision, not this package's, and it is what lets one chip serve
+a list that shows a type and a size and a list that shows a size, a person and
+a date.
+
+The `badge` is a **string, never a state**. Whatever it reflects is something
+you have just read; the chip stores no copy of it, derives nothing from it and
+asks no one — it paints the words you pass, in a role colour proven to read on
+the chip's own background. Pass `badgeStatus` to choose the role; the words
+carry the meaning, so the colour is tone only.
+
+Anything a file can be *done to* is yours: put it in the `action` slot, where it
+keeps its own accessible name and focus ring.
+
+```vue
+<FileChip
+  name="north-bay-layout.pdf"
+  :meta="[formatSize(f.size), f.author, formatDate(f.at)]"
+  :badge="f.checked ? t('files.checked') : undefined"
+>
+  <template #action>
+    <button :aria-label="t('files.download', { name: f.name })" @click="download(f)">…</button>
+  </template>
+</FileChip>
+```
+
 ## Repointing the palette
 
 Each status role is set by a **single** value — the saturated one used for the
 dot. Its background, foreground and border are derived from it, with the
 foreground darkened until it clears 4.5:1 against the background it will
 actually sit on. One value in, a readable set out.
+
+Beside the status roles, two more families derive the same way:
+
+- **The page accent** — one `accent` value in, two out: `--color-accent` for
+  graphics and fills, and `--color-accent-deep`, darkened until it reads as
+  text against the page background. Use `-deep` for anything textual
+  (eyebrows, links); the base is deliberately not text-safe.
+- **The focus pair** — `--color-focus` is the ring on light surfaces;
+  `--color-console-focus` is derived from it for dark surfaces, lightened
+  until it is unmistakable against the console colour (the floor there is far
+  above the text ratio, because a technically-passing dark ring still
+  disappears in practice). The kit's own dark-surface controls already use it.
 
 Repoint through the builder, so the derived values move with it:
 
@@ -138,6 +193,8 @@ const css = themeCss(
   buildTheme({
     surfaces: { paper: '#FFFFFF' },
     status: { ontrack: '#3B5BDB' },
+    accent: '#3B5BDB',
+    focus: '#3B5BDB',
   }),
 )
 ```

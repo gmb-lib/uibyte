@@ -140,7 +140,7 @@ function onNavigate(item: NavItem): void {
           :is="link"
           v-else
           v-bind="item.linkProps"
-          class="flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px] font-medium text-console-muted focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+          class="flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px] font-medium text-console-muted focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-console-focus"
           active-class="!text-white"
           @click="emit('navigate', item)"
         >

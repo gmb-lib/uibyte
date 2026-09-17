@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { contrastRatio, parseHex } from './color'
-import { MINIMUM_CONTRAST } from './derive'
+import { CONSOLE_RING_CONTRAST, MINIMUM_CONTRAST } from './derive'
 import {
   buildTheme,
   statusRoles,
@@ -35,10 +35,16 @@ describe('the shipped stylesheet', () => {
       expect(stylesheet).toContain(`--color-status-${role}-bg:`)
       expect(stylesheet).toContain(`--color-status-${role}-fg:`)
       expect(stylesheet).toContain(`--color-status-${role}-border:`)
+      expect(stylesheet).toContain(`--color-status-${role}-solid-bg:`)
+      expect(stylesheet).toContain(`--color-status-${role}-solid-fg:`)
     }
     for (const role of typeRoles) {
       expect(stylesheet).toContain(`--font-${role}:`)
     }
+    expect(stylesheet).toContain('--color-accent:')
+    expect(stylesheet).toContain('--color-accent-deep:')
+    expect(stylesheet).toContain('--color-focus:')
+    expect(stylesheet).toContain('--color-console-focus:')
   })
 
   it('names roles, never colours', () => {
@@ -61,7 +67,28 @@ describe('the shipped stylesheet', () => {
       expect(contrastRatio(parseHex(fg), parseHex(bg))).toBeGreaterThanOrEqual(
         MINIMUM_CONTRAST,
       )
+      const solidBg = valueOf(`--color-status-${role}-solid-bg`)
+      const solidFg = valueOf(`--color-status-${role}-solid-fg`)
+      expect(
+        contrastRatio(parseHex(solidFg), parseHex(solidBg)),
+      ).toBeGreaterThanOrEqual(MINIMUM_CONTRAST)
     }
+  })
+
+  it('publishes an accent whose text form reads on the page', () => {
+    const deep = valueOf('--color-accent-deep')
+    const paper = valueOf('--color-paper')
+    expect(contrastRatio(parseHex(deep), parseHex(paper))).toBeGreaterThanOrEqual(
+      MINIMUM_CONTRAST,
+    )
+  })
+
+  it('publishes a console focus ring far above the text floor', () => {
+    const ring = valueOf('--color-console-focus')
+    const console_ = valueOf('--color-console')
+    expect(contrastRatio(parseHex(ring), parseHex(console_))).toBeGreaterThanOrEqual(
+      CONSOLE_RING_CONTRAST,
+    )
   })
 })
 
@@ -112,6 +139,30 @@ describe('repointing a role', () => {
     expect(css.startsWith('@theme {')).toBe(true)
     expect(css.trimEnd().endsWith('}')).toBe(true)
     expect(css).toContain('--color-status-late: #b4232e;')
+  })
+
+  it('moves the accent as a pair, with the text form still reading on the page', () => {
+    const repointed = buildTheme({ accent: '#3B5BDB' })
+    expect(repointed.accent.base).toBe('#3b5bdb')
+    expect(repointed.accent.deep).not.toBe(buildTheme().accent.deep)
+    expect(
+      contrastRatio(parseHex(repointed.accent.deep), parseHex(repointed.surfaces.paper)),
+    ).toBeGreaterThanOrEqual(MINIMUM_CONTRAST)
+  })
+
+  it('re-derives the console ring from a repointed focus colour', () => {
+    const repointed = buildTheme({ focus: '#B4232E' })
+    expect(repointed.consoleFocus).not.toBe(buildTheme().consoleFocus)
+    expect(
+      contrastRatio(parseHex(repointed.consoleFocus), parseHex(repointed.surfaces.console)),
+    ).toBeGreaterThanOrEqual(CONSOLE_RING_CONTRAST)
+  })
+
+  it('keeps the console ring visible even on a repointed light console', () => {
+    const repointed = buildTheme({ surfaces: { console: '#F0F0F0' } })
+    expect(
+      contrastRatio(parseHex(repointed.consoleFocus), parseHex('#F0F0F0')),
+    ).toBeGreaterThanOrEqual(CONSOLE_RING_CONTRAST)
   })
 })
 

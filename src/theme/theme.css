@@ -13,26 +13,39 @@
   --color-status-ontrack-bg: #dee9de;
   --color-status-ontrack-fg: #00764f;
   --color-status-ontrack-border: #c0dcc9;
+  --color-status-ontrack-solid-bg: #00875a;
+  --color-status-ontrack-solid-fg: #ffffff;
 
   --color-status-blocked: #d79a2b;
   --color-status-blocked-bg: #f1e9da;
   --color-status-blocked-fg: #8e6100;
   --color-status-blocked-border: #eddbbe;
+  --color-status-blocked-solid-bg: #9f6d00;
+  --color-status-blocked-solid-fg: #ffffff;
 
   --color-status-approaching: #e8b23a;
   --color-status-approaching-bg: #f3ecdc;
   --color-status-approaching-fg: #8b6500;
   --color-status-approaching-border: #f1e2c3;
+  --color-status-approaching-solid-bg: #987000;
+  --color-status-approaching-solid-fg: #ffffff;
 
   --color-status-late: #d2524d;
   --color-status-late-bg: #f3e0db;
   --color-status-late-fg: #b73937;
   --color-status-late-border: #f0c7c0;
+  --color-status-late-solid-bg: #cb4c48;
+  --color-status-late-solid-fg: #ffffff;
 
   --color-status-idle: #9aa0a6;
   --color-status-idle-bg: #e9e9e6;
   --color-status-idle-fg: #646a6f;
   --color-status-idle-border: #dadbda;
+  --color-status-idle-solid-bg: #72777d;
+  --color-status-idle-solid-fg: #ffffff;
+
+  --color-accent: #0e9e6b;
+  --color-accent-deep: #007f55;
 
   --font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", monospace;
@@ -48,6 +61,7 @@
   --color-console-muted: #8a9298;
   --color-console-accent: #2bd18c;
   --color-focus: #0e9e6b;
+  --color-console-focus: #4ec892;
 
   --radius-pill: 999px;
   --radius-card: 14px;

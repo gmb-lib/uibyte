@@ -36,6 +36,12 @@ describe('SidebarContent', () => {
     expect(w.findAll('nav a')).toHaveLength(2)
   })
 
+  it('wears the console ring — focus on a dark surface must stay visible', () => {
+    const w = mountSidebar()
+    const link = w.findAllComponents(RouterLinkStub)[0]
+    expect(link.classes().join(' ')).toContain('focus-visible:outline-console-focus')
+  })
+
   it('leaves the footer to the host', () => {
     const w = mount(SidebarContent, {
       props: { items, navLabel: 'Primary' },

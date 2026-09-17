@@ -34,7 +34,7 @@ const open = defineModel<boolean>('open', { default: false })
           <slot name="header" />
           <DialogClose
             :aria-label="closeLabel"
-            class="-mr-1 rounded-chip p-1.5 text-console-muted hover:bg-white/[0.1] hover:text-console-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus"
+            class="-mr-1 rounded-chip p-1.5 text-console-muted hover:bg-white/[0.1] hover:text-console-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-console-focus"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="M18 6 6 18M6 6l12 12" stroke-linecap="round" />

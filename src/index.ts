@@ -10,6 +10,7 @@ export type { ClassValue } from 'clsx'
 export {
   buildTheme,
   themeCss,
+  referenceAccent,
   referenceStatus,
   referenceSurfaces,
   referenceType,
@@ -24,7 +25,12 @@ export type {
   ThemeInput,
   TypeRole,
 } from './theme/tokens'
-export { deriveRole, MINIMUM_CONTRAST } from './theme/derive'
+export {
+  adjustToContrast,
+  CONSOLE_RING_CONTRAST,
+  deriveRole,
+  MINIMUM_CONTRAST,
+} from './theme/derive'
 export type { DerivedRole, DeriveOptions, RoleOverride } from './theme/derive'
 export { contrastRatio } from './theme/color'
 export { radii, shadows, supportColors } from './theme/tokens'
@@ -35,6 +41,7 @@ export { default as AppShell } from './components/AppShell.vue'
 export { default as SidebarContent } from './components/SidebarContent.vue'
 export { default as MobileDrawer } from './components/MobileDrawer.vue'
 export { default as StatusPill } from './components/StatusPill.vue'
+export { default as FileChip } from './components/FileChip.vue'
 export { default as NavIcon } from './components/NavIcon.vue'
 export { default as OrderableList } from './components/OrderableList.vue'
 export { default as BrandMark } from './components/BrandMark.vue'
@@ -45,5 +52,6 @@ export type {
   NavGroup,
   NavIconName,
   NavItem,
+  PillLook,
   ShellLabels,
 } from './components/types'
