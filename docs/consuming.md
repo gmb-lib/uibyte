@@ -12,7 +12,7 @@ doing together.
 **1. Pin a version.** A tag, never a floating branch.
 
 ```json
-"uibyte": "github:gmb-lib/uibyte#v0.1.0"
+"uibyte": "github:gmb-lib/uibyte#v0.4.0"
 ```
 
 **Upgrading is not just editing the tag.** Changing the version in
