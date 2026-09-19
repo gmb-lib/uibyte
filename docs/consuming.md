@@ -12,7 +12,7 @@ doing together.
 **1. Pin a version.** A tag, never a floating branch.
 
 ```json
-"uibyte": "github:gmb-lib/uibyte#v0.4.0"
+"uibyte": "github:gmb-lib/uibyte#v0.5.0"
 ```
 
 **Upgrading is not just editing the tag.** Changing the version in
@@ -165,6 +165,44 @@ keeps its own accessible name and focus ring.
 </FileChip>
 ```
 
+**A tab strip is a keyboard contract, not a row of buttons.** `Tabs` draws the
+choices and, on request, the panel under them. You own which one is chosen —
+`v-model` on the key — and the component owns everything a reader needs for the
+markup to keep its promise: the strip is a **single** stop in the page order,
+the arrow keys move along it (Home and End go to the ends), choosing follows
+focus, and the panel is wired to the choice that opened it.
+
+That behaviour is the reason to reach for this rather than styling four buttons.
+`role="tablist"` tells a reader the arrow keys work; a row that announces itself
+that way and then does not move is worse than plain buttons, which promise
+nothing.
+
+A `disabled` choice is **shown, never hidden** — drawn dimmed, announced as
+unavailable, never activated, and never given the strip's tab stop. Use it for
+something a person may need to know exists before they can ask for it. `tag` is
+a small chip after the label: a count, a short note, already translated and
+already formatted, because this package neither counts nor formats.
+
+Omit the default slot and you get the strip alone, with no panel and no
+`aria-controls` pointing at a region that is not there.
+
+```vue
+<Tabs v-model="section" :tabs="sections" :label="t('settings.sections')">
+  <template #default="{ tab }">
+    <GeneralPanel v-if="tab.key === 'general'" />
+    <PeoplePanel v-else-if="tab.key === 'people'" />
+  </template>
+</Tabs>
+```
+
+```ts
+const sections: TabItem[] = [
+  { key: 'general', label: t('settings.general') },
+  { key: 'people', label: t('settings.people'), tag: String(people.length) },
+  { key: 'billing', label: t('settings.billing'), disabled: true },
+]
+```
+
 ## Repointing the palette
 
 Each status role is set by a **single** value — the saturated one used for the
@@ -238,3 +276,7 @@ telling the package you know better, and it believes you.
   repoint it without repointing a status colour that happens to match it today.
 - Two status roles share a hue on purpose and are separated by their glyph, so
   removing the icon would genuinely lose information rather than just decoration.
+- **A control that announces a keyboard contract honours it.** A tab strip is one
+  stop in the page order with the arrow keys moving along it, not one stop per
+  choice — four choices meaning four stops is how a keyboard reader ends up
+  pressing Tab eleven times to get past a row of chips.
