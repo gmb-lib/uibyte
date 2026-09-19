@@ -1,5 +1,7 @@
 import type { Component } from 'vue'
 
+import type { IconName } from './icons'
+
 /**
  * How loudly a status pill renders. Volume, never meaning — the status role
  * carries the meaning. `soft` is the default derived pair; `solid` is the
@@ -29,17 +31,30 @@ export interface TabItem {
   disabled?: boolean
 }
 
-/** The glyphs the navigation icon can draw, named for the shape. */
-export type NavIconName =
-  | 'grid'
-  | 'doc'
-  | 'pen'
-  | 'plus'
-  | 'shield'
-  | 'mail'
-  | 'clock'
-  | 'people'
-  | 'lock'
+/**
+ * The glyphs the navigation icon can draw, named for the shape.
+ *
+ * A narrow slice of the package's set: a sidebar wants a handful of
+ * unmistakable marks, and offering all of them there would invite a navigation
+ * drawn in beakers. Every name here is drawn from the same geometry as
+ * `Icon` — one glyph, one definition.
+ */
+export type NavIconName = Extract<
+  IconName,
+  'grid' | 'doc' | 'pen' | 'plus' | 'shield' | 'mail' | 'clock' | 'people' | 'lock'
+>
+
+/**
+ * One glyph offered by a picker: which one, and what to call it.
+ *
+ * The label is a finished, already-translated string — this package does no
+ * i18n, and its own names are English shape words rather than anything to put
+ * in front of somebody. An empty `name` means "no glyph".
+ */
+export interface IconPickerOption {
+  name: IconName | ''
+  label: string
+}
 
 /**
  * One navigation destination.
