@@ -43,12 +43,17 @@ export { default as MobileDrawer } from './components/MobileDrawer.vue'
 export { default as StatusPill } from './components/StatusPill.vue'
 export { default as FileChip } from './components/FileChip.vue'
 export { default as NavIcon } from './components/NavIcon.vue'
+export { default as Icon } from './components/Icon.vue'
+export { default as IconPicker } from './components/IconPicker.vue'
+export { iconGlyphs, iconNames, isIconName } from './components/icons'
+export type { IconName, IconPart } from './components/icons'
 export { default as OrderableList } from './components/OrderableList.vue'
 export { default as Tabs } from './components/Tabs.vue'
 export { default as BrandMark } from './components/BrandMark.vue'
 export { Button, buttonVariants } from './components/ui/button'
 export type { ButtonVariants } from './components/ui/button'
 export type {
+  IconPickerOption,
   LinkComponent,
   NavGroup,
   NavIconName,

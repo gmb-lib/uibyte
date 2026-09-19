@@ -7,6 +7,65 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.6.0
+
+### Added — `Icon` and `IconPicker`: a named glyph set, and the grid that chooses from it
+
+Twenty-six glyphs drawn by this package, each named for its **shape** — `wrench`, `beaker`,
+`calendar`, `truck`, `beetle` — and drawn at the family's stroke weight in the colour of the text
+around them.
+
+The reason they are named rather than drawn is that a mark is often **data**: somebody chooses it,
+you store it, it travels in an exported configuration file, and something reads it back in a
+different deployment. A name survives all of that and draws the same mark at the other end. So:
+
+```vue
+<Icon name="wrench" />
+<Icon :name="kind.icon" :size="14" />
+<Icon name="alert" :size="18" :label="t('task.overdue')" />
+```
+
+**A name this version does not know draws nothing at all** — no placeholder, no question mark, no
+reserved space. That is deliberate: a column of empty wells says a setting was missed, a column with
+nothing in it says nothing is wrong. Ask `isIconName(name)` first if you need to react to it, and
+import `iconNames` for the whole set.
+
+A glyph is decoration unless you say otherwise. Give `label` only where the mark carries meaning no
+neighbouring text carries, and it is announced as an image by that name.
+
+`IconPicker` is the grid, and it is a radio group rather than a row of buttons — **one** stop in the
+page order, arrow keys inside it, wrapping, `Home` and `End` at the ends. Twenty-six separate tab
+stops is what a hand-drawn grid produces, and it makes the keyboard walk the whole set to reach
+whatever comes after it.
+
+```vue
+<IconPicker v-model="form.icon" :options="glyphs" :label="t('kind.icon')" :clear-label="t('kind.noIcon')" />
+```
+
+```ts
+import { iconNames, type IconPickerOption } from 'uibyte'
+
+const glyphs: IconPickerOption[] = iconNames.map((name) => ({ name, label: t(`glyph.${name}`) }))
+```
+
+**Which glyphs, and what each is called, are yours.** `options` carries finished, already-translated
+labels — this package's own names are English shape words, which are identifiers rather than words
+to put in front of somebody. `clearLabel` offers the way back to nothing; omit it and a chosen glyph
+can never be unchosen.
+
+The full set: `alert` · `beaker` · `beetle` · `bolt` · `box` · `calendar` · `cart` · `chat` ·
+`check` · `clipboard` · `clock` · `doc` · `flame` · `grid` · `lock` · `mail` · `pen` · `people` ·
+`plus` · `ruler` · `shield` · `star` · `tag` · `target` · `truck` · `wrench`.
+
+### Changed — `NavIcon` draws from the same geometry
+
+Nothing about it moves: same name, same nine names it accepts, same size default, and it still
+always draws a mark rather than leaving a hole in a row. What changed is where the drawing comes
+from — one definition per glyph, so a mark in a sidebar and the same mark on a row can no longer
+drift apart. Asserted glyph for glyph in the suite.
+
+**Nothing else moves.** Additive; no component, token or type changed.
+
 ## v0.5.0
 
 ### Added — `Tabs`, a strip of choices with the keyboard contract it announces

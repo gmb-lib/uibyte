@@ -12,7 +12,7 @@ doing together.
 **1. Pin a version.** A tag, never a floating branch.
 
 ```json
-"uibyte": "github:gmb-lib/uibyte#v0.5.0"
+"uibyte": "github:gmb-lib/uibyte#v0.6.0"
 ```
 
 **Upgrading is not just editing the tag.** Changing the version in
@@ -202,6 +202,61 @@ const sections: TabItem[] = [
   { key: 'billing', label: t('settings.billing'), disabled: true },
 ]
 ```
+
+**A glyph is a name, and the name is data.** `Icon` draws one mark from the
+package's fixed set of 26, at the family's stroke weight and in the colour of
+the text around it. `name` is a plain string on purpose: the names an
+application shows are usually chosen by somebody, stored, exported and read back
+somewhere else, so being handed a name this version does not know is a normal
+event rather than a programming error. When that happens **nothing is drawn** —
+no placeholder, no question mark, no reserved space. A column of empty wells
+says a setting was missed; a column with nothing in it says nothing is wrong.
+Ask `isIconName` first if you need to react to it, and import `iconNames` for
+the whole set.
+
+A glyph is decoration unless you say otherwise. Give `label` only when the mark
+carries meaning no neighbouring text carries — a lone icon control — and it is
+announced as an image by that name.
+
+```vue
+<Icon name="wrench" />
+<Icon :name="kind.icon" :size="14" />
+<Icon name="alert" :size="18" :label="t('task.overdue')" />
+```
+
+**Choosing a glyph is a set of mutually exclusive choices, so `IconPicker` is
+built as one:** a radio group that is a **single** stop in the page order, arrow
+keys moving inside it and wrapping, Home and End at the ends. Twenty-six buttons
+each taking their own tab stop is what a hand-drawn grid reliably produces, and
+it makes the keyboard walk the whole set to reach whatever follows it.
+
+**Which glyphs and what they are called are yours.** This package does no i18n
+and its own names are English shape words — identifiers, not words to put in
+front of somebody — so `options` carries finished, already-translated labels and
+you decide which of the 26 your people may choose from. `clearLabel` offers the
+way back to nothing; omit it and a chosen glyph can never be unchosen.
+
+```vue
+<IconPicker
+  v-model="form.icon"
+  :options="glyphs"
+  :label="t('kind.icon')"
+  :clear-label="t('kind.noIcon')"
+/>
+```
+
+```ts
+import { iconNames, type IconPickerOption } from 'uibyte'
+
+const glyphs: IconPickerOption[] = iconNames.map((name) => ({
+  name,
+  label: t(`glyph.${name}`),
+}))
+```
+
+`NavIcon` is unchanged and draws from the same geometry — nine of the names, for
+sidebars and drawers, and it always draws something rather than leaving a hole
+in a row of marks.
 
 ## Repointing the palette
 
