@@ -7,6 +7,28 @@ import type { Component } from 'vue'
  */
 export type PillLook = 'soft' | 'solid' | 'outline'
 
+/**
+ * One choice in a tab strip.
+ *
+ * A disabled choice is **shown, never hidden**: drawn dimmed, announced as
+ * unavailable and not activatable. Same posture as a locked navigation item —
+ * a person may need to know a thing exists before they can ask for it, and an
+ * absence says nothing at all.
+ */
+export interface TabItem {
+  /** Stable identity for the choice, and what the host is told when it is made. */
+  key: string
+  /** The visible text. Already translated — the kit does no i18n. */
+  label: string
+  /**
+   * Small chip drawn after the label, e.g. a count or a short note. Already
+   * translated and already formatted; the kit neither counts nor formats.
+   */
+  tag?: string
+  /** Drawn and announced, never activated. */
+  disabled?: boolean
+}
+
 /** The glyphs the navigation icon can draw, named for the shape. */
 export type NavIconName =
   | 'grid'
