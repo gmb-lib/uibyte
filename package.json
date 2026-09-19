@@ -13,6 +13,7 @@
     "!src/**/*.test.ts",
     "docs",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "exports": {
