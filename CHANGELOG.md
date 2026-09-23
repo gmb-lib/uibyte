@@ -7,6 +7,55 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.7.0
+
+### Added — `FileDrop`: the platform's own file input, with a zone around it
+
+A place to hand over files — dropped onto it, or chosen through the platform's chooser. The zone is a
+`<label>` around a visually hidden native input, so a click anywhere opens the chooser, the keyboard
+reaches it as the one control it is, and a reader hears it by the words you give it:
+
+```vue
+<FileDrop
+  :label="t('import.drop')"
+  :hint="t('import.dropHint')"
+  accept=".json,application/json"
+  @files="([file]) => preview(file)"
+  @rejected="(files, why) => (refusal = t(`import.rejected.${why}`))"
+/>
+```
+
+Three things it does that a zone drawn by hand usually does not:
+
+- **`accept` holds for a drop too.** The platform only filters what the chooser offers; a dropped file
+  is checked here against the same rule, and what it refuses comes back in `rejected` with the reason
+  `'type'` instead of being lost. Several files landing where `multiple` is off come back as
+  `'count'` — which one was meant is not the component's guess.
+- **The same file can be chosen twice.** The input is cleared after every choice, so correcting a file
+  and choosing it again is still heard.
+- **The highlight does not flicker.** Moving over the zone's own text fires `dragleave` on the zone;
+  the component counts enters and leaves, so the highlight holds until the file has actually left.
+
+`files` is never an empty list; `disabled` makes both the drop and the click do nothing.
+
+### Added — `DiffList`: what a change would do, or did, rendered from your answer
+
+Titled groups of keyed rows, each with a status pill and the reason beside it. It judges nothing:
+which rows exist, what each is called and which role tones it are yours, so the same list shows a
+preview and an outcome. Every word is yours, the status's own included — a row carries `statusLabel`
+beside its `status` role, because the same role reads *added* in one list and *applied* in another.
+
+- Rows marked `folded` wait behind one toggle per group, reading your `foldedLabel` (the package
+  neither counts nor pluralises) and telling a reader whether it is open.
+- A row marked `marked` is drawn in its own role's tint, for the one a reader must not miss.
+- The part column appears only where a group's rows have parts; a group with no rows draws its title
+  and its `note`.
+- It keeps one thing of its own — which groups are unfolded. A new answer is a new list.
+
+New types: `DiffGroup`, `DiffRow`, `DiffColumns`.
+
+Nothing existing changed; upgrading from `v0.6.0` needs no edit to an application already built on it.
+
 ## v0.6.0
 
 ### Added — `Icon` and `IconPicker`: a named glyph set, and the grid that chooses from it

@@ -1,6 +1,7 @@
 import type { Component } from 'vue'
 
 import type { IconName } from './icons'
+import type { StatusRole } from '../theme/tokens'
 
 /**
  * How loudly a status pill renders. Volume, never meaning — the status role
@@ -122,4 +123,58 @@ export interface ShellLabels {
    * (e.g. "not available"). Optional but recommended when any item is locked.
    */
   locked?: string
+}
+
+/**
+ * One row of a diff list: a keyed thing, what happens to it, and why.
+ *
+ * Every word is the host's, finished and translated — the status's own words
+ * included, because the same role reads "added" in one list and "applied" in
+ * another. The role only tones the pill.
+ */
+export interface DiffRow {
+  /** What the row is about, drawn in mono — e.g. an item's key. */
+  key: string
+  /** Which part of the group the row belongs to, when the group has parts. */
+  part?: string
+  /** Which role tones the row's pill. */
+  status: StatusRole
+  /** The pill's words. */
+  statusLabel: string
+  /** Why, or what moves. A row without one draws a dash no reader hears. */
+  detail?: string
+  /** Kept behind the group's fold until it is opened — e.g. rows that do not change. */
+  folded?: boolean
+  /** Drawn marked, in its own role's tint, for a row a reader must not miss. */
+  marked?: boolean
+}
+
+/** A titled group of rows in a diff list, e.g. one section of a document. */
+export interface DiffGroup {
+  /** Stable identity for the group. */
+  key: string
+  /** The group's heading. */
+  title: string
+  /** A short status for the whole group, drawn as a pill beside the title. */
+  badge?: string
+  /** Which role tones the badge. */
+  badgeStatus?: StatusRole
+  /** A count or summary after the title, already formatted — e.g. "5 changes". */
+  summary?: string
+  /** A sentence under the title, e.g. why a group has no rows. */
+  note?: string
+  /**
+   * The fold toggle's words, e.g. "38 unchanged". Drawn only when a row is
+   * folded; the kit neither counts nor pluralises, so the host says it.
+   */
+  foldedLabel?: string
+  rows: DiffRow[]
+}
+
+/** The column headings a diff list draws, already translated. */
+export interface DiffColumns {
+  part: string
+  key: string
+  status: string
+  detail: string
 }

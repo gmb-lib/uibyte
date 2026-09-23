@@ -42,6 +42,8 @@ export { default as SidebarContent } from './components/SidebarContent.vue'
 export { default as MobileDrawer } from './components/MobileDrawer.vue'
 export { default as StatusPill } from './components/StatusPill.vue'
 export { default as FileChip } from './components/FileChip.vue'
+export { default as FileDrop } from './components/FileDrop.vue'
+export { default as DiffList } from './components/DiffList.vue'
 export { default as NavIcon } from './components/NavIcon.vue'
 export { default as Icon } from './components/Icon.vue'
 export { default as IconPicker } from './components/IconPicker.vue'
@@ -53,6 +55,9 @@ export { default as BrandMark } from './components/BrandMark.vue'
 export { Button, buttonVariants } from './components/ui/button'
 export type { ButtonVariants } from './components/ui/button'
 export type {
+  DiffColumns,
+  DiffGroup,
+  DiffRow,
   IconPickerOption,
   LinkComponent,
   NavGroup,
