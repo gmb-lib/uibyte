@@ -12,7 +12,7 @@ doing together.
 **1. Pin a version.** A tag, never a floating branch.
 
 ```json
-"uibyte": "github:gmb-lib/uibyte#v0.6.0"
+"uibyte": "github:gmb-lib/uibyte#v0.7.0"
 ```
 
 **Upgrading is not just editing the tag.** Changing the version in
@@ -257,6 +257,77 @@ const glyphs: IconPickerOption[] = iconNames.map((name) => ({
 `NavIcon` is unchanged and draws from the same geometry — nine of the names, for
 sidebars and drawers, and it always draws something rather than leaving a hole
 in a row of marks.
+
+**A file drop is the platform's own file input, with a zone around it.**
+`FileDrop` is a `<label>` wrapping a visually hidden native input, so a click
+anywhere opens the chooser, the keyboard reaches it as the single control it
+is, and a reader hears it by the zone's own words — `label`, and `hint` under
+it. None of that is imitated in script, which is the reason to reach for it
+rather than a `div` with a click handler.
+
+It listens for two things. `files` hands over what was chosen or dropped, and is
+never an empty list. `rejected` hands back what a drop brought that the zone does
+not take: `'type'` when `accept` refuses it — the platform filters only the
+chooser, so a drop is held to the same rule here — and `'count'` when several
+files land where `multiple` is off, because which one was meant is not the
+component's guess to make. Say why in your own words; the zone owns none.
+
+The input is cleared after every choice, so choosing the same file again — after
+correcting it, say — is still heard. The highlight holds while a file moves over
+the zone's own text, and `disabled` makes both the drop and the click do nothing.
+
+```vue
+<FileDrop
+  :label="t('import.drop')"
+  :hint="t('import.dropHint')"
+  accept=".json,application/json"
+  :disabled="working"
+  @files="([file]) => preview(file)"
+  @rejected="(files, why) => (refusal = t(`import.rejected.${why}`))"
+/>
+```
+
+**A diff list renders an answer; it never works one out.** `DiffList` draws
+titled groups of keyed rows — each with a status pill and the reason beside it —
+from `groups` you build out of whatever your services answered. Every word is
+yours, including the status's own: the same role reads *added* in a preview and
+*applied* in an outcome, so a row carries `statusLabel` beside its `status` role,
+and the role only tones the pill.
+
+A row marked `folded` waits behind one toggle per group, which reads your
+`foldedLabel` (the package neither counts nor pluralises, so *"38 unchanged"* is
+yours to say) and tells a reader whether it is open. A row marked `marked` is
+drawn in its own role's tint, for the one a reader must not miss. The part
+column appears only in a group whose rows have parts; a group with no rows draws
+its title and its `note` — the place to say why there is nothing to show. The
+list keeps one thing of its own, which groups a reader has unfolded; everything
+else follows the prop, so a new answer is simply a new list.
+
+```vue
+<DiffList
+  :groups="sections"
+  :columns="{ part: t('diff.part'), key: t('diff.key'), status: t('diff.status'), detail: t('diff.why') }"
+/>
+```
+
+```ts
+import type { DiffGroup } from 'uibyte'
+
+const sections: DiffGroup[] = [
+  {
+    key: 'palette',
+    title: t('section.palette'),
+    badge: t('section.clean'),
+    badgeStatus: 'ontrack',
+    summary: t('diff.changes', { n: 2 }),
+    foldedLabel: t('diff.unchanged', { n: 38 }),
+    rows: [
+      { key: 'teal', part: 'colours', status: 'ontrack', statusLabel: t('diff.added') },
+      { key: 'navy', part: 'colours', status: 'idle', statusLabel: t('diff.same'), folded: true },
+    ],
+  },
+]
+```
 
 ## Repointing the palette
 
