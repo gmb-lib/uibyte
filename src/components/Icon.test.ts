@@ -117,6 +117,7 @@ describe('NavIcon', () => {
     'clock',
     'people',
     'lock',
+    'gear',
   ]
 
   it.each(navNames)('draws %s from the same geometry as the rest of the set', (name) => {

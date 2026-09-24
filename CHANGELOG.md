@@ -7,6 +7,23 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.8.0
+
+### Added — the `gear` glyph
+
+The set grows from 26 to 27 names: `gear`, a toothed wheel around a hub — the mark people read as
+"settings" before they read the word beside it.
+
+```vue
+<Icon name="gear" />
+```
+
+It is also one of the navigation marks `NavIcon` draws (`NavIconName` gains `gear`), so a sidebar can
+carry it beside `grid`, `doc` and the rest.
+
+Additive: no name moved and no drawing changed. An application that offers glyphs through
+`IconPicker` chooses its own `options`, so `gear` appears in nobody's picker until a host lists it.
+
 ## v0.7.0
 
 ### Added — `FileDrop`: the platform's own file input, with a zone around it

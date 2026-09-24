@@ -204,7 +204,7 @@ const sections: TabItem[] = [
 ```
 
 **A glyph is a name, and the name is data.** `Icon` draws one mark from the
-package's fixed set of 26, at the family's stroke weight and in the colour of
+package's fixed set of 27, at the family's stroke weight and in the colour of
 the text around it. `name` is a plain string on purpose: the names an
 application shows are usually chosen by somebody, stored, exported and read back
 somewhere else, so being handed a name this version does not know is a normal
@@ -226,14 +226,14 @@ announced as an image by that name.
 
 **Choosing a glyph is a set of mutually exclusive choices, so `IconPicker` is
 built as one:** a radio group that is a **single** stop in the page order, arrow
-keys moving inside it and wrapping, Home and End at the ends. Twenty-six buttons
+keys moving inside it and wrapping, Home and End at the ends. Twenty-seven buttons
 each taking their own tab stop is what a hand-drawn grid reliably produces, and
 it makes the keyboard walk the whole set to reach whatever follows it.
 
 **Which glyphs and what they are called are yours.** This package does no i18n
 and its own names are English shape words — identifiers, not words to put in
 front of somebody — so `options` carries finished, already-translated labels and
-you decide which of the 26 your people may choose from. `clearLabel` offers the
+you decide which of the 27 your people may choose from. `clearLabel` offers the
 way back to nothing; omit it and a chosen glyph can never be unchosen.
 
 ```vue
@@ -254,8 +254,8 @@ const glyphs: IconPickerOption[] = iconNames.map((name) => ({
 }))
 ```
 
-`NavIcon` is unchanged and draws from the same geometry — nine of the names, for
-sidebars and drawers, and it always draws something rather than leaving a hole
+`NavIcon` is unchanged and draws from the same geometry — ten of the names, the settings gear
+among them, for sidebars and drawers, and it always draws something rather than leaving a hole
 in a row of marks.
 
 **A file drop is the platform's own file input, with a zone around it.**

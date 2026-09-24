@@ -42,7 +42,7 @@ export interface TabItem {
  */
 export type NavIconName = Extract<
   IconName,
-  'grid' | 'doc' | 'pen' | 'plus' | 'shield' | 'mail' | 'clock' | 'people' | 'lock'
+  'grid' | 'doc' | 'pen' | 'plus' | 'shield' | 'mail' | 'clock' | 'people' | 'lock' | 'gear'
 >
 
 /**
