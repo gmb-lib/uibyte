@@ -37,6 +37,7 @@ export type IconName =
   | 'clock'
   | 'doc'
   | 'flame'
+  | 'gear'
   | 'grid'
   | 'lock'
   | 'mail'
@@ -112,6 +113,14 @@ export const iconGlyphs: Record<IconName, readonly IconPart[]> = {
       d: 'M12 3s5 4.5 5 9a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.3 1.5 1 2.5 2 3 .5-3-1-5.5 1-7.5z',
       join: true,
     },
+  ],
+  gear: [
+    {
+      shape: 'path',
+      d: 'M10.4 4.6L10.7 2.1L13.3 2.1L13.6 4.6L16.1 5.6L18.1 4.1L19.9 5.9L18.4 7.9L19.4 10.4L21.9 10.7L21.9 13.3L19.4 13.6L18.4 16.1L19.9 18.1L18.1 19.9L16.1 18.4L13.6 19.4L13.3 21.9L10.7 21.9L10.4 19.4L7.9 18.4L5.9 19.9L4.1 18.1L5.6 16.1L4.6 13.6L2.1 13.3L2.1 10.7L4.6 10.4L5.6 7.9L4.1 5.9L5.9 4.1L7.9 5.6z',
+      join: true,
+    },
+    { shape: 'circle', cx: 12, cy: 12, r: 3 },
   ],
   grid: [
     { shape: 'rect', x: 3, y: 3, width: 7, height: 7, rx: 1.5 },
