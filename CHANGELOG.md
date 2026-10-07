@@ -86,6 +86,19 @@ one. `CountStrip` draws counts you have already read as the filters, one chosen 
 </ListTable>
 ```
 
+### Added — `Menu` and `LanguageMenu`, and the `globe` glyph
+
+`Menu` is a button that opens a short list on the page's body — a list of acts (`@select`), or one choice among
+options (`v-model`, the chosen one checked). `LanguageMenu` is the menu every sign-in page needs: the language in
+use named in itself beside a globe, opening every language you carry, each named and marked in its own language.
+
+```vue
+<LanguageMenu v-model="locale" :languages="[{ code: 'en', name: 'English' }, { code: 'lv', name: 'Latviešu' }]"
+              :label="t('language')" />
+```
+
+The glyph set grows from 27 to 28 names with `globe`. No picker offers it until you list it.
+
 ### Added — `Button`'s `danger` variant
 
 For an act that cannot be undone, painted from the late role's derived solid pair, which the token layer

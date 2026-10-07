@@ -61,6 +61,8 @@ export { default as ConfirmAsk } from './components/ConfirmAsk.vue'
 export { default as ListTable } from './components/ListTable.vue'
 export { default as Pager } from './components/Pager.vue'
 export { default as CountStrip } from './components/CountStrip.vue'
+export { default as Menu } from './components/Menu.vue'
+export { default as LanguageMenu } from './components/LanguageMenu.vue'
 export { Button, buttonVariants } from './components/ui/button'
 export type { ButtonVariants } from './components/ui/button'
 export type {
@@ -72,9 +74,11 @@ export type {
   DiffRow,
   FindOption,
   IconPickerOption,
+  LanguageOption,
   LinkComponent,
   ListColumn,
   ListSort,
+  MenuItem,
   NavGroup,
   NavIconName,
   NavItem,

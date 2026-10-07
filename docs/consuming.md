@@ -477,6 +477,32 @@ scrolling sideways; put *More filters* or a find box in the `more` slot.
 </CountStrip>
 ```
 
+**A menu is a button and a short list.** `Menu` draws `label` on a pill-shaped
+button; the list of `items` opens on the page's body, so a page that is its own
+size container never clips it. The arrow keys, Enter, Space and Escape do what the
+menu pattern promises, and focus returns to the button. Give `modelValue` and the
+menu is a choice among options: each is announced as checked or not, the chosen
+one wears a check, and `update:modelValue` fires only for a different choice.
+Without it the menu is a list of acts and emits `select`. An item's `lang` marks
+words in another language.
+
+```vue
+<Menu :label="t('sort.label', { by: t(`sort.${sortBy}`) })" :items="sortChoices" v-model="sortBy" align="start" />
+```
+
+**The language menu names every language in itself.** `LanguageMenu` takes the
+`languages` your application carries, each `{ code, name }` with the name in that
+language (*Latviešu*, never *Latvian*), and `modelValue`, the code in use. Its
+button shows the current language's own name beside a globe; each name is marked
+with its language so a reader pronounces it right; `label` names what the menu
+changes, in the page's language. Whether the first choice comes from the browser
+and where a choice is kept are yours.
+
+```vue
+<LanguageMenu v-model="locale" :languages="[{ code: 'en', name: 'English' }, { code: 'lv', name: 'Latviešu' }]"
+              :label="t('language')" @update:model-value="(code) => keepInThisBrowser(code)" />
+```
+
 ## Repointing the palette
 
 Each status role is set by a **single** value — the saturated one used for the

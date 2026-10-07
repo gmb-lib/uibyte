@@ -248,6 +248,29 @@ export interface CountItem {
   status?: StatusRole
 }
 
+/** One choice in a menu. */
+export interface MenuItem {
+  /** Stable identity, and what the host is told when it is chosen. */
+  key: string
+  /** The words. */
+  label: string
+  /** Shown and announced, never chosen. */
+  disabled?: boolean
+  /**
+   * The language the words are in, when it differs from the page's — e.g. each
+   * language named in itself — so a reader pronounces them right.
+   */
+  lang?: string
+}
+
+/** One language an application carries, named in itself: `{ code: 'lv', name: 'Latviešu' }`. */
+export interface LanguageOption {
+  /** The code the host uses for it, and the `lang` it is marked with. */
+  code: string
+  /** Its own name for itself. */
+  name: string
+}
+
 /** How an act ended, as far as the line that reports it is concerned. */
 export type ActOutcome = 'done' | 'refused'
 
