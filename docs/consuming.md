@@ -409,6 +409,34 @@ know one. Matching ignores case and the marks over letters (*krumins* finds
 *Krūmiņš*), and the rule is exported as `findMatches(query, ...texts)`, so a list
 you filter yourself with a plain box above it finds the same way.
 
+**Every act ends in a sentence.** `ActLine` says what an act did (`outcome="done"`,
+announced politely) or why it was refused (`outcome="refused"`, announced at once),
+in your `text`, toned by the outcome. A way on — *Open it* after something was
+made — goes in the `action` slot, outside the announcement. It stays until you
+take it away, usually with the next act: a line that fades on a timer is gone
+before a slow reader reaches it.
+
+```vue
+<ActLine v-if="said" :outcome="said.ok ? 'done' : 'refused'" :text="said.text">
+  <template v-if="said.link" #action><RouterLink :to="said.link">{{ t('open') }}</RouterLink></template>
+</ActLine>
+```
+
+**An act worth asking about is asked in place.** `ConfirmAsk` draws the question
+where the act was asked for — never a window over the page — with what it does
+(`detail`: say whether it can be undone) and two answers in your words. When it
+appears it takes focus on the answer that changes nothing, so a stray Enter is
+harmless, and when you remove it focus goes back to whatever opened it. Escape
+answers *keep*. Give `danger` when the act cannot be undone: its button wears the
+danger look (also available on its own as `Button variant="danger"`). Hold both
+answers with `busy` while the act runs.
+
+```vue
+<ConfirmAsk v-if="asking" :question="t('item.retire.ask', { name })" :detail="t('item.retire.final')"
+            :confirm-label="t('item.retire.do')" :keep-label="t('common.keep')" danger :busy="working"
+            @confirm="retire()" @keep="asking = false" />
+```
+
 ## Repointing the palette
 
 Each status role is set by a **single** value — the saturated one used for the

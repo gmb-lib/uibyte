@@ -207,6 +207,9 @@ export interface FindOption {
   disabled?: boolean
 }
 
+/** How an act ended, as far as the line that reports it is concerned. */
+export type ActOutcome = 'done' | 'refused'
+
 /** The column headings a diff list draws, already translated. */
 export interface DiffColumns {
   part: string

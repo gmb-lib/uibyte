@@ -143,4 +143,10 @@ describe('Button', () => {
   it('shows a visible focus ring', () => {
     expect(buttonVariants()).toContain('focus-visible:outline-focus')
   })
+
+  // The derived solid pair is the one the token layer proves white text reads on.
+  it('paints the danger variant from the late role’s solid pair', () => {
+    expect(buttonVariants({ variant: 'danger' })).toContain('bg-status-late-solid-bg')
+    expect(buttonVariants({ variant: 'danger' })).toContain('text-status-late-solid-fg')
+  })
 })

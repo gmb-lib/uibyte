@@ -60,6 +60,23 @@ Typing never chooses, and when the list could not be read (`failed`) nothing is 
 no way to type a key instead. Matching ignores case and the marks over letters; the same rule is exported as
 `findMatches(query, ...texts)` for lists you filter yourself.
 
+### Added — `ActLine` and `ConfirmAsk`: an act's answer, and an act asked about first
+
+`ActLine` says what an act did, or why it was refused, in your sentence — politely or at once, toned by the
+outcome, with an optional way on beside it. `ConfirmAsk` asks in place, never in a window over the page: the
+question, what it does, *do it* and *keep it*; it takes focus when it appears and gives it back when it goes.
+
+```vue
+<ActLine outcome="refused" :text="t('roles.refused.setupBox')" />
+<ConfirmAsk :question="t('file.remove.ask')" :detail="t('common.final')" :confirm-label="t('file.remove.do')"
+            :keep-label="t('common.keep')" danger @confirm="remove()" @keep="asking = false" />
+```
+
+### Added — `Button`'s `danger` variant
+
+For an act that cannot be undone, painted from the late role's derived solid pair, which the token layer
+guarantees white text reads on. The other variants are unchanged.
+
 ## v0.8.0
 
 ### Added — the `gear` glyph

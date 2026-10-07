@@ -56,9 +56,12 @@ export { default as BrandMark } from './components/BrandMark.vue'
 export { default as PageHeader } from './components/PageHeader.vue'
 export { default as StateBlock } from './components/StateBlock.vue'
 export { default as FindField } from './components/FindField.vue'
+export { default as ActLine } from './components/ActLine.vue'
+export { default as ConfirmAsk } from './components/ConfirmAsk.vue'
 export { Button, buttonVariants } from './components/ui/button'
 export type { ButtonVariants } from './components/ui/button'
 export type {
+  ActOutcome,
   BackLink,
   DiffColumns,
   DiffGroup,
