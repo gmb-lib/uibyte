@@ -99,6 +99,20 @@ use named in itself beside a globe, opening every language you carry, each named
 
 The glyph set grows from 27 to 28 names with `globe`. No picker offers it until you list it.
 
+### Added — `SplitDetail`, `FoldMore` and `DayList`
+
+`SplitDetail` shows an item beside its list when its own width allows, and alone with a way back when it does
+not, moving focus so a keyboard reader is never left behind. `FoldMore` shows the first few and your words for the
+rest, held open while a search runs. `DayList` draws what happened under the days you group, with older lines on
+request.
+
+```vue
+<SplitDetail :open="!!item" :back-label="t('items.title')" @back="item = null">
+  <template #list>…</template>
+  <template #detail>…</template>
+</SplitDetail>
+```
+
 ### Added — `Button`'s `danger` variant
 
 For an act that cannot be undone, painted from the late role's derived solid pair, which the token layer

@@ -271,6 +271,29 @@ export interface LanguageOption {
   name: string
 }
 
+/** One line of a day list: when, what, and where it happened. */
+export interface DayLine {
+  /** Stable identity. */
+  key: string
+  /** The time of day, already formatted. */
+  time?: string
+  /** What happened, as a sentence. A `line` slot can draw it richer. */
+  text?: string
+  /** Where, or by whom — drawn quiet beside it. */
+  where?: string
+  /** Drawn on a band, for a line of another kind — e.g. one a service wrote, not a person. */
+  marked?: boolean
+}
+
+/** The lines of one day, under its heading. */
+export interface DayGroup {
+  /** Stable identity, e.g. the date. */
+  key: string
+  /** The day's heading, already worded: "Today", "Tuesday 6 October". */
+  heading: string
+  lines: DayLine[]
+}
+
 /** How an act ended, as far as the line that reports it is concerned. */
 export type ActOutcome = 'done' | 'refused'
 

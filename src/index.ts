@@ -63,12 +63,17 @@ export { default as Pager } from './components/Pager.vue'
 export { default as CountStrip } from './components/CountStrip.vue'
 export { default as Menu } from './components/Menu.vue'
 export { default as LanguageMenu } from './components/LanguageMenu.vue'
+export { default as SplitDetail } from './components/SplitDetail.vue'
+export { default as FoldMore } from './components/FoldMore.vue'
+export { default as DayList } from './components/DayList.vue'
 export { Button, buttonVariants } from './components/ui/button'
 export type { ButtonVariants } from './components/ui/button'
 export type {
   ActOutcome,
   BackLink,
   CountItem,
+  DayGroup,
+  DayLine,
   DiffColumns,
   DiffGroup,
   DiffRow,

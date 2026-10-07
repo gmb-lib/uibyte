@@ -503,6 +503,37 @@ and where a choice is kept are yours.
               :label="t('language')" @update:model-value="(code) => keepInThisBrowser(code)" />
 ```
 
+**An item opens beside its list, or instead of it.** `SplitDetail` takes the
+`list` and `detail` slots and `open`. With room — decided by its own width, so a
+narrow column behaves the same on any screen — the item sits beside the list
+(`detailWidth`, 390px by default); below 760px it replaces the list, with a way
+back reading `backLabel` (the list's name; the arrow is drawn). Taking it emits
+`back`: close the item. Focus follows: to the item when the list is no longer
+shown, and back to the row the list marks `aria-current` (as `ListTable` does with
+`current`).
+
+```vue
+<SplitDetail :open="!!person" :back-label="t('people.users')" :label="person?.name" @back="person = null">
+  <template #list><ListTable … :current="person?.id" @open="(p) => (person = p)" /></template>
+  <template #detail><PersonCard :person="person" /></template>
+</SplitDetail>
+```
+
+**The first few, then the rest.** `FoldMore` shows `limit` items (5) and your
+`moreLabel` for the rest — counted and worded by you. Hold it `open` while a
+search is running: a match behind the fold is a match the person never sees.
+
+**History is lines under days.** `DayList` draws `days` you have grouped and
+headed (*Today*, *Tuesday 6 October* — where a day begins is the reader's time
+zone, so the grouping is yours), each line with its `time`, its `text` (or the
+`line` slot) and, quieter, `where`. Give `olderLabel` to offer older lines
+(`@older`), and `note` to say how much is shown.
+
+```vue
+<DayList :days="days" :label="t('history.title')" :older-label="more ? t('history.older') : undefined"
+         :older-busy="reading" :note="t('history.shown', { n })" @older="readOlder()" />
+```
+
 ## Repointing the palette
 
 Each status role is set by a **single** value — the saturated one used for the
