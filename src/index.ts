@@ -58,17 +58,23 @@ export { default as StateBlock } from './components/StateBlock.vue'
 export { default as FindField } from './components/FindField.vue'
 export { default as ActLine } from './components/ActLine.vue'
 export { default as ConfirmAsk } from './components/ConfirmAsk.vue'
+export { default as ListTable } from './components/ListTable.vue'
+export { default as Pager } from './components/Pager.vue'
+export { default as CountStrip } from './components/CountStrip.vue'
 export { Button, buttonVariants } from './components/ui/button'
 export type { ButtonVariants } from './components/ui/button'
 export type {
   ActOutcome,
   BackLink,
+  CountItem,
   DiffColumns,
   DiffGroup,
   DiffRow,
   FindOption,
   IconPickerOption,
   LinkComponent,
+  ListColumn,
+  ListSort,
   NavGroup,
   NavIconName,
   NavItem,

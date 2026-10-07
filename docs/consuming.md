@@ -437,6 +437,46 @@ answers with `busy` while the act runs.
             @confirm="retire()" @keep="asking = false" />
 ```
 
+**In a list, the whole row is the way in.** `ListTable` draws your `rows` on a
+grid of `columns`, and each row is one target — one stop in the page order,
+announced as one. Give `rowLink` (props for your `linkComponent`) and each row is
+your link; leave it out and each row is a button that emits `open` with the row.
+A cell draws the row's field of the same `key`, or your `cell-<key>` slot. Mark
+the row open beside the list with `current`.
+
+It folds by its **own** width, not the window's, because a list beside an open
+item is narrow on any screen. A column's `priority` says how: `1` is the title
+(on a line of its own when narrow), `2` (the default) folds into the line under the
+title, `3` is shown only while the table is wide. The thresholds are the table's
+own width — 1100px, then 760px, where the header goes too. Sorting is asked for
+(`sortable` columns emit `sort`); you sort, and pass `sort` back with
+`sortedLabels`, the words a reader hears after the sorted column's name. Put a
+`Pager` in the `footer` slot to keep it in the same card.
+
+```vue
+<ListTable :columns="columns" :rows="page" :row-key="(p) => p.id" :label="t('people.title')"
+           :row-link="(p) => ({ to: { name: 'person', params: { id: p.id } } })" :link-component="RouterLink"
+           :sort="sort" :sorted-labels="{ ascending: t('sort.az'), descending: t('sort.za') }" @sort="toggleSort">
+  <template #cell-name="{ row }"><b>{{ row.name }}</b></template>
+  <template #footer>
+    <Pager v-model:page="pageNo" :pages="pages" :range="t('pager.range', { from, to, total })" :label="t('pager.label')"
+           :previous-label="t('pager.previous')" :next-label="t('pager.next')" :page-label="(n) => t('pager.page', { n })" />
+  </template>
+</ListTable>
+```
+
+**Counts that filter are one strip.** `CountStrip` draws `items` — each a label,
+an optional `count` you have already formatted, and an optional `status` for a
+dot — as toggles, one chosen (`v-model`), each announcing whether it is. It cannot
+add a count, so it shows only what your read already has. It wraps rather than
+scrolling sideways; put *More filters* or a find box in the `more` slot.
+
+```vue
+<CountStrip v-model="filter" :items="counts" :label="t('people.show')">
+  <template #more><input type="search" :placeholder="t('people.find')" v-model="query" /></template>
+</CountStrip>
+```
+
 ## Repointing the palette
 
 Each status role is set by a **single** value — the saturated one used for the

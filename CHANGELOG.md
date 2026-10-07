@@ -72,6 +72,20 @@ question, what it does, *do it* and *keep it*; it takes focus when it appears an
             :keep-label="t('common.keep')" danger @confirm="remove()" @keep="asking = false" />
 ```
 
+### Added — `ListTable`, `Pager` and `CountStrip`: a long list, the way through it, and counts that filter it
+
+`ListTable` draws rows on a shared grid where **the whole row is the way in** — your link, or a button that
+emits `open` — and folds by its own width: a column's `priority` says whether it stays, folds under the title,
+or goes. `Pager` says where the page sits in your words and offers previous, next and the pages around this
+one. `CountStrip` draws counts you have already read as the filters, one chosen at a time.
+
+```vue
+<CountStrip v-model="filter" :items="counts" :label="t('people.show')" />
+<ListTable :columns="columns" :rows="rows" :row-key="(r) => r.id" :label="t('people.title')" @open="show">
+  <template #footer><Pager v-model:page="page" :pages="pages" :range="range" v-bind="pagerWords" /></template>
+</ListTable>
+```
+
 ### Added — `Button`'s `danger` variant
 
 For an act that cannot be undone, painted from the late role's derived solid pair, which the token layer

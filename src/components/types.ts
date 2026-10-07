@@ -207,6 +207,47 @@ export interface FindOption {
   disabled?: boolean
 }
 
+/**
+ * One column of a list table.
+ *
+ * How it folds is said by its priority, because a list shown beside something
+ * else is narrow on any screen and the table has to decide from its own width:
+ * 1 — the title: always shown, on a line of its own when the table is narrow;
+ * 2 — the default: shown, and drawn in the line under the title when narrow;
+ * 3 — shown only while the table is wide.
+ */
+export interface ListColumn {
+  /** Stable identity, and the row field drawn when no cell slot is given. */
+  key: string
+  /** The header's words. */
+  label: string
+  /** The column's track in the row's grid, e.g. `'76px'` or `'minmax(240px,2fr)'`. */
+  width?: string
+  priority?: 1 | 2 | 3
+  /** The header offers to sort by it; the host does the sorting. */
+  sortable?: boolean
+  /** Drawn at the end of its cell — a number, a date. */
+  end?: boolean
+}
+
+/** Which column a list is sorted by, and which way. */
+export interface ListSort {
+  key: string
+  direction: 'ascending' | 'descending'
+}
+
+/** One count that is also a filter. */
+export interface CountItem {
+  /** Stable identity, and what the host is told when it is chosen. */
+  key: string
+  /** The words. */
+  label: string
+  /** The count, already formatted — the kit neither counts nor formats. */
+  count?: string
+  /** A dot in a status role's colour beside the words. Tone only: the words carry it. */
+  status?: StatusRole
+}
+
 /** How an act ended, as far as the line that reports it is concerned. */
 export type ActOutcome = 'done' | 'refused'
 
