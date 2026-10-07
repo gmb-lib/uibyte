@@ -171,6 +171,25 @@ export interface DiffGroup {
   rows: DiffRow[]
 }
 
+/**
+ * Where a read stands when it has nothing to show yet, or never will.
+ *
+ * Three values in one field, so that an empty answer and a failed one can never
+ * be drawn as each other: "nothing here" said of a read that failed is a wrong
+ * answer, not a quiet one.
+ */
+export type ReadState = 'loading' | 'empty' | 'failed'
+
+/**
+ * The one way back a page header offers: the destination's name, and the props
+ * handed untouched to the host's link component, e.g. `{ to: { name: 'list' } }`.
+ */
+export interface BackLink {
+  /** The name of where it leads, already translated. The arrow is drawn, not written. */
+  label: string
+  linkProps?: Record<string, unknown>
+}
+
 /** The column headings a diff list draws, already translated. */
 export interface DiffColumns {
   part: string

@@ -329,6 +329,55 @@ const sections: DiffGroup[] = [
 ]
 ```
 
+**A page says its title once, at the top.** `PageHeader` draws the page's heading
+(`h1` unless you give a `level` for a page inside another's frame; the size
+follows), with an optional `eyebrow` above it for the area, a quiet `subtitle`
+under it, and your actions in the `actions` slot at the top right. When the row is
+too narrow for both, the actions wrap under the title; the title is never what
+gives way. The decision is made by the header's own row, not the window, so a
+page drawn beside a list behaves the same on a wide screen.
+
+It offers **one** way back, above everything else: `back` is the destination's
+name and the props for your link component, handed over untouched. The arrow is
+drawn and hidden from a reader, so write the name alone — *Items*, not
+*← Items* — or a screen reader announces "leftwards arrow" first.
+
+```vue
+<PageHeader
+  :title="item.name"
+  :eyebrow="t('area.workspace')"
+  :back="{ label: t('items.title'), linkProps: { to: { name: 'items' } } }"
+  :link-component="RouterLink"
+>
+  <template #actions><Button variant="outline">{{ t('item.edit') }}</Button></template>
+</PageHeader>
+```
+
+**A read that has nothing to show says why, and a failed one never says
+"nothing".** `StateBlock` draws a read's `state` — `loading`, `empty` or `failed`
+— from your words: a `title` (what is true) and a `text` (why, or what to do).
+The three are one prop, so an empty answer and a failed read cannot be drawn as
+each other, and there is no prop a service's code could be passed through: say
+what happened in a sentence, and keep the code for your logs.
+
+Loading and empty are announced politely; a failure is announced at once. Give
+`retryLabel` and a failure offers to try again — the block emits `retry` and you
+read again. Anything else a person can do goes in the `actions` slot (*Add the
+first one* on an empty list, *Back* on a failure); the buttons sit outside the
+announcement, so a reader hears what happened rather than every label at once.
+`size="page"` centres it as a page's whole content; the default sits inside a card.
+With no words at all it draws its state and says nothing — it has no sentence of
+its own to fall back on, because it would be in the wrong language.
+
+```vue
+<StateBlock v-if="list.failed" state="failed" :title="t('list.down')" :text="t('list.downWhy')"
+            :retry-label="t('common.tryAgain')" @retry="list.read()" />
+<StateBlock v-else-if="list.loading" state="loading" :text="t('common.reading')" />
+<StateBlock v-else-if="!list.rows.length" state="empty" size="page" :title="t('list.none')">
+  <template #actions><Button>{{ t('list.add') }}</Button></template>
+</StateBlock>
+```
+
 ## Repointing the palette
 
 Each status role is set by a **single** value — the saturated one used for the

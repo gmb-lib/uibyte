@@ -7,6 +7,46 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.9.0
+
+A release of pieces that screens share, so each is built once with the keyboard and reader behaviour
+it promises. Everything is additive: no existing component changes.
+
+### Added — `PageHeader`: the title once, one way back, actions that give way
+
+The top of a page: its heading, an optional area above it and a quiet line under it, and the page's
+own actions at the top right. When the row is too narrow for both, the actions wrap under the title;
+the title is never squeezed. The row decides this from its own width, not the window's.
+
+```vue
+<PageHeader
+  :title="item.name"
+  :eyebrow="t('area.workspace')"
+  :back="{ label: t('items.title'), linkProps: { to: { name: 'items' } } }"
+  :link-component="RouterLink"
+>
+  <template #actions><Button variant="outline">{{ t('item.edit') }}</Button></template>
+</PageHeader>
+```
+
+`back` is the destination's name and the props for your link component; the arrow is drawn and hidden
+from a reader, so pass the name alone. The heading is an `h1` unless you give `level` (2 or 3) for a
+page inside another's frame.
+
+### Added — `StateBlock`: loading, empty, or failed — and never a code
+
+What a read says when it has nothing to show. One `state` prop with three values, so an empty answer
+and a failure cannot be drawn as each other; a failure is announced at once, the other two politely.
+Give `retryLabel` and a failure offers to try again (`@retry`); anything else a person can do goes in
+the `actions` slot, outside the announcement.
+
+```vue
+<StateBlock state="failed" :title="t('list.down')" :retry-label="t('common.tryAgain')" @retry="read()" />
+```
+
+There is no prop for an error code, on purpose: say what happened in words, and keep the code for your
+logs. With no words the block says nothing — it has no sentence of its own.
+
 ## v0.8.0
 
 ### Added — the `gear` glyph

@@ -52,9 +52,12 @@ export type { IconName, IconPart } from './components/icons'
 export { default as OrderableList } from './components/OrderableList.vue'
 export { default as Tabs } from './components/Tabs.vue'
 export { default as BrandMark } from './components/BrandMark.vue'
+export { default as PageHeader } from './components/PageHeader.vue'
+export { default as StateBlock } from './components/StateBlock.vue'
 export { Button, buttonVariants } from './components/ui/button'
 export type { ButtonVariants } from './components/ui/button'
 export type {
+  BackLink,
   DiffColumns,
   DiffGroup,
   DiffRow,
@@ -64,6 +67,7 @@ export type {
   NavIconName,
   NavItem,
   PillLook,
+  ReadState,
   ShellLabels,
   TabItem,
 } from './components/types'
