@@ -144,4 +144,20 @@ describe('DiffList', () => {
     expect(keysShown(w)).toEqual(['olive'])
     expect(w.text()).not.toContain('rose')
   })
+
+  // A person knows a thing by its name; the key is for whoever must find it in a file.
+  it('draws a row by its name when it has one, with the key after it, quieter', () => {
+    const w = list([{ key: 'types', title: 'Task types', rows: [
+      { key: 'delivery', label: 'Delivery', status: 'ontrack', statusLabel: 'added' },
+      { key: 'install', status: 'idle', statusLabel: 'unchanged' },
+    ] }])
+    const [named, bare] = w.findAll('tbody tr').map((tr) => tr.findAll('td')[0])
+    const parts = named.findAll('span')
+    expect(parts.map((p) => p.text())).toEqual(['Delivery', 'delivery'])
+    expect(parts[0].classes()).not.toContain('font-mono')
+    expect(parts[1].classes()).toContain('font-mono')
+    expect(parts[1].classes()).toContain('text-muted')
+    expect(bare.classes()).toContain('font-mono')
+    expect(bare.text()).toBe('install')
+  })
 })

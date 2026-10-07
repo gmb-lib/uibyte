@@ -135,6 +135,11 @@ export interface ShellLabels {
 export interface DiffRow {
   /** What the row is about, drawn in mono — e.g. an item's key. */
   key: string
+  /**
+   * The thing's name, when it has one a person knows it by. The row is then drawn
+   * by name, with the key after it, quieter.
+   */
+  label?: string
   /** Which part of the group the row belongs to, when the group has parts. */
   part?: string
   /** Which role tones the row's pill. */

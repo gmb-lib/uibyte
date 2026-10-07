@@ -297,7 +297,9 @@ and the role only tones the pill.
 A row marked `folded` waits behind one toggle per group, which reads your
 `foldedLabel` (the package neither counts nor pluralises, so *"38 unchanged"* is
 yours to say) and tells a reader whether it is open. A row marked `marked` is
-drawn in its own role's tint, for the one a reader must not miss. The part
+drawn in its own role's tint, for the one a reader must not miss. A row with a `label` — the thing's name — is drawn by
+it, with the `key` after it in quieter mono: a person knows a thing by its name, and
+the key is for whoever must find it in a file. The part
 column appears only in a group whose rows have parts; a group with no rows draws
 its title and its `note` — the place to say why there is nothing to show. The
 list keeps one thing of its own, which groups a reader has unfolded; everything

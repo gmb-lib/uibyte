@@ -107,7 +107,11 @@ const markedByRole: Record<StatusRole, string> = {
             <td v-if="hasParts(group)" class="py-[7px] pr-2.5 text-[12.5px] text-muted-strong">
               {{ row.part }}
             </td>
-            <td class="py-[7px] pr-2.5 font-mono text-[12px] text-ink">{{ row.key }}</td>
+            <td v-if="row.label" class="py-[7px] pr-2.5 text-ink">
+              <span class="font-semibold">{{ row.label }}</span>
+              <span class="ml-1.5 font-mono text-[11px] text-muted">{{ row.key }}</span>
+            </td>
+            <td v-else class="py-[7px] pr-2.5 font-mono text-[12px] text-ink">{{ row.key }}</td>
             <td class="py-[7px] pr-2.5">
               <StatusPill :status="row.status" :label="row.statusLabel" size="sm" />
             </td>

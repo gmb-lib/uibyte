@@ -113,6 +113,15 @@ request.
 </SplitDetail>
 ```
 
+### Added — a `DiffList` row can be drawn by name
+
+`DiffRow` gains an optional `label`: the row is then drawn by the thing's name, with its `key` after it in
+quieter mono. A row without one is drawn exactly as before.
+
+```ts
+{ key: 'delivery', label: t('types.delivery'), status: 'ontrack', statusLabel: t('diff.added') }
+```
+
 ### Added — `Button`'s `danger` variant
 
 For an act that cannot be undone, painted from the late role's derived solid pair, which the token layer
