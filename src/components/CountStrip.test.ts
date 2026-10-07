@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import CountStrip from './CountStrip.vue'
 import type { CountItem } from './types'
+import { statusRoles } from '../theme/tokens'
 
 const items: CountItem[] = [
   { key: 'all', label: 'All', count: '18' },
@@ -57,5 +58,10 @@ describe('CountStrip', () => {
 
   it('shows a visible focus ring', () => {
     expect(strip().get('button').classes()).toContain('focus-visible:outline-focus')
+  })
+
+  it.each(statusRoles)('draws the %s dot in its own colour', (status) => {
+    const w = mount(CountStrip, { props: { items: [{ key: 'a', label: 'A', status }], modelValue: 'a', label: 'Show' } })
+    expect(w.get('i').classes()).toContain(`bg-status-${status}`)
   })
 })

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import DiffList from './DiffList.vue'
+import { statusRoles } from '../theme/tokens'
 import StatusPill from './StatusPill.vue'
 import type { DiffColumns, DiffGroup } from './types'
 
@@ -159,5 +160,10 @@ describe('DiffList', () => {
     expect(parts[1].classes()).toContain('text-muted')
     expect(bare.classes()).toContain('font-mono')
     expect(bare.text()).toBe('install')
+  })
+
+  it.each(statusRoles)('tints a marked %s row in its own role', (status) => {
+    const w = list([{ key: 'g', title: 'G', rows: [{ key: 'k', status, statusLabel: 'x', marked: true }] }])
+    expect(w.get('tbody tr').classes()).toContain(`bg-status-${status}-bg/40`)
   })
 })

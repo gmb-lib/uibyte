@@ -31,6 +31,7 @@ const dotByRole: Record<StatusRole, string> = {
   approaching: 'bg-status-approaching',
   late: 'bg-status-late',
   idle: 'bg-status-idle',
+  closed: 'bg-status-closed',
 }
 </script>
 

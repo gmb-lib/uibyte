@@ -43,6 +43,7 @@ const markedByRole: Record<StatusRole, string> = {
   approaching: 'bg-status-approaching-bg/40',
   late: 'bg-status-late-bg/40',
   idle: 'bg-status-idle-bg/40',
+  closed: 'bg-status-closed-bg/40',
 }
 </script>
 

@@ -12,7 +12,7 @@ doing together.
 **1. Pin a version.** A tag, never a floating branch.
 
 ```json
-"uibyte": "github:gmb-lib/uibyte#v0.7.0"
+"uibyte": "github:gmb-lib/uibyte#v0.9.0"
 ```
 
 **Upgrading is not just editing the tag.** Changing the version in
@@ -133,6 +133,16 @@ repointed role stays readable in every look.
 ```vue
 <StatusPill status="late" :label="t('status.late')" look="solid" />
 <StatusPill status="ontrack" :label="t('status.inWork')" look="outline" />
+```
+
+**Finished work is `closed`, not `ontrack`.** `ontrack` means *on track, valid,
+under way*; `closed` — a muted blue, marked with a check inside a circle — means
+*done and put away*. Before `0.9.0` there was no `closed` and done was drawn in
+`ontrack`; an application upgrading moves its finished states across, and keeps
+*cancelled* or *closed without an outcome* in `idle`.
+
+```vue
+<StatusPill status="closed" :label="t('status.closed')" />
 ```
 
 **A file is described by a chip, and you describe it.** `FileChip` draws the

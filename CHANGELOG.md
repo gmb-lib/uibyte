@@ -10,7 +10,23 @@ build compiles. Nothing here deploys and nothing holds state.
 ## v0.9.0
 
 A release of pieces that screens share, so each is built once with the keyboard and reader behaviour
-it promises. Everything is additive: no existing component changes.
+it promises. One meaning changes — **done moves from `ontrack` to a new `closed` role** (below); no existing
+component changes shape.
+
+### Added — a sixth status role, `closed`; `ontrack` no longer means done
+
+Finished work now has its own role: `closed`, a muted blue with its derived pair (`status-closed-bg`, `-fg`,
+`-border`, `-solid-bg`, `-solid-fg`), and its own mark in `StatusPill` — a check inside a circle, so it never
+relies on colour to differ from `ontrack`'s open check. `ontrack` keeps *on track, valid, under way*.
+
+```vue
+<StatusPill status="closed" :label="t('status.closed')" />
+```
+
+**What to do when you upgrade:** move the states that mean *done* or *finished* from `ontrack` to `closed`;
+leave *cancelled* and *closed without an outcome* in `idle`. Nothing breaks if you do not — a done state just
+keeps reading as on track. A theme built with `buildTheme` gains the new role from the reference dot
+`#5B78DA`, and can set its own through `status.closed`.
 
 ### Added — `PageHeader`: the title once, one way back, actions that give way
 
