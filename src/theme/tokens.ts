@@ -16,8 +16,11 @@ export const surfaceRoles = ['ink', 'paper', 'band', 'console'] as const
 export type SurfaceRole = (typeof surfaceRoles)[number]
 
 /**
- * The five status roles. A status is always rendered as colour **and** an icon
+ * The six status roles. A status is always rendered as colour **and** an icon
  * **and** a text label — never colour alone.
+ *
+ * `closed` is finished work, put away; `ontrack` is work that is fine — on track,
+ * valid, under way. Done used to be drawn in `ontrack`, and now has its own.
  */
 export const statusRoles = [
   'ontrack',
@@ -25,6 +28,7 @@ export const statusRoles = [
   'approaching',
   'late',
   'idle',
+  'closed',
 ] as const
 export type StatusRole = (typeof statusRoles)[number]
 
@@ -45,6 +49,7 @@ export const referenceStatus: Record<StatusRole, string> = {
   approaching: '#E8B23A',
   late: '#D2524D',
   idle: '#9AA0A6',
+  closed: '#5B78DA',
 }
 
 /**

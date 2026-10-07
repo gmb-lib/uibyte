@@ -38,6 +38,7 @@ export type IconName =
   | 'doc'
   | 'flame'
   | 'gear'
+  | 'globe'
   | 'grid'
   | 'lock'
   | 'mail'
@@ -121,6 +122,10 @@ export const iconGlyphs: Record<IconName, readonly IconPart[]> = {
       join: true,
     },
     { shape: 'circle', cx: 12, cy: 12, r: 3 },
+  ],
+  globe: [
+    { shape: 'circle', cx: 12, cy: 12, r: 9 },
+    { shape: 'path', d: 'M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18' },
   ],
   grid: [
     { shape: 'rect', x: 3, y: 3, width: 7, height: 7, rx: 1.5 },

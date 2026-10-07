@@ -135,6 +135,11 @@ export interface ShellLabels {
 export interface DiffRow {
   /** What the row is about, drawn in mono — e.g. an item's key. */
   key: string
+  /**
+   * The thing's name, when it has one a person knows it by. The row is then drawn
+   * by name, with the key after it, quieter.
+   */
+  label?: string
   /** Which part of the group the row belongs to, when the group has parts. */
   part?: string
   /** Which role tones the row's pill. */
@@ -170,6 +175,132 @@ export interface DiffGroup {
   foldedLabel?: string
   rows: DiffRow[]
 }
+
+/**
+ * Where a read stands when it has nothing to show yet, or never will.
+ *
+ * Three values in one field, so that an empty answer and a failed one can never
+ * be drawn as each other: "nothing here" said of a read that failed is a wrong
+ * answer, not a quiet one.
+ */
+export type ReadState = 'loading' | 'empty' | 'failed'
+
+/**
+ * The one way back a page header offers: the destination's name, and the props
+ * handed untouched to the host's link component, e.g. `{ to: { name: 'list' } }`.
+ */
+export interface BackLink {
+  /** The name of where it leads, already translated. The arrow is drawn, not written. */
+  label: string
+  linkProps?: Record<string, unknown>
+}
+
+/**
+ * One thing a find field can offer.
+ *
+ * The key is what the host is told when it is chosen; the person sees only the
+ * label and the note. A key is never shown and never typed.
+ */
+export interface FindOption {
+  /** Stable identity, and what the host is told when this is chosen. */
+  key: string
+  /** The name a person finds it by. Already translated. */
+  label: string
+  /** A quiet line beside the name — e.g. what someone already holds. Found by too. */
+  note?: string
+  /** Shown and announced, never chosen — e.g. someone who has left. */
+  disabled?: boolean
+}
+
+/**
+ * One column of a list table.
+ *
+ * How it folds is said by its priority, because a list shown beside something
+ * else is narrow on any screen and the table has to decide from its own width:
+ * 1 — the title: always shown, on a line of its own when the table is narrow;
+ * 2 — the default: shown, and drawn in the line under the title when narrow;
+ * 3 — shown only while the table is wide.
+ */
+export interface ListColumn {
+  /** Stable identity, and the row field drawn when no cell slot is given. */
+  key: string
+  /** The header's words. */
+  label: string
+  /** The column's track in the row's grid, e.g. `'76px'` or `'minmax(240px,2fr)'`. */
+  width?: string
+  priority?: 1 | 2 | 3
+  /** The header offers to sort by it; the host does the sorting. */
+  sortable?: boolean
+  /** Drawn at the end of its cell — a number, a date. */
+  end?: boolean
+}
+
+/** Which column a list is sorted by, and which way. */
+export interface ListSort {
+  key: string
+  direction: 'ascending' | 'descending'
+}
+
+/** One count that is also a filter. */
+export interface CountItem {
+  /** Stable identity, and what the host is told when it is chosen. */
+  key: string
+  /** The words. */
+  label: string
+  /** The count, already formatted — the kit neither counts nor formats. */
+  count?: string
+  /** A dot in a status role's colour beside the words. Tone only: the words carry it. */
+  status?: StatusRole
+}
+
+/** One choice in a menu. */
+export interface MenuItem {
+  /** Stable identity, and what the host is told when it is chosen. */
+  key: string
+  /** The words. */
+  label: string
+  /** Shown and announced, never chosen. */
+  disabled?: boolean
+  /**
+   * The language the words are in, when it differs from the page's — e.g. each
+   * language named in itself — so a reader pronounces them right.
+   */
+  lang?: string
+}
+
+/** One language an application carries, named in itself: `{ code: 'lv', name: 'Latviešu' }`. */
+export interface LanguageOption {
+  /** The code the host uses for it, and the `lang` it is marked with. */
+  code: string
+  /** Its own name for itself. */
+  name: string
+}
+
+/** One line of a day list: when, what, and where it happened. */
+export interface DayLine {
+  /** Stable identity. */
+  key: string
+  /** The time of day, already formatted. */
+  time?: string
+  /** What happened, as a sentence. A `line` slot can draw it richer. */
+  text?: string
+  /** Where, or by whom — drawn quiet beside it. */
+  where?: string
+  /** Drawn on a band, for a line of another kind — e.g. one a service wrote, not a person. */
+  marked?: boolean
+}
+
+/** The lines of one day, under its heading. */
+export interface DayGroup {
+  /** Stable identity, e.g. the date. */
+  key: string
+  /** The day's heading, already worded: "Today", "Tuesday 6 October". */
+  heading: string
+  lines: DayLine[]
+}
+
+/** How an act ended, as far as the line that reports it is concerned. */
+export type ActOutcome = 'done' | 'refused'
 
 /** The column headings a diff list draws, already translated. */
 export interface DiffColumns {

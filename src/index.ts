@@ -2,6 +2,7 @@
 // there is no supported deep-import path into the source tree, so internals can
 // move without breaking a host.
 export { cn } from './lib/cn'
+export { findMatches, foldForFind } from './lib/find'
 export type { ClassValue } from 'clsx'
 
 // The token layer. A host importing the stylesheet gets the reference look; a
@@ -52,18 +53,42 @@ export type { IconName, IconPart } from './components/icons'
 export { default as OrderableList } from './components/OrderableList.vue'
 export { default as Tabs } from './components/Tabs.vue'
 export { default as BrandMark } from './components/BrandMark.vue'
+export { default as PageHeader } from './components/PageHeader.vue'
+export { default as StateBlock } from './components/StateBlock.vue'
+export { default as FindField } from './components/FindField.vue'
+export { default as ActLine } from './components/ActLine.vue'
+export { default as ConfirmAsk } from './components/ConfirmAsk.vue'
+export { default as ListTable } from './components/ListTable.vue'
+export { default as Pager } from './components/Pager.vue'
+export { default as CountStrip } from './components/CountStrip.vue'
+export { default as Menu } from './components/Menu.vue'
+export { default as LanguageMenu } from './components/LanguageMenu.vue'
+export { default as SplitDetail } from './components/SplitDetail.vue'
+export { default as FoldMore } from './components/FoldMore.vue'
+export { default as DayList } from './components/DayList.vue'
 export { Button, buttonVariants } from './components/ui/button'
 export type { ButtonVariants } from './components/ui/button'
 export type {
+  ActOutcome,
+  BackLink,
+  CountItem,
+  DayGroup,
+  DayLine,
   DiffColumns,
   DiffGroup,
   DiffRow,
+  FindOption,
   IconPickerOption,
+  LanguageOption,
   LinkComponent,
+  ListColumn,
+  ListSort,
+  MenuItem,
   NavGroup,
   NavIconName,
   NavItem,
   PillLook,
+  ReadState,
   ShellLabels,
   TabItem,
 } from './components/types'

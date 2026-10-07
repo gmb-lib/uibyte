@@ -13,6 +13,10 @@ export const buttonVariants = cva(
         outline: 'border border-line bg-surface text-ink hover:bg-band',
         ghost: 'text-ink hover:bg-band',
         accent: 'bg-status-ontrack text-white hover:bg-status-ontrack-fg',
+        // The final act of an ask — taking something away that cannot be put back.
+        // Painted from the late role's solid pair, which the token layer derives so
+        // that white text on it always reads.
+        danger: 'bg-status-late-solid-bg text-status-late-solid-fg hover:bg-status-late-solid-bg/90',
       },
       size: {
         default: 'h-10 px-4 py-2',

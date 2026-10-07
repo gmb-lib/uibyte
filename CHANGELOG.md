@@ -7,6 +7,142 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.9.0
+
+A release of pieces that screens share, so each is built once with the keyboard and reader behaviour
+it promises. One meaning changes — **done moves from `ontrack` to a new `closed` role** (below); no existing
+component changes shape.
+
+### Added — a sixth status role, `closed`; `ontrack` no longer means done
+
+Finished work now has its own role: `closed`, a muted blue with its derived pair (`status-closed-bg`, `-fg`,
+`-border`, `-solid-bg`, `-solid-fg`), and its own mark in `StatusPill` — a check inside a circle, so it never
+relies on colour to differ from `ontrack`'s open check. `ontrack` keeps *on track, valid, under way*.
+
+```vue
+<StatusPill status="closed" :label="t('status.closed')" />
+```
+
+**What to do when you upgrade:** move the states that mean *done* or *finished* from `ontrack` to `closed`;
+leave *cancelled* and *closed without an outcome* in `idle`. Nothing breaks if you do not — a done state just
+keeps reading as on track. A theme built with `buildTheme` gains the new role from the reference dot
+`#5B78DA`, and can set its own through `status.closed`.
+
+### Added — `PageHeader`: the title once, one way back, actions that give way
+
+The top of a page: its heading, an optional area above it and a quiet line under it, and the page's
+own actions at the top right. When the row is too narrow for both, the actions wrap under the title;
+the title is never squeezed. The row decides this from its own width, not the window's.
+
+```vue
+<PageHeader
+  :title="item.name"
+  :eyebrow="t('area.workspace')"
+  :back="{ label: t('items.title'), linkProps: { to: { name: 'items' } } }"
+  :link-component="RouterLink"
+>
+  <template #actions><Button variant="outline">{{ t('item.edit') }}</Button></template>
+</PageHeader>
+```
+
+`back` is the destination's name and the props for your link component; the arrow is drawn and hidden
+from a reader, so pass the name alone. The heading is an `h1` unless you give `level` (2 or 3) for a
+page inside another's frame.
+
+### Added — `StateBlock`: loading, empty, or failed — and never a code
+
+What a read says when it has nothing to show. One `state` prop with three values, so an empty answer
+and a failure cannot be drawn as each other; a failure is announced at once, the other two politely.
+Give `retryLabel` and a failure offers to try again (`@retry`); anything else a person can do goes in
+the `actions` slot, outside the announcement.
+
+```vue
+<StateBlock state="failed" :title="t('list.down')" :retry-label="t('common.tryAgain')" @retry="read()" />
+```
+
+There is no prop for an error code, on purpose: say what happened in words, and keep the code for your
+logs. With no words the block says nothing — it has no sentence of its own.
+
+### Added — `FindField`: find one thing or several, by typing
+
+Type a few letters and choose from what matches, among `options` you have already read. One at a time it is a
+combobox whose matches open under the box; with `multiple` it is a box over ticks, the ticked kept in view.
+
+```vue
+<FindField v-model="holder" :options="people" :label="t('handOver.to')" :no-match="t('people.noMatch')" />
+```
+
+Typing never chooses, and when the list could not be read (`failed`) nothing is offered in its place — there is
+no way to type a key instead. Matching ignores case and the marks over letters; the same rule is exported as
+`findMatches(query, ...texts)` for lists you filter yourself.
+
+### Added — `ActLine` and `ConfirmAsk`: an act's answer, and an act asked about first
+
+`ActLine` says what an act did, or why it was refused, in your sentence — politely or at once, toned by the
+outcome, with an optional way on beside it. `ConfirmAsk` asks in place, never in a window over the page: the
+question, what it does, *do it* and *keep it*; it takes focus when it appears and gives it back when it goes.
+
+```vue
+<ActLine outcome="refused" :text="t('roles.refused.setupBox')" />
+<ConfirmAsk :question="t('file.remove.ask')" :detail="t('common.final')" :confirm-label="t('file.remove.do')"
+            :keep-label="t('common.keep')" danger @confirm="remove()" @keep="asking = false" />
+```
+
+### Added — `ListTable`, `Pager` and `CountStrip`: a long list, the way through it, and counts that filter it
+
+`ListTable` draws rows on a shared grid where **the whole row is the way in** — your link, or a button that
+emits `open` — and folds by its own width: a column's `priority` says whether it stays, folds under the title,
+or goes. `Pager` says where the page sits in your words and offers previous, next and the pages around this
+one. `CountStrip` draws counts you have already read as the filters, one chosen at a time.
+
+```vue
+<CountStrip v-model="filter" :items="counts" :label="t('people.show')" />
+<ListTable :columns="columns" :rows="rows" :row-key="(r) => r.id" :label="t('people.title')" @open="show">
+  <template #footer><Pager v-model:page="page" :pages="pages" :range="range" v-bind="pagerWords" /></template>
+</ListTable>
+```
+
+### Added — `Menu` and `LanguageMenu`, and the `globe` glyph
+
+`Menu` is a button that opens a short list on the page's body — a list of acts (`@select`), or one choice among
+options (`v-model`, the chosen one checked). `LanguageMenu` is the menu every sign-in page needs: the language in
+use named in itself beside a globe, opening every language you carry, each named and marked in its own language.
+
+```vue
+<LanguageMenu v-model="locale" :languages="[{ code: 'en', name: 'English' }, { code: 'lv', name: 'Latviešu' }]"
+              :label="t('language')" />
+```
+
+The glyph set grows from 27 to 28 names with `globe`. No picker offers it until you list it.
+
+### Added — `SplitDetail`, `FoldMore` and `DayList`
+
+`SplitDetail` shows an item beside its list when its own width allows, and alone with a way back when it does
+not, moving focus so a keyboard reader is never left behind. `FoldMore` shows the first few and your words for the
+rest, held open while a search runs. `DayList` draws what happened under the days you group, with older lines on
+request.
+
+```vue
+<SplitDetail :open="!!item" :back-label="t('items.title')" @back="item = null">
+  <template #list>…</template>
+  <template #detail>…</template>
+</SplitDetail>
+```
+
+### Added — a `DiffList` row can be drawn by name
+
+`DiffRow` gains an optional `label`: the row is then drawn by the thing's name, with its `key` after it in
+quieter mono. A row without one is drawn exactly as before.
+
+```ts
+{ key: 'delivery', label: t('types.delivery'), status: 'ontrack', statusLabel: t('diff.added') }
+```
+
+### Added — `Button`'s `danger` variant
+
+For an act that cannot be undone, painted from the late role's derived solid pair, which the token layer
+guarantees white text reads on. The other variants are unchanged.
+
 ## v0.8.0
 
 ### Added — the `gear` glyph

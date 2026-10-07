@@ -33,6 +33,7 @@ const softByRole: Record<StatusRole, string> = {
   approaching: 'bg-status-approaching-bg text-status-approaching-fg',
   late: 'bg-status-late-bg text-status-late-fg',
   idle: 'bg-status-idle-bg text-status-idle-fg',
+  closed: 'bg-status-closed-bg text-status-closed-fg',
 }
 
 const solidByRole: Record<StatusRole, string> = {
@@ -41,6 +42,7 @@ const solidByRole: Record<StatusRole, string> = {
   approaching: 'bg-status-approaching-solid-bg text-status-approaching-solid-fg',
   late: 'bg-status-late-solid-bg text-status-late-solid-fg',
   idle: 'bg-status-idle-solid-bg text-status-idle-solid-fg',
+  closed: 'bg-status-closed-solid-bg text-status-closed-solid-fg',
 }
 
 const dotByRole: Record<StatusRole, string> = {
@@ -49,6 +51,7 @@ const dotByRole: Record<StatusRole, string> = {
   approaching: 'bg-status-approaching',
   late: 'bg-status-late',
   idle: 'bg-status-idle',
+  closed: 'bg-status-closed',
 }
 
 const lookClass = (): string => {
@@ -101,6 +104,11 @@ const lookClass = (): string => {
       <template v-else-if="status === 'late'">
         <path d="M12 4.5 21 19.5H3z" stroke-linejoin="round" />
         <path d="M12 10v3.5M12 16.6v.2" stroke-linecap="round" />
+      </template>
+      <!-- Finished: the check closed inside a circle, never the open check of on track. -->
+      <template v-else-if="status === 'closed'">
+        <circle cx="12" cy="12" r="8.5" />
+        <path d="M8.2 12.4l2.6 2.6 5-5.4" stroke-linecap="round" stroke-linejoin="round" />
       </template>
       <circle v-else cx="12" cy="12" r="4.5" fill="currentColor" stroke="none" />
     </svg>

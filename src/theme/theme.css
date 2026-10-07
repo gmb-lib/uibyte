@@ -44,6 +44,13 @@
   --color-status-idle-solid-bg: #72777d;
   --color-status-idle-solid-fg: #ffffff;
 
+  --color-status-closed: #5b78da;
+  --color-status-closed-bg: #e0e4ee;
+  --color-status-closed-fg: #455fbf;
+  --color-status-closed-border: #c7d1ec;
+  --color-status-closed-solid-bg: #5470d2;
+  --color-status-closed-solid-fg: #ffffff;
+
   --color-accent: #0e9e6b;
   --color-accent-deep: #007f55;
 

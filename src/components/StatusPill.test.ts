@@ -88,4 +88,21 @@ describe('StatusPill', () => {
       expect(w.find('svg').exists() || w.find('span[aria-hidden="true"]').exists()).toBe(true)
     }
   })
+
+  // Every role carries its own pair in every look, so none borrows another's
+  // colour — the newest role included.
+  it.each(statusRoles)('paints %s from its own pair in every look', (status) => {
+    const soft = mount(StatusPill, { props: { status, label: 'x' } })
+    const solid = mount(StatusPill, { props: { status, label: 'x', look: 'solid' } })
+    const outline = mount(StatusPill, { props: { status, label: 'x', look: 'outline' } })
+    expect(soft.classes()).toContain(`bg-status-${status}-bg`)
+    expect(solid.classes()).toContain(`bg-status-${status}-solid-bg`)
+    expect(outline.get('span > span').classes()).toContain(`bg-status-${status}`)
+  })
+
+  it('marks closed work apart from work on track, by shape as well as colour', () => {
+    const glyph = (status: 'closed' | 'ontrack') => mount(StatusPill, { props: { status, label: 'x' } }).get('svg').html()
+    expect(glyph('closed')).not.toBe(glyph('ontrack'))
+    expect(mount(StatusPill, { props: { status: 'closed', label: 'x' } }).find('svg circle').exists()).toBe(true)
+  })
 })

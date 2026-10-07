@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import DiffList from './DiffList.vue'
+import { statusRoles } from '../theme/tokens'
 import StatusPill from './StatusPill.vue'
 import type { DiffColumns, DiffGroup } from './types'
 
@@ -143,5 +144,26 @@ describe('DiffList', () => {
     await w.setProps({ groups: [g] })
     expect(keysShown(w)).toEqual(['olive'])
     expect(w.text()).not.toContain('rose')
+  })
+
+  // A person knows a thing by its name; the key is for whoever must find it in a file.
+  it('draws a row by its name when it has one, with the key after it, quieter', () => {
+    const w = list([{ key: 'types', title: 'Task types', rows: [
+      { key: 'delivery', label: 'Delivery', status: 'ontrack', statusLabel: 'added' },
+      { key: 'install', status: 'idle', statusLabel: 'unchanged' },
+    ] }])
+    const [named, bare] = w.findAll('tbody tr').map((tr) => tr.findAll('td')[0])
+    const parts = named.findAll('span')
+    expect(parts.map((p) => p.text())).toEqual(['Delivery', 'delivery'])
+    expect(parts[0].classes()).not.toContain('font-mono')
+    expect(parts[1].classes()).toContain('font-mono')
+    expect(parts[1].classes()).toContain('text-muted')
+    expect(bare.classes()).toContain('font-mono')
+    expect(bare.text()).toBe('install')
+  })
+
+  it.each(statusRoles)('tints a marked %s row in its own role', (status) => {
+    const w = list([{ key: 'g', title: 'G', rows: [{ key: 'k', status, statusLabel: 'x', marked: true }] }])
+    expect(w.get('tbody tr').classes()).toContain(`bg-status-${status}-bg/40`)
   })
 })

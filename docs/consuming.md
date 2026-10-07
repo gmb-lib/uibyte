@@ -12,7 +12,7 @@ doing together.
 **1. Pin a version.** A tag, never a floating branch.
 
 ```json
-"uibyte": "github:gmb-lib/uibyte#v0.7.0"
+"uibyte": "github:gmb-lib/uibyte#v0.9.0"
 ```
 
 **Upgrading is not just editing the tag.** Changing the version in
@@ -133,6 +133,16 @@ repointed role stays readable in every look.
 ```vue
 <StatusPill status="late" :label="t('status.late')" look="solid" />
 <StatusPill status="ontrack" :label="t('status.inWork')" look="outline" />
+```
+
+**Finished work is `closed`, not `ontrack`.** `ontrack` means *on track, valid,
+under way*; `closed` — a muted blue, marked with a check inside a circle — means
+*done and put away*. Before `0.9.0` there was no `closed` and done was drawn in
+`ontrack`; an application upgrading moves its finished states across, and keeps
+*cancelled* or *closed without an outcome* in `idle`.
+
+```vue
+<StatusPill status="closed" :label="t('status.closed')" />
 ```
 
 **A file is described by a chip, and you describe it.** `FileChip` draws the
@@ -297,7 +307,9 @@ and the role only tones the pill.
 A row marked `folded` waits behind one toggle per group, which reads your
 `foldedLabel` (the package neither counts nor pluralises, so *"38 unchanged"* is
 yours to say) and tells a reader whether it is open. A row marked `marked` is
-drawn in its own role's tint, for the one a reader must not miss. The part
+drawn in its own role's tint, for the one a reader must not miss. A row with a `label` — the thing's name — is drawn by
+it, with the `key` after it in quieter mono: a person knows a thing by its name, and
+the key is for whoever must find it in a file. The part
 column appears only in a group whose rows have parts; a group with no rows draws
 its title and its `note` — the place to say why there is nothing to show. The
 list keeps one thing of its own, which groups a reader has unfolded; everything
@@ -327,6 +339,211 @@ const sections: DiffGroup[] = [
     ],
   },
 ]
+```
+
+**A page says its title once, at the top.** `PageHeader` draws the page's heading
+(`h1` unless you give a `level` for a page inside another's frame; the size
+follows), with an optional `eyebrow` above it for the area, a quiet `subtitle`
+under it, and your actions in the `actions` slot at the top right. When the row is
+too narrow for both, the actions wrap under the title; the title is never what
+gives way. The decision is made by the header's own row, not the window, so a
+page drawn beside a list behaves the same on a wide screen.
+
+It offers **one** way back, above everything else: `back` is the destination's
+name and the props for your link component, handed over untouched. The arrow is
+drawn and hidden from a reader, so write the name alone — *Items*, not
+*← Items* — or a screen reader announces "leftwards arrow" first.
+
+```vue
+<PageHeader
+  :title="item.name"
+  :eyebrow="t('area.workspace')"
+  :back="{ label: t('items.title'), linkProps: { to: { name: 'items' } } }"
+  :link-component="RouterLink"
+>
+  <template #actions><Button variant="outline">{{ t('item.edit') }}</Button></template>
+</PageHeader>
+```
+
+**A read that has nothing to show says why, and a failed one never says
+"nothing".** `StateBlock` draws a read's `state` — `loading`, `empty` or `failed`
+— from your words: a `title` (what is true) and a `text` (why, or what to do).
+The three are one prop, so an empty answer and a failed read cannot be drawn as
+each other, and there is no prop a service's code could be passed through: say
+what happened in a sentence, and keep the code for your logs.
+
+Loading and empty are announced politely; a failure is announced at once. Give
+`retryLabel` and a failure offers to try again — the block emits `retry` and you
+read again. Anything else a person can do goes in the `actions` slot (*Add the
+first one* on an empty list, *Back* on a failure); the buttons sit outside the
+announcement, so a reader hears what happened rather than every label at once.
+`size="page"` centres it as a page's whole content; the default sits inside a card.
+With no words at all it draws its state and says nothing — it has no sentence of
+its own to fall back on, because it would be in the wrong language.
+
+```vue
+<StateBlock v-if="list.failed" state="failed" :title="t('list.down')" :text="t('list.downWhy')"
+            :retry-label="t('common.tryAgain')" @retry="list.read()" />
+<StateBlock v-else-if="list.loading" state="loading" :text="t('common.reading')" />
+<StateBlock v-else-if="!list.rows.length" state="empty" size="page" :title="t('list.none')">
+  <template #actions><Button>{{ t('list.add') }}</Button></template>
+</StateBlock>
+```
+
+**Finding something is typing a few letters and choosing from what matches.**
+`FindField` searches `options` you have already read — each a `FindOption` with a
+`key` (what you are told), a `label` and an optional `note` (both searched, so a
+code or a second name can be found too), and `disabled` for one that is shown but
+cannot be chosen. It fetches nothing.
+
+One at a time (the default) it is a combobox: the matches open under the box in
+the page's own flow, the arrow keys move through them and Enter takes one. Typing
+never chooses — `v-model` changes only when a match is taken, and a box left with
+half a name in it goes back to the name actually chosen. Give `clearLabel` to
+offer the way back to nothing. With `multiple` it is a box over ticks, and what is
+ticked stays in view at the top whatever is typed.
+
+```vue
+<FindField
+  v-model="holder"
+  :options="people.map((p) => ({ key: p.id, label: p.name, note: t('holds', { n: p.holds }) }))"
+  :label="t('handOver.to')"
+  :placeholder="t('people.find')"
+  :no-match="t('people.noMatch')"
+  :loading="people.reading ? t('common.reading') : undefined"
+  :failed="people.failed ? t('people.unreadable') : undefined"
+/>
+```
+
+When the list could not be read, say so with `failed` — the field offers nothing
+in its place. It deliberately has no way to type a key instead: a person does not
+know one. Matching ignores case and the marks over letters (*krumins* finds
+*Krūmiņš*), and the rule is exported as `findMatches(query, ...texts)`, so a list
+you filter yourself with a plain box above it finds the same way.
+
+**Every act ends in a sentence.** `ActLine` says what an act did (`outcome="done"`,
+announced politely) or why it was refused (`outcome="refused"`, announced at once),
+in your `text`, toned by the outcome. A way on — *Open it* after something was
+made — goes in the `action` slot, outside the announcement. It stays until you
+take it away, usually with the next act: a line that fades on a timer is gone
+before a slow reader reaches it.
+
+```vue
+<ActLine v-if="said" :outcome="said.ok ? 'done' : 'refused'" :text="said.text">
+  <template v-if="said.link" #action><RouterLink :to="said.link">{{ t('open') }}</RouterLink></template>
+</ActLine>
+```
+
+**An act worth asking about is asked in place.** `ConfirmAsk` draws the question
+where the act was asked for — never a window over the page — with what it does
+(`detail`: say whether it can be undone) and two answers in your words. When it
+appears it takes focus on the answer that changes nothing, so a stray Enter is
+harmless, and when you remove it focus goes back to whatever opened it. Escape
+answers *keep*. Give `danger` when the act cannot be undone: its button wears the
+danger look (also available on its own as `Button variant="danger"`). Hold both
+answers with `busy` while the act runs.
+
+```vue
+<ConfirmAsk v-if="asking" :question="t('item.retire.ask', { name })" :detail="t('item.retire.final')"
+            :confirm-label="t('item.retire.do')" :keep-label="t('common.keep')" danger :busy="working"
+            @confirm="retire()" @keep="asking = false" />
+```
+
+**In a list, the whole row is the way in.** `ListTable` draws your `rows` on a
+grid of `columns`, and each row is one target — one stop in the page order,
+announced as one. Give `rowLink` (props for your `linkComponent`) and each row is
+your link; leave it out and each row is a button that emits `open` with the row.
+A cell draws the row's field of the same `key`, or your `cell-<key>` slot. Mark
+the row open beside the list with `current`.
+
+It folds by its **own** width, not the window's, because a list beside an open
+item is narrow on any screen. A column's `priority` says how: `1` is the title
+(on a line of its own when narrow), `2` (the default) folds into the line under the
+title, `3` is shown only while the table is wide. The thresholds are the table's
+own width — 1100px, then 760px, where the header goes too. Sorting is asked for
+(`sortable` columns emit `sort`); you sort, and pass `sort` back with
+`sortedLabels`, the words a reader hears after the sorted column's name. Put a
+`Pager` in the `footer` slot to keep it in the same card.
+
+```vue
+<ListTable :columns="columns" :rows="page" :row-key="(p) => p.id" :label="t('people.title')"
+           :row-link="(p) => ({ to: { name: 'person', params: { id: p.id } } })" :link-component="RouterLink"
+           :sort="sort" :sorted-labels="{ ascending: t('sort.az'), descending: t('sort.za') }" @sort="toggleSort">
+  <template #cell-name="{ row }"><b>{{ row.name }}</b></template>
+  <template #footer>
+    <Pager v-model:page="pageNo" :pages="pages" :range="t('pager.range', { from, to, total })" :label="t('pager.label')"
+           :previous-label="t('pager.previous')" :next-label="t('pager.next')" :page-label="(n) => t('pager.page', { n })" />
+  </template>
+</ListTable>
+```
+
+**Counts that filter are one strip.** `CountStrip` draws `items` — each a label,
+an optional `count` you have already formatted, and an optional `status` for a
+dot — as toggles, one chosen (`v-model`), each announcing whether it is. It cannot
+add a count, so it shows only what your read already has. It wraps rather than
+scrolling sideways; put *More filters* or a find box in the `more` slot.
+
+```vue
+<CountStrip v-model="filter" :items="counts" :label="t('people.show')">
+  <template #more><input type="search" :placeholder="t('people.find')" v-model="query" /></template>
+</CountStrip>
+```
+
+**A menu is a button and a short list.** `Menu` draws `label` on a pill-shaped
+button; the list of `items` opens on the page's body, so a page that is its own
+size container never clips it. The arrow keys, Enter, Space and Escape do what the
+menu pattern promises, and focus returns to the button. Give `modelValue` and the
+menu is a choice among options: each is announced as checked or not, the chosen
+one wears a check, and `update:modelValue` fires only for a different choice.
+Without it the menu is a list of acts and emits `select`. An item's `lang` marks
+words in another language.
+
+```vue
+<Menu :label="t('sort.label', { by: t(`sort.${sortBy}`) })" :items="sortChoices" v-model="sortBy" align="start" />
+```
+
+**The language menu names every language in itself.** `LanguageMenu` takes the
+`languages` your application carries, each `{ code, name }` with the name in that
+language (*Latviešu*, never *Latvian*), and `modelValue`, the code in use. Its
+button shows the current language's own name beside a globe; each name is marked
+with its language so a reader pronounces it right; `label` names what the menu
+changes, in the page's language. Whether the first choice comes from the browser
+and where a choice is kept are yours.
+
+```vue
+<LanguageMenu v-model="locale" :languages="[{ code: 'en', name: 'English' }, { code: 'lv', name: 'Latviešu' }]"
+              :label="t('language')" @update:model-value="(code) => keepInThisBrowser(code)" />
+```
+
+**An item opens beside its list, or instead of it.** `SplitDetail` takes the
+`list` and `detail` slots and `open`. With room — decided by its own width, so a
+narrow column behaves the same on any screen — the item sits beside the list
+(`detailWidth`, 390px by default); below 760px it replaces the list, with a way
+back reading `backLabel` (the list's name; the arrow is drawn). Taking it emits
+`back`: close the item. Focus follows: to the item when the list is no longer
+shown, and back to the row the list marks `aria-current` (as `ListTable` does with
+`current`).
+
+```vue
+<SplitDetail :open="!!person" :back-label="t('people.users')" :label="person?.name" @back="person = null">
+  <template #list><ListTable … :current="person?.id" @open="(p) => (person = p)" /></template>
+  <template #detail><PersonCard :person="person" /></template>
+</SplitDetail>
+```
+
+**The first few, then the rest.** `FoldMore` shows `limit` items (5) and your
+`moreLabel` for the rest — counted and worded by you. Hold it `open` while a
+search is running: a match behind the fold is a match the person never sees.
+
+**History is lines under days.** `DayList` draws `days` you have grouped and
+headed (*Today*, *Tuesday 6 October* — where a day begins is the reader's time
+zone, so the grouping is yours), each line with its `time`, its `text` (or the
+`line` slot) and, quieter, `where`. Give `olderLabel` to offer older lines
+(`@older`), and `note` to say how much is shown.
+
+```vue
+<DayList :days="days" :label="t('history.title')" :older-label="more ? t('history.older') : undefined"
+         :older-busy="reading" :note="t('history.shown', { n })" @older="readOlder()" />
 ```
 
 ## Repointing the palette

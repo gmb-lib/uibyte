@@ -50,6 +50,7 @@ const badgeByRole: Record<StatusRole, string> = {
   approaching: 'text-status-approaching-fg',
   late: 'text-status-late-fg',
   idle: 'text-status-idle-fg',
+  closed: 'text-status-closed-fg',
 }
 </script>
 

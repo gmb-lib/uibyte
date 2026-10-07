@@ -19,7 +19,7 @@ provides the toolchain:
 ## Install
 
 ```
-npm install github:gmb-lib/uibyte#v0.7.0
+npm install github:gmb-lib/uibyte#v0.9.0
 ```
 
 Pin a tag. There is no registry release and no floating version.
@@ -83,8 +83,8 @@ are licensed under the SIL Open Font License 1.1, with the licence text beside
 each file. A host wanting a different typeface skips this import and repoints
 the type roles instead.
 
-That declares four surface roles (`ink`, `paper`, `band`, `console`), five
-status roles (`ontrack`, `blocked`, `approaching`, `late`, `idle`) and two type
+That declares four surface roles (`ink`, `paper`, `band`, `console`), six
+status roles (`ontrack`, `blocked`, `approaching`, `late`, `idle`, `closed`) and two type
 roles (`sans`, `mono`), so the usual utilities work: `bg-paper`, `text-ink`,
 `bg-status-late-bg`, `font-mono`.
 
