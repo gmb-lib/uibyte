@@ -378,6 +378,37 @@ its own to fall back on, because it would be in the wrong language.
 </StateBlock>
 ```
 
+**Finding something is typing a few letters and choosing from what matches.**
+`FindField` searches `options` you have already read — each a `FindOption` with a
+`key` (what you are told), a `label` and an optional `note` (both searched, so a
+code or a second name can be found too), and `disabled` for one that is shown but
+cannot be chosen. It fetches nothing.
+
+One at a time (the default) it is a combobox: the matches open under the box in
+the page's own flow, the arrow keys move through them and Enter takes one. Typing
+never chooses — `v-model` changes only when a match is taken, and a box left with
+half a name in it goes back to the name actually chosen. Give `clearLabel` to
+offer the way back to nothing. With `multiple` it is a box over ticks, and what is
+ticked stays in view at the top whatever is typed.
+
+```vue
+<FindField
+  v-model="holder"
+  :options="people.map((p) => ({ key: p.id, label: p.name, note: t('holds', { n: p.holds }) }))"
+  :label="t('handOver.to')"
+  :placeholder="t('people.find')"
+  :no-match="t('people.noMatch')"
+  :loading="people.reading ? t('common.reading') : undefined"
+  :failed="people.failed ? t('people.unreadable') : undefined"
+/>
+```
+
+When the list could not be read, say so with `failed` — the field offers nothing
+in its place. It deliberately has no way to type a key instead: a person does not
+know one. Matching ignores case and the marks over letters (*krumins* finds
+*Krūmiņš*), and the rule is exported as `findMatches(query, ...texts)`, so a list
+you filter yourself with a plain box above it finds the same way.
+
 ## Repointing the palette
 
 Each status role is set by a **single** value — the saturated one used for the

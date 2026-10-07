@@ -2,6 +2,7 @@
 // there is no supported deep-import path into the source tree, so internals can
 // move without breaking a host.
 export { cn } from './lib/cn'
+export { findMatches, foldForFind } from './lib/find'
 export type { ClassValue } from 'clsx'
 
 // The token layer. A host importing the stylesheet gets the reference look; a
@@ -54,6 +55,7 @@ export { default as Tabs } from './components/Tabs.vue'
 export { default as BrandMark } from './components/BrandMark.vue'
 export { default as PageHeader } from './components/PageHeader.vue'
 export { default as StateBlock } from './components/StateBlock.vue'
+export { default as FindField } from './components/FindField.vue'
 export { Button, buttonVariants } from './components/ui/button'
 export type { ButtonVariants } from './components/ui/button'
 export type {
@@ -61,6 +63,7 @@ export type {
   DiffColumns,
   DiffGroup,
   DiffRow,
+  FindOption,
   IconPickerOption,
   LinkComponent,
   NavGroup,

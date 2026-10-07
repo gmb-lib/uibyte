@@ -47,6 +47,19 @@ the `actions` slot, outside the announcement.
 There is no prop for an error code, on purpose: say what happened in words, and keep the code for your
 logs. With no words the block says nothing — it has no sentence of its own.
 
+### Added — `FindField`: find one thing or several, by typing
+
+Type a few letters and choose from what matches, among `options` you have already read. One at a time it is a
+combobox whose matches open under the box; with `multiple` it is a box over ticks, the ticked kept in view.
+
+```vue
+<FindField v-model="holder" :options="people" :label="t('handOver.to')" :no-match="t('people.noMatch')" />
+```
+
+Typing never chooses, and when the list could not be read (`failed`) nothing is offered in its place — there is
+no way to type a key instead. Matching ignores case and the marks over letters; the same rule is exported as
+`findMatches(query, ...texts)` for lists you filter yourself.
+
 ## v0.8.0
 
 ### Added — the `gear` glyph

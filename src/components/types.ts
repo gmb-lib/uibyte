@@ -190,6 +190,23 @@ export interface BackLink {
   linkProps?: Record<string, unknown>
 }
 
+/**
+ * One thing a find field can offer.
+ *
+ * The key is what the host is told when it is chosen; the person sees only the
+ * label and the note. A key is never shown and never typed.
+ */
+export interface FindOption {
+  /** Stable identity, and what the host is told when this is chosen. */
+  key: string
+  /** The name a person finds it by. Already translated. */
+  label: string
+  /** A quiet line beside the name — e.g. what someone already holds. Found by too. */
+  note?: string
+  /** Shown and announced, never chosen — e.g. someone who has left. */
+  disabled?: boolean
+}
+
 /** The column headings a diff list draws, already translated. */
 export interface DiffColumns {
   part: string
