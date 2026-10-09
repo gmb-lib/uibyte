@@ -103,6 +103,22 @@ describe('Menu', () => {
     const w = mount(Menu, { props: { label: 'More', items } })
     expect(w.get('button').classes()).toContain('focus-visible:outline-focus')
   })
+
+  // One menu per row draws the same words on every button; what each acts on
+  // is what tells them apart for a reader or a voice command.
+  describe('with a name of its own', () => {
+    it('is named by its words first, then what it acts on — and draws only its words', () => {
+      const plain = mount(Menu, { props: { label: 'Move to…', items } })
+      const w = mount(Menu, { props: { label: 'Move to…', about: 'notes.txt', items } })
+      expect(w.get('button').attributes('aria-label')).toBe('Move to… — notes.txt')
+      expect(w.get('button').text()).toBe(plain.get('button').text())
+    })
+
+    it('has no name but its words when it is not told what it acts on', () => {
+      const w = mount(Menu, { props: { label: 'Move to…', items } })
+      expect(w.get('button').attributes('aria-label')).toBeUndefined()
+    })
+  })
 })
 
 describe('LanguageMenu', () => {

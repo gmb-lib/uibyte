@@ -22,6 +22,12 @@ import type { MenuItem } from './types'
 // chosen — marked for the eye with a check, and announced as checked. Without
 // it, the menu is a list of acts and says only which was picked.
 //
+// A page that draws one menu per row draws the same words on every button, so
+// a reader, or someone driving the page by voice, cannot tell them apart. Given
+// `about` — what this one acts on — the button is named by its own words and
+// then that, the visible words first so the name still contains what is seen.
+// Nothing on screen changes.
+//
 // The words on the button, the choices and their order are the host's.
 const props = withDefaults(
   defineProps<{
@@ -34,8 +40,10 @@ const props = withDefaults(
     align?: 'start' | 'end'
     /** The language of the button's words, when it differs from the page's. */
     lang?: string
+    /** What the button acts on, added to its name after its words: "Move to… — Quarterly report". */
+    about?: string
   }>(),
-  { modelValue: undefined, align: 'end', lang: undefined },
+  { modelValue: undefined, align: 'end', lang: undefined, about: undefined },
 )
 
 const emit = defineEmits<{ select: [key: string]; 'update:modelValue': [key: string] }>()
@@ -52,6 +60,7 @@ const item =
 <template>
   <DropdownMenuRoot>
     <DropdownMenuTrigger
+      :aria-label="about ? `${label} — ${about}` : undefined"
       class="inline-flex items-center gap-[7px] rounded-pill border border-line bg-surface px-3 py-[5px] text-[12.5px] text-ink hover:border-ink/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
     >
       <slot name="before" />

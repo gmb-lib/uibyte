@@ -548,6 +548,48 @@ scrolling sideways; put *More filters* or a find box in the `more` slot.
 </CountStrip>
 ```
 
+**An order a person sets is dragged, or moved from the keyboard.** `OrderableList`
+draws your `items` in order — each a card with a grip and its position — and asks
+for a move: drag a row onto another, or press Alt+ArrowUp / Alt+ArrowDown on a
+focused row, and it emits `move` with the row's index and where it should go. It
+never reorders anything itself; you own the array and apply the move. `itemKey` is
+a row's identity (never its index), `label` names a row, `listLabel` names the
+list, and `rowLabel` names a row while it can be moved — say the position, since
+that is what changes. `orderable: false` draws the same list with nothing to move.
+
+```vue
+<OrderableList :items="levels" :item-key="(l) => l.id" :label="(l) => l.name" :list-label="t('levels.title')"
+               :row-label="(name, at, of) => t('levels.position', { name, at, of })" @move="moveLevel">
+  <template #default="{ item }">{{ item.name }}</template>
+</OrderableList>
+```
+
+**A row with links or buttons of its own moves by its grip alone.** Such a row
+cannot also be the thing that is dragged and the stop the keyboard lands on: its
+links would drag the row, and its controls would sit inside an option a reader is
+told to choose. With `handle` the list is a plain list and you draw each row in
+full — no card, no position badge. The row's grip reaches your slot as `grip`;
+place it with `<component :is="grip" />` wherever the row wants it, such as the
+start of a heading line with the row's own list under it.
+
+The grip is a button in the Tab order, named by your `rowLabel`, and
+Alt+ArrowUp / Alt+ArrowDown on it emits `move`. Only a drag that starts on the
+grip moves the row — the whole row, with the same drop line and fade; anywhere else
+in it, text selects and links drag as links. If you apply a move later — after
+writing it somewhere — focus goes back to the moved row's grip once you draw the
+new order, unless the person has moved on. Without `orderable`, `grip` is absent
+and nothing moves.
+
+```vue
+<OrderableList handle :items="groups" :item-key="(g) => g.id" :label="(g) => g.name" :list-label="t('groups.title')"
+               :row-label="(name, at, of) => t('groups.move', { name, at, of })" @move="moveGroup">
+  <template #default="{ item, grip }">
+    <div class="flex items-center gap-3"><component :is="grip" /><h3>{{ item.name }}</h3></div>
+    <EntryList :entries="item.entries" />
+  </template>
+</OrderableList>
+```
+
 **A menu is a button and a short list.** `Menu` draws `label` on a pill-shaped
 button; the list of `items` opens on the page's body, so a page that is its own
 size container never clips it. The arrow keys, Enter, Space and Escape do what the
@@ -559,6 +601,17 @@ words in another language.
 
 ```vue
 <Menu :label="t('sort.label', { by: t(`sort.${sortBy}`) })" :items="sortChoices" v-model="sortBy" align="start" />
+```
+
+A page that draws one menu per row — *Move to…* on every row — gives every button
+the same words, and a reader or a voice command cannot tell them apart. Give
+`about`, what this one acts on, and the button is named by its words and then that:
+*Move to… — Quarterly report*. Your words come first, so the name still holds what
+is on screen, and nothing drawn changes. An `aria-label` given to `Menu` does not
+reach its button; `about` is the way to name it.
+
+```vue
+<Menu :label="t('row.moveTo')" :about="row.name" :items="destinations" @select="(to) => move(row, to)" />
 ```
 
 **The language menu names every language in itself.** `LanguageMenu` takes the
