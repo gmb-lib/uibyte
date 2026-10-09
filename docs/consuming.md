@@ -12,7 +12,7 @@ doing together.
 **1. Pin a version.** A tag, never a floating branch.
 
 ```json
-"uibyte": "github:gmb-lib/uibyte#v0.9.0"
+"uibyte": "github:gmb-lib/uibyte#v0.10.0"
 ```
 
 **Upgrading is not just editing the tag.** Changing the version in
@@ -421,6 +421,24 @@ know one. Matching ignores case and the marks over letters (*krumins* finds
 *Krūmiņš*), and the rule is exported as `findMatches(query, ...texts)`, so a list
 you filter yourself with a plain box above it finds the same way.
 
+An option may carry an `icon` — a glyph name from the package's set — drawn before
+its name in the list, in the box once it is chosen, and beside each tick. It is for
+the eye; the name carries the meaning. As with `Icon`, a name this version does not
+know draws nothing and keeps no room open for itself, so a glyph name read from
+your data is safe to pass as it is. `footer` is a quiet line under the options,
+said whenever the list is open — how many there are, and where they are kept — and
+the box is described by it, so a reader hears it too.
+
+```vue
+<FindField
+  v-model="kind"
+  :options="kinds.map((k) => ({ key: k.id, label: k.name, icon: k.icon }))"
+  :label="t('item.kind')"
+  :no-match="t('kinds.noMatch')"
+  :footer="t('kinds.count', { n: kinds.length })"
+/>
+```
+
 **Every act ends in a sentence.** `ActLine` says what an act did (`outcome="done"`,
 announced politely) or why it was refused (`outcome="refused"`, announced at once),
 in your `text`, toned by the outcome. A way on — *Open it* after something was
@@ -448,6 +466,47 @@ answers with `busy` while the act runs.
             :confirm-label="t('item.retire.do')" :keep-label="t('common.keep')" danger :busy="working"
             @confirm="retire()" @keep="asking = false" />
 ```
+
+**A short form that belongs to the page opens over it.** `Window` is a modal
+window for a form like changing an item's details, where leaving the page would
+lose the person's place: your `title` as its heading — and the name a reader hears
+— your form in the default slot, your buttons in the `footer` slot, and a close mark
+named by `closeLabel`. Hold it with `v-model:open`.
+
+When it opens, focus moves to the first thing in its body that takes it — not the
+close mark, which comes first, because the person opened the window to fill it in
+— or to the window itself when the body holds nothing to focus. Tab stays inside,
+and the page behind is held still and hidden from a reader. Escape, the close mark
+and a press on the backdrop each close it (`update:open` with `false`), and focus
+goes back to whatever opened it.
+
+Set `busy` while something the window started is under way — a save, say — and
+none of the three closes it, so its answer is never left unseen; the close mark is
+announced as unavailable. Setting `open` yourself still closes it, so a save that
+answers can close the window at once. Your own buttons are yours to hold. An
+Escape that something inside has already used — a `FindField` closing its list —
+leaves the window open.
+
+It is a short form's width (560px), or `size="wide"` (760px) for a form laid out
+in two columns. It folds by the width of the space it opens in, as everything here
+does — for a window that is the whole page, since it opens on the page's body:
+below 640px it takes the full width and height.
+
+```vue
+<Window v-model:open="editing" :title="t('item.edit')" :close-label="t('common.close')" :busy="saving">
+  <ItemForm v-model="draft" />
+  <template #footer>
+    <Button variant="outline" @click="editing = false">{{ t('common.cancel') }}</Button>
+    <Button :disabled="saving" @click="save()">{{ t('common.save') }}</Button>
+  </template>
+</Window>
+```
+
+An act asked about first is not a window: ask it in place with `ConfirmAsk`. And
+the name is also the browser's: where this one is imported, `Window` as a type is
+still the browser's, but `Window` as a value — `x instanceof Window` — is the
+component, so a module that needs the browser's imports this one under another
+name: `import { Window as FormWindow } from 'uibyte'`.
 
 **In a list, the whole row is the way in.** `ListTable` draws your `rows` on a
 grid of `columns`, and each row is one target — one stop in the page order,
@@ -489,6 +548,48 @@ scrolling sideways; put *More filters* or a find box in the `more` slot.
 </CountStrip>
 ```
 
+**An order a person sets is dragged, or moved from the keyboard.** `OrderableList`
+draws your `items` in order — each a card with a grip and its position — and asks
+for a move: drag a row onto another, or press Alt+ArrowUp / Alt+ArrowDown on a
+focused row, and it emits `move` with the row's index and where it should go. It
+never reorders anything itself; you own the array and apply the move. `itemKey` is
+a row's identity (never its index), `label` names a row, `listLabel` names the
+list, and `rowLabel` names a row while it can be moved — say the position, since
+that is what changes. `orderable: false` draws the same list with nothing to move.
+
+```vue
+<OrderableList :items="levels" :item-key="(l) => l.id" :label="(l) => l.name" :list-label="t('levels.title')"
+               :row-label="(name, at, of) => t('levels.position', { name, at, of })" @move="moveLevel">
+  <template #default="{ item }">{{ item.name }}</template>
+</OrderableList>
+```
+
+**A row with links or buttons of its own moves by its grip alone.** Such a row
+cannot also be the thing that is dragged and the stop the keyboard lands on: its
+links would drag the row, and its controls would sit inside an option a reader is
+told to choose. With `handle` the list is a plain list and you draw each row in
+full — no card, no position badge. The row's grip reaches your slot as `grip`;
+place it with `<component :is="grip" />` wherever the row wants it, such as the
+start of a heading line with the row's own list under it.
+
+The grip is a button in the Tab order, named by your `rowLabel`, and
+Alt+ArrowUp / Alt+ArrowDown on it emits `move`. Only a drag that starts on the
+grip moves the row — the whole row, with the same drop line and fade; anywhere else
+in it, text selects and links drag as links. If you apply a move later — after
+writing it somewhere — focus goes back to the moved row's grip once you draw the
+new order, unless the person has moved on. Without `orderable`, `grip` is absent
+and nothing moves.
+
+```vue
+<OrderableList handle :items="groups" :item-key="(g) => g.id" :label="(g) => g.name" :list-label="t('groups.title')"
+               :row-label="(name, at, of) => t('groups.move', { name, at, of })" @move="moveGroup">
+  <template #default="{ item, grip }">
+    <div class="flex items-center gap-3"><component :is="grip" /><h3>{{ item.name }}</h3></div>
+    <EntryList :entries="item.entries" />
+  </template>
+</OrderableList>
+```
+
 **A menu is a button and a short list.** `Menu` draws `label` on a pill-shaped
 button; the list of `items` opens on the page's body, so a page that is its own
 size container never clips it. The arrow keys, Enter, Space and Escape do what the
@@ -500,6 +601,17 @@ words in another language.
 
 ```vue
 <Menu :label="t('sort.label', { by: t(`sort.${sortBy}`) })" :items="sortChoices" v-model="sortBy" align="start" />
+```
+
+A page that draws one menu per row — *Move to…* on every row — gives every button
+the same words, and a reader or a voice command cannot tell them apart. Give
+`about`, what this one acts on, and the button is named by its words and then that:
+*Move to… — Quarterly report*. Your words come first, so the name still holds what
+is on screen, and nothing drawn changes. An `aria-label` given to `Menu` does not
+reach its button; `about` is the way to name it.
+
+```vue
+<Menu :label="t('row.moveTo')" :about="row.name" :items="destinations" @select="(to) => move(row, to)" />
 ```
 
 **The language menu names every language in itself.** `LanguageMenu` takes the

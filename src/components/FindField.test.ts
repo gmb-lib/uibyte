@@ -199,6 +199,100 @@ describe('FindField — one at a time', () => {
   })
 })
 
+describe('FindField — a glyph per option, and a line under the list', () => {
+  const kinds: FindOption[] = [
+    { key: 'k-meeting', label: 'Meeting', icon: 'calendar' },
+    { key: 'k-check', label: 'Inspection', note: 'against a standard', icon: 'check' },
+    { key: 'k-plain', label: 'Plain work' },
+    { key: 'k-unknown', label: 'Imported', icon: 'no-such-glyph' },
+  ]
+  const ofKinds = (props: Record<string, unknown> = {}) =>
+    one({ options: kinds, label: 'Kind', noMatch: 'No kind matches', ...props })
+
+  // The name carries the meaning; the glyph is there for the eye, so a reader
+  // hears the name once and nothing else.
+  it('draws an option’s glyph before its name, hidden from a reader', async () => {
+    const w = ofKinds()
+    await w.get('input').trigger('focus')
+    const [meeting, inspection, plain] = w.findAll('[role="option"]')
+    const glyph = meeting.element.firstElementChild
+    expect(glyph?.tagName.toLowerCase()).toBe('svg')
+    expect(glyph?.getAttribute('aria-hidden')).toBe('true')
+    expect(meeting.text()).toBe('Meeting')
+    expect(inspection.find('svg').exists()).toBe(true)
+    expect(plain.find('svg').exists()).toBe(false)
+  })
+
+  it('draws the chosen one’s glyph in the box beside its name, and drops it while typing', async () => {
+    const w = ofKinds({ modelValue: 'k-meeting' })
+    const box = w.get('input')
+    const glyph = () => box.element.parentElement?.querySelector('svg')
+    expect(glyph()?.getAttribute('aria-hidden')).toBe('true')
+    expect(box.classes()).toContain('pl-[34px]')
+    await box.trigger('focus')
+    await box.setValue('Insp')
+    expect(glyph()).toBeNull()
+    expect(box.classes()).not.toContain('pl-[34px]')
+  })
+
+  // A glyph name is data a host has stored; one this version does not know draws
+  // nothing and holds no room open for it.
+  it('keeps no room in the box for a glyph it does not know', () => {
+    const w = ofKinds({ modelValue: 'k-unknown' })
+    expect(w.find('svg').exists()).toBe(false)
+    expect(w.get('input').classes()).not.toContain('pl-[34px]')
+  })
+
+  it('draws the glyph beside each tick too', () => {
+    const w = mount(FindField, {
+      props: { options: kinds, modelValue: ['k-check'], multiple: true, label: 'Kinds', noMatch: 'No kind matches' },
+    })
+    const rows = w.findAll('label')
+    expect(rows.map((r) => r.find('svg').exists())).toEqual([true, true, false, false])
+    expect(rows[0].text()).toBe('Inspection against a standard')
+  })
+
+  it('says the line under the list whenever the list is open, and the box is described by it', async () => {
+    const w = ofKinds({ footer: '4 kinds in all' })
+    expect(w.text()).not.toContain('4 kinds in all')
+    expect(w.get('input').attributes('aria-describedby')).toBeUndefined()
+    await w.get('input').trigger('focus')
+    const line = document.getElementById(w.get('input').attributes('aria-describedby') ?? '')
+    expect(line?.textContent?.trim()).toBe('4 kinds in all')
+    // Under the options, and not one of them.
+    expect(line?.closest('[role="listbox"]')).toBeNull()
+    expect(w.get('[role="listbox"]').element.compareDocumentPosition(line as Node)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    expect(optionTexts(w)).toEqual(['Meeting', 'Inspection against a standard', 'Plain work', 'Imported'])
+    await w.get('input').trigger('keydown', { key: 'Escape' })
+    expect(w.text()).not.toContain('4 kinds in all')
+  })
+
+  it('says the line under the ticks, which are always open', () => {
+    const w = mount(FindField, {
+      props: {
+        options: kinds,
+        modelValue: [],
+        multiple: true,
+        label: 'Kinds',
+        noMatch: 'No kind matches',
+        footer: '4 kinds in all',
+      },
+    })
+    const group = w.get('[role="group"]')
+    expect(group.element.lastElementChild?.textContent?.trim()).toBe('4 kinds in all')
+    expect(w.get('input[type="search"]').attributes('aria-describedby')).toBe(
+      group.element.lastElementChild?.id,
+    )
+  })
+
+  it('says no line under a list it could not read', () => {
+    const w = ofKinds({ footer: '4 kinds in all', failed: 'The kinds could not be read' })
+    expect(w.text()).not.toContain('4 kinds in all')
+  })
+})
+
 describe('FindField — several at once', () => {
   it('is a box over a named group of ticks', () => {
     const w = several({ summary: '4 not added yet' })

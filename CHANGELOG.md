@@ -7,6 +7,98 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.10.0
+
+A window for a short form, two optional additions to `FindField`, a way to move an `OrderableList` row by
+its grip alone, and a name of its own for a `Menu`. Everything is additive: nothing you already pass changes
+what is drawn.
+
+### Added — `Window`: a short form over the page
+
+For a form that belongs to the page under it — changing an item's details, say — where leaving the page would
+lose the person's place. You hold it open with `v-model:open`; it draws your `title` as its heading and names
+itself by it, your form in the default slot and your buttons in `footer`.
+
+```vue
+<Window v-model:open="editing" :title="t('item.edit')" :close-label="t('common.close')" :busy="saving">
+  <ItemForm v-model="draft" />
+  <template #footer>
+    <Button variant="outline" @click="editing = false">{{ t('common.cancel') }}</Button>
+    <Button :disabled="saving" @click="save()">{{ t('common.save') }}</Button>
+  </template>
+</Window>
+```
+
+When it opens, focus moves to the first thing in its body that takes it (the window itself when there is none),
+Tab stays inside, and the page behind is held still and hidden from a reader. Escape, the close mark and a
+press outside close it — emitting `update:open` with `false` — and focus goes back to whatever opened it. While
+`busy` is set, none of the three closes it, so a save under way is never left with its answer unseen; setting
+`open` yourself still does. An Escape
+that something inside has already used for itself, such as a `FindField` closing its list, leaves the window
+open. `size="wide"` is for a form laid out in two columns. It folds by the width of the space it opens in, as
+the rest of the package does — here the whole page, since it opens on the page's body: below 640px it takes the
+full width and height.
+
+`ConfirmAsk` does not change: an act asked about first is still asked in place, not in a window.
+
+The name is also the browser's: in a module that imports this one, `Window` as a type is still the browser's,
+but `Window` as a value — `x instanceof Window` — is now the component. Such a module imports it under another
+name: `import { Window as FormWindow } from 'uibyte'`.
+
+### Added — `FindField`: a glyph per option, and a line under the list
+
+A `FindOption` may carry an `icon`, a glyph name from the package's set, drawn before its name in the list, in
+the box once chosen, and beside each tick. It is for the eye only — the name carries the meaning — and, as with
+`Icon`, a name this version does not know draws nothing and keeps no room open for itself.
+
+`footer` is a quiet line under the options, said whenever the list is open, and the box is described by it.
+
+```vue
+<FindField v-model="kind" :options="kinds.map((k) => ({ key: k.id, label: k.name, icon: k.icon }))"
+           :label="t('item.kind')" :no-match="t('kinds.noMatch')" :footer="t('kinds.count', { n: kinds.length })" />
+```
+
+An option without a glyph and a field without a footer are drawn as before. The box and the open list each now
+sit inside one more element than they did, which matters only to a test of yours that reaches into the field's
+markup by position.
+
+### Added — `OrderableList`: a row moved by its grip alone
+
+For a list whose rows hold links or buttons of their own — a heading with a list of things that open under it,
+say. The list as it was cannot carry such a row: it makes the whole row the drag source and the keyboard stop,
+draws it as a card with its position, and tells a reader each row is an option to choose. With `handle`, the
+list is a plain list and you draw each row in full; the row's grip reaches your slot as `grip`, for you to
+place wherever the row wants it.
+
+```vue
+<OrderableList handle :items="groups" :item-key="(g) => g.id" :label="(g) => g.name" :list-label="t('groups.title')"
+               :row-label="(name, at, of) => t('groups.move', { name, at, of })" @move="moveGroup">
+  <template #default="{ item, grip }">
+    <div class="flex items-center gap-3"><component :is="grip" /><h3>{{ item.name }}</h3></div>
+    <EntryList :entries="item.entries" />
+  </template>
+</OrderableList>
+```
+
+The grip is a button in the Tab order, named by your `rowLabel`, and Alt+ArrowUp / Alt+ArrowDown on it emits
+`move` as a focused row does today. Only a drag that starts on the grip moves the row — the whole row, with the
+same drop line and fade; anywhere else in it, text selects and links drag as links. If you apply a move later,
+after writing it somewhere, focus goes back to the moved row's grip once you draw the new order, unless the
+person has moved on. Without `orderable`, `grip` is absent and nothing moves. A list without `handle` is drawn
+and behaves exactly as before.
+
+### Added — `Menu`: a name that says what it acts on
+
+`about` is what the button acts on, in your words. The button is then named by its words followed by that —
+*Move to… — Quarterly report* — your visible words first, so the name still holds what is on screen. Nothing
+drawn changes. It is for a page that draws one menu per row, where every button says the same thing and a reader
+or a voice command could not tell them apart; an `aria-label` given to `Menu` does not reach its button, so this
+is the way to name it. Without `about`, the button is named by its words alone, as before.
+
+```vue
+<Menu :label="t('row.moveTo')" :about="row.name" :items="destinations" @select="(to) => move(row, to)" />
+```
+
 ## v0.9.0
 
 A release of pieces that screens share, so each is built once with the keyboard and reader behaviour

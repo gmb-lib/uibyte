@@ -1,10 +1,17 @@
 <script setup lang="ts" generic="T">
-import { ref } from 'vue'
+import { h, onBeforeUnmount, ref, watch, type VNode } from 'vue'
 
 // One reorder control for every ordered list. A grip handle drags a row
 // anywhere — a drop line previews the landing slot — and a focused row moves
 // with Alt+ArrowUp / Alt+ArrowDown, so the keyboard path is first-class rather
 // than an afterthought. The order badge shows each row's 1-based position.
+//
+// A row that holds links or buttons of its own cannot be the drag source and the
+// keyboard stop at once: its links would drag the row, and its controls would sit
+// inside an option a reader is told to choose. With `handle` the list is a plain
+// list whose rows the host draws in full, and the row moves by its grip alone —
+// a real button, placed by the host wherever its row wants it, that drags the
+// whole row and moves it with Alt and the arrow keys.
 //
 // The parent owns the array. This only ever emits the desired move.
 const props = withDefaults(
@@ -19,18 +26,33 @@ const props = withDefaults(
     /**
      * Accessible name for a row when it can be reordered — it should say the
      * position, since that is the thing being changed. Given the row's label,
-     * its 1-based position and the total.
+     * its 1-based position and the total. With `handle` it names the grip.
      */
     rowLabel?: (name: string, position: number, total: number) => string
     /** False renders the list with no reorder affordance at all. */
     orderable?: boolean
+    /**
+     * Rows are moved by their grip only, and drawn entirely by the host: no card,
+     * no position badge. The grip reaches the default slot as `grip`, for the host
+     * to place with `<component :is="grip" />`.
+     */
+    handle?: boolean
   }>(),
   {
     orderable: true,
     rowLabel: (name: string, position: number, total: number) =>
       `${name} — ${position} of ${total}`,
+    handle: false,
   },
 )
+
+defineSlots<{
+  /**
+   * One row. With `handle`, `grip` is the row's grip — absent when the list is
+   * not orderable.
+   */
+  default(props: { item: T; index: number; grip?: VNode }): unknown
+}>()
 
 const emit = defineEmits<{ move: [from: number, to: number] }>()
 
@@ -61,21 +83,164 @@ function onDragEnd(): void {
   dropIndex.value = null
 }
 
+/** Where Alt+ArrowUp / Alt+ArrowDown asks row `i` to go, or null for any other key. */
+function keyedMove(i: number, e: KeyboardEvent): number | null {
+  if (!e.altKey) return null
+  if (e.key === 'ArrowUp' && i > 0) return i - 1
+  if (e.key === 'ArrowDown' && i < props.items.length - 1) return i + 1
+  return null
+}
+
 function onKeydown(i: number, e: KeyboardEvent): void {
-  if (!e.altKey) return
-  if (e.key === 'ArrowUp' && i > 0) {
-    e.preventDefault()
-    emit('move', i, i - 1)
-  }
-  if (e.key === 'ArrowDown' && i < props.items.length - 1) {
-    e.preventDefault()
-    emit('move', i, i + 1)
-  }
+  const to = keyedMove(i, e)
+  if (to === null) return
+  e.preventDefault()
+  emit('move', i, to)
+}
+
+// --- moved by its grip only --------------------------------------------------
+
+// The list says it is a list: Safari stops calling one a list once its markers
+// are styled away, unless it is told. The rows stay plain items.
+//
+// A row is draggable only while its grip is pressed. At rest it is not, so text
+// in it can be selected and its links dragged as links; and a dragstart that
+// something inside the row raises for itself is never taken for the row's own.
+const armed = ref<string | null>(null)
+
+function arm(key: string, e: PointerEvent): void {
+  // A press with any button but the main one — a context menu — is not a drag.
+  if (e.button > 0) return
+  armed.value = key
+  // The press can end anywhere: the pointer may leave the grip before a drag
+  // begins, or no drag may begin at all.
+  window.addEventListener('pointerup', disarm)
+  window.addEventListener('pointercancel', letGoSoon)
+}
+
+function disarm(): void {
+  armed.value = null
+  window.removeEventListener('pointerup', disarm)
+  window.removeEventListener('pointercancel', letGoSoon)
+}
+
+// A drag that begins takes the pointer away, and a browser may say so just
+// before it fires dragstart. Letting go a moment later leaves that drag its
+// chance; a drag under way is let go of when it ends.
+function letGoSoon(): void {
+  setTimeout(() => {
+    if (dragIndex.value === null) disarm()
+  })
+}
+
+onBeforeUnmount(disarm)
+
+// The parent may apply a move later — after writing it somewhere — and redrawing
+// the rows can take focus off the grip that asked. So the grip that asked is
+// remembered, and focus goes back to it once the row is drawn in another place.
+let refocus: { key: string; from: number } | null = null
+const list = ref<HTMLElement | null>(null)
+const gripEls = new Map<string, HTMLElement>()
+
+function onGripDragStart(i: number, key: string, e: DragEvent): void {
+  if (armed.value !== key || e.target !== e.currentTarget) return
+  refocus = null
+  onDragStart(i, e)
+}
+
+function onGripDragEnd(): void {
+  onDragEnd()
+  disarm()
+}
+
+function onGripKeydown(i: number, key: string, e: KeyboardEvent): void {
+  const to = keyedMove(i, e)
+  if (to === null) return
+  e.preventDefault()
+  refocus = { key, from: i }
+  emit('move', i, to)
+}
+
+watch(
+  () => props.items.map((item) => props.itemKey(item)),
+  (keys) => {
+    if (!refocus) return
+    const at = keys.indexOf(refocus.key)
+    // Still where it was: the move has not been drawn yet.
+    if (at === refocus.from) return
+    const key = refocus.key
+    refocus = null
+    if (at < 0) return
+    // Only take focus back if it is still ours to give: on the list, or nowhere.
+    // If the person has moved on, leave them there.
+    const now = document.activeElement
+    const ours = !now || now === document.body || (list.value?.contains(now) ?? false)
+    if (ours) gripEls.get(key)?.focus()
+  },
+  { flush: 'post' },
+)
+
+const dots: [number, number][] = [
+  [2.5, 2.5], [7.5, 2.5],
+  [2.5, 8], [7.5, 8],
+  [2.5, 13.5], [7.5, 13.5],
+]
+
+/** The grip of row `i`, drawn here and placed by the host. */
+function grip(item: T, i: number): VNode {
+  const key = props.itemKey(item)
+  return h(
+    'button',
+    {
+      type: 'button',
+      class:
+        'grid h-7 w-5 shrink-0 cursor-grab place-items-center rounded-chip text-faint hover:bg-status-ontrack-bg hover:text-status-ontrack-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus',
+      'aria-label': props.rowLabel(props.label(item), i + 1, props.items.length),
+      'data-testid': 'grip',
+      ref: (el: unknown) => {
+        if (el instanceof HTMLElement) gripEls.set(key, el)
+        else gripEls.delete(key)
+      },
+      onPointerdown: (e: PointerEvent) => arm(key, e),
+      onKeydown: (e: KeyboardEvent) => onGripKeydown(i, key, e),
+    },
+    [
+      h(
+        'svg',
+        { width: 10, height: 16, viewBox: '0 0 10 16', fill: 'currentColor', 'aria-hidden': 'true' },
+        dots.map(([cx, cy]) => h('circle', { cx, cy, r: 1.5 })),
+      ),
+    ],
+  )
+}
+
+/** Row `i` is where a dragged row would land. */
+function isDropTarget(i: number): boolean {
+  return dropIndex.value === i && dragIndex.value !== null && dragIndex.value !== i
 }
 </script>
 
 <template>
-  <ul class="space-y-2.5" role="listbox" :aria-label="listLabel">
+  <ul v-if="handle" ref="list" role="list" :aria-label="listLabel">
+    <li
+      v-for="(item, i) in items"
+      :key="itemKey(item)"
+      :draggable="(orderable && armed === itemKey(item)) || undefined"
+      :class="[
+        dragIndex === i ? 'opacity-45' : '',
+        isDropTarget(i) ? 'shadow-[inset_0_3px_0_0_var(--color-status-ontrack)]' : '',
+      ]"
+      @dragstart="orderable && onGripDragStart(i, itemKey(item), $event)"
+      @dragover="orderable && onDragOver(i, $event)"
+      @dragleave="dropIndex === i && (dropIndex = null)"
+      @drop.prevent="orderable && onDrop(i)"
+      @dragend="onGripDragEnd"
+    >
+      <slot :item="item" :index="i" :grip="orderable ? grip(item, i) : undefined" />
+    </li>
+  </ul>
+
+  <ul v-else class="space-y-2.5" role="listbox" :aria-label="listLabel">
     <li
       v-for="(item, i) in items"
       :key="itemKey(item)"
