@@ -7,6 +7,60 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.10.0
+
+A window for a short form, and two optional additions to `FindField`. Everything is additive: nothing you
+already pass changes what is drawn.
+
+### Added — `Window`: a short form over the page
+
+For a form that belongs to the page under it — changing an item's details, say — where leaving the page would
+lose the person's place. You hold it open with `v-model:open`; it draws your `title` as its heading and names
+itself by it, your form in the default slot and your buttons in `footer`.
+
+```vue
+<Window v-model:open="editing" :title="t('item.edit')" :close-label="t('common.close')" :busy="saving">
+  <ItemForm v-model="draft" />
+  <template #footer>
+    <Button variant="outline" @click="editing = false">{{ t('common.cancel') }}</Button>
+    <Button :disabled="saving" @click="save()">{{ t('common.save') }}</Button>
+  </template>
+</Window>
+```
+
+When it opens, focus moves to the first thing in its body that takes it (the window itself when there is none),
+Tab stays inside, and the page behind is held still and hidden from a reader. Escape, the close mark and a
+press outside close it — emitting `update:open` with `false` — and focus goes back to whatever opened it. While
+`busy` is set, none of the three closes it, so a save under way is never left with its answer unseen; setting
+`open` yourself still does. An Escape
+that something inside has already used for itself, such as a `FindField` closing its list, leaves the window
+open. `size="wide"` is for a form laid out in two columns. It folds by the width of the space it opens in, as
+the rest of the package does — here the whole page, since it opens on the page's body: below 640px it takes the
+full width and height.
+
+`ConfirmAsk` does not change: an act asked about first is still asked in place, not in a window.
+
+The name is also the browser's: in a module that imports this one, `Window` as a type is still the browser's,
+but `Window` as a value — `x instanceof Window` — is now the component. Such a module imports it under another
+name: `import { Window as FormWindow } from 'uibyte'`.
+
+### Added — `FindField`: a glyph per option, and a line under the list
+
+A `FindOption` may carry an `icon`, a glyph name from the package's set, drawn before its name in the list, in
+the box once chosen, and beside each tick. It is for the eye only — the name carries the meaning — and, as with
+`Icon`, a name this version does not know draws nothing and keeps no room open for itself.
+
+`footer` is a quiet line under the options, said whenever the list is open, and the box is described by it.
+
+```vue
+<FindField v-model="kind" :options="kinds.map((k) => ({ key: k.id, label: k.name, icon: k.icon }))"
+           :label="t('item.kind')" :no-match="t('kinds.noMatch')" :footer="t('kinds.count', { n: kinds.length })" />
+```
+
+An option without a glyph and a field without a footer are drawn as before. The box and the open list each now
+sit inside one more element than they did, which matters only to a test of yours that reaches into the field's
+markup by position.
+
 ## v0.9.0
 
 A release of pieces that screens share, so each is built once with the keyboard and reader behaviour

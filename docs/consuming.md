@@ -421,6 +421,24 @@ know one. Matching ignores case and the marks over letters (*krumins* finds
 *Krūmiņš*), and the rule is exported as `findMatches(query, ...texts)`, so a list
 you filter yourself with a plain box above it finds the same way.
 
+An option may carry an `icon` — a glyph name from the package's set — drawn before
+its name in the list, in the box once it is chosen, and beside each tick. It is for
+the eye; the name carries the meaning. As with `Icon`, a name this version does not
+know draws nothing and keeps no room open for itself, so a glyph name read from
+your data is safe to pass as it is. `footer` is a quiet line under the options,
+said whenever the list is open — how many there are, and where they are kept — and
+the box is described by it, so a reader hears it too.
+
+```vue
+<FindField
+  v-model="kind"
+  :options="kinds.map((k) => ({ key: k.id, label: k.name, icon: k.icon }))"
+  :label="t('item.kind')"
+  :no-match="t('kinds.noMatch')"
+  :footer="t('kinds.count', { n: kinds.length })"
+/>
+```
+
 **Every act ends in a sentence.** `ActLine` says what an act did (`outcome="done"`,
 announced politely) or why it was refused (`outcome="refused"`, announced at once),
 in your `text`, toned by the outcome. A way on — *Open it* after something was
@@ -448,6 +466,47 @@ answers with `busy` while the act runs.
             :confirm-label="t('item.retire.do')" :keep-label="t('common.keep')" danger :busy="working"
             @confirm="retire()" @keep="asking = false" />
 ```
+
+**A short form that belongs to the page opens over it.** `Window` is a modal
+window for a form like changing an item's details, where leaving the page would
+lose the person's place: your `title` as its heading — and the name a reader hears
+— your form in the default slot, your buttons in the `footer` slot, and a close mark
+named by `closeLabel`. Hold it with `v-model:open`.
+
+When it opens, focus moves to the first thing in its body that takes it — not the
+close mark, which comes first, because the person opened the window to fill it in
+— or to the window itself when the body holds nothing to focus. Tab stays inside,
+and the page behind is held still and hidden from a reader. Escape, the close mark
+and a press on the backdrop each close it (`update:open` with `false`), and focus
+goes back to whatever opened it.
+
+Set `busy` while something the window started is under way — a save, say — and
+none of the three closes it, so its answer is never left unseen; the close mark is
+announced as unavailable. Setting `open` yourself still closes it, so a save that
+answers can close the window at once. Your own buttons are yours to hold. An
+Escape that something inside has already used — a `FindField` closing its list —
+leaves the window open.
+
+It is a short form's width (560px), or `size="wide"` (760px) for a form laid out
+in two columns. It folds by the width of the space it opens in, as everything here
+does — for a window that is the whole page, since it opens on the page's body:
+below 640px it takes the full width and height.
+
+```vue
+<Window v-model:open="editing" :title="t('item.edit')" :close-label="t('common.close')" :busy="saving">
+  <ItemForm v-model="draft" />
+  <template #footer>
+    <Button variant="outline" @click="editing = false">{{ t('common.cancel') }}</Button>
+    <Button :disabled="saving" @click="save()">{{ t('common.save') }}</Button>
+  </template>
+</Window>
+```
+
+An act asked about first is not a window: ask it in place with `ConfirmAsk`. And
+the name is also the browser's: where this one is imported, `Window` as a type is
+still the browser's, but `Window` as a value — `x instanceof Window` — is the
+component, so a module that needs the browser's imports this one under another
+name: `import { Window as FormWindow } from 'uibyte'`.
 
 **In a list, the whole row is the way in.** `ListTable` draws your `rows` on a
 grid of `columns`, and each row is one target — one stop in the page order,

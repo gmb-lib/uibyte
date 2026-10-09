@@ -210,6 +210,13 @@ export interface FindOption {
   note?: string
   /** Shown and announced, never chosen — e.g. someone who has left. */
   disabled?: boolean
+  /**
+   * A glyph from the package's set, drawn before the name in the list and in the
+   * box once chosen. For the eye only: the name carries the meaning. A plain
+   * string, like `Icon`'s name, because it is usually data the host has stored —
+   * a name this version does not know draws nothing and keeps no room for itself.
+   */
+  icon?: string
 }
 
 /**
