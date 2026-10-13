@@ -7,6 +7,28 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.11.1
+
+A fix to the side menu's width, and `align` on `LanguageMenu`.
+
+### Fixed — the side menu's column fills the menu
+
+On a wide screen the side menu is a fixed width, but its column was only as wide as the longest line in it — a
+link's name, or the signed-in line in the footer — so the links' highlight stopped short of the menu's edge, and
+anything spread across the footer was only as wide as that line. With a short line a full-width menu at the foot
+was narrow, and its list could reach past the menu's edge. The column now fills the menu. What changes for an app
+already built on it: the links' highlight and anything spread across the footer reach the menu's width. The phone's
+drawer always filled its width and is unchanged.
+
+### Added — `LanguageMenu` `align`
+
+Which edge of the button its list lines up with — `'start'` or `'end'` (the default), as on `Menu`. A language
+menu among the values of a settings list, opening below its button, lines up with the button's start:
+
+```vue
+<LanguageMenu v-model="locale" align="start" :label="t('language')" :languages="languages" />
+```
+
 ## v0.11.0
 
 Three options that say where a `Menu` sits — which side its list opens on, which surface its button is drawn

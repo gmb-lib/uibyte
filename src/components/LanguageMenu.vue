@@ -29,6 +29,8 @@ const props = defineProps<{
   label: string
   /** Which side of the button the list opens on. */
   side?: 'bottom' | 'top'
+  /** Which edge of the button the list lines up with: `end` unless told. */
+  align?: 'start' | 'end'
   /** The surface it sits on: a page's light surface, or the dark application menu. */
   tone?: 'surface' | 'console'
   /** It takes the full width of its container. */
@@ -50,6 +52,7 @@ const items = computed<MenuItem[]>(() =>
       :lang="current?.code"
       :items="items"
       :model-value="modelValue"
+      :align="align"
       :side="side"
       :tone="tone"
       :block="block"
