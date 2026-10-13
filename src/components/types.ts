@@ -273,6 +273,12 @@ export interface MenuItem {
    * language named in itself — so a reader pronounces them right.
    */
   lang?: string
+  /**
+   * A short word drawn after the words, small and quiet — e.g. "everyone here".
+   * In the page's language, not the item's, and heard as part of its name.
+   * Already translated.
+   */
+  note?: string
 }
 
 /** One language an application carries, named in itself: `{ code: 'lv', name: 'Latviešu' }`. */
@@ -281,6 +287,11 @@ export interface LanguageOption {
   code: string
   /** Its own name for itself. */
   name: string
+  /**
+   * A short word drawn after its name, in the page's language — e.g. marking the
+   * language everyone here has. Already translated.
+   */
+  note?: string
 }
 
 /** One line of a day list: when, what, and where it happened. */

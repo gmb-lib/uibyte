@@ -12,7 +12,7 @@ doing together.
 **1. Pin a version.** A tag, never a floating branch.
 
 ```json
-"uibyte": "github:gmb-lib/uibyte#v0.10.0"
+"uibyte": "github:gmb-lib/uibyte#v0.11.0"
 ```
 
 **Upgrading is not just editing the tag.** Changing the version in
@@ -614,6 +614,21 @@ reach its button; `about` is the way to name it.
 <Menu :label="t('row.moveTo')" :about="row.name" :items="destinations" @select="(to) => move(row, to)" />
 ```
 
+Where a menu sits is yours to say, and three options say it. `side="top"` opens the
+list above the button — for a button at the foot of a column, with no room below;
+with no room above, it opens below instead. `tone="console"` draws the
+button for the dark application menu: no fill of its own, the dark surface's line
+for a border, light words, a faint fill when pointed at or open, and the focus ring
+made for the dark surface. The list it opens stays the light list every menu opens.
+`block` spreads the button across its container — its words take the room between
+whatever leads them and the arrow — and opens a list at least as wide as the button.
+Left out, each is as before: below, on a light surface, as wide as its words.
+
+An item's `note` is a short word drawn after its words, small and quiet — *everyone
+here* beside the one everyone has. It is in the page's language, so when an item
+has one, the item's `lang` marks its words alone and the note is read as the page
+is. A reader hears it as part of the item's name, after the words.
+
 **The language menu names every language in itself.** `LanguageMenu` takes the
 `languages` your application carries, each `{ code, name }` with the name in that
 language (*Latviešu*, never *Latvian*), and `modelValue`, the code in use. Its
@@ -625,6 +640,19 @@ and where a choice is kept are yours.
 ```vue
 <LanguageMenu v-model="locale" :languages="[{ code: 'en', name: 'English' }, { code: 'lv', name: 'Latviešu' }]"
               :label="t('language')" @update:model-value="(code) => keepInThisBrowser(code)" />
+```
+
+It takes `side`, `tone` and `block` and hands them to its menu, and when `block` is
+set the group around it spans its container too. A language's `note` reaches its
+item: at the foot of a dark side menu, opening upward across the menu's width, the
+language everyone here has can say so in the page's language.
+
+```vue
+<template #sidebar-footer>
+  <LanguageMenu v-model="locale" side="top" tone="console" block :label="t('language')"
+                :languages="languages.map((l) => ({ ...l, note: l.code === everyoneHas ? t('language.everyoneHere') : undefined }))" />
+  <!-- the signed-in person's name, below it -->
+</template>
 ```
 
 **An item opens beside its list, or instead of it.** `SplitDetail` takes the
