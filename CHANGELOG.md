@@ -7,6 +7,44 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.11.0
+
+Three options that say where a `Menu` sits — which side its list opens on, which surface its button is drawn
+for, and whether it spans its container — and a note an item can carry after its words. `LanguageMenu` takes
+all four. Everything is additive: a menu that passes none of them draws exactly the markup it drew in v0.10.0.
+
+### Added — `Menu`: opening upward, a button for the dark menu, the full width
+
+- `side` (`'bottom'` or `'top'`, default `'bottom'`) — which side of the button the list opens on. A button at
+  the foot of a column has no room below it; with no room above, the list opens below instead.
+- `tone` (`'surface'` or `'console'`, default `'surface'`) — `'console'` draws the button for the dark
+  application menu: no fill of its own, the dark surface's line for its border, light words, a faint fill when
+  pointed at or open, a quieter arrow, and the focus ring made for the dark surface (`console-focus`). The list
+  it opens stays the light list every menu opens.
+- `block` (default `false`) — the button spans its container; its words take the room between whatever leads
+  them and the arrow, and the list it opens is at least as wide as the button.
+
+### Added — a note after an item's words
+
+`MenuItem.note` is a short word drawn after the item's words, small, quiet and in mono — *everyone here*
+beside the one everyone has, say. It is in the page's language, not the item's: when an item carries one, its
+`lang` marks its words alone, so a reader says the name in its own language and the note in the page's. The
+note is part of the item's name, heard after its words. An item without a note is drawn as before.
+
+### Added — `LanguageMenu` carries them
+
+`LanguageOption.note` reaches the language's item, and `side`, `tone` and `block` reach its menu; with `block`,
+the group around the menu spans its container too (it was, and without `block` still is, inline). A language
+menu at the foot of a dark side menu, opening upward across its width, the deployment's language marked:
+
+```vue
+<template #sidebar-footer>
+  <LanguageMenu v-model="locale" side="top" tone="console" block :label="t('language')"
+                :languages="[{ code: 'en', name: 'English' },
+                             { code: 'lv', name: 'Latviešu', note: t('language.everyoneHere') }]" />
+</template>
+```
+
 ## v0.10.0
 
 A window for a short form, two optional additions to `FindField`, a way to move an `OrderableList` row by
