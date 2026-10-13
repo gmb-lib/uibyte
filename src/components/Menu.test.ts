@@ -227,11 +227,13 @@ describe('Menu', () => {
       expect(arrow.text()).toBe('▾')
     })
 
-    it('opens a list at least as wide as itself', async () => {
+    // A spread button is as wide as its column, and its list lines up with it: no
+    // floor of its own that would push it past a narrow column's edge.
+    it('opens a list as wide as itself, and no wider unless its words need it', async () => {
       const w = mount(Menu, { props: { label: 'More', items, block: true }, attachTo: document.body })
       await open(w)
-      expect(list().classList).toContain('min-w-[max(190px,var(--reka-dropdown-menu-trigger-width))]')
-      expect(list().classList).not.toContain('min-w-[190px]')
+      expect(list().classList).toContain('min-w-[var(--reka-dropdown-menu-trigger-width)]')
+      expect([...list().classList].filter((c) => c.startsWith('min-w-'))).toEqual(['min-w-[var(--reka-dropdown-menu-trigger-width)]'])
     })
   })
 

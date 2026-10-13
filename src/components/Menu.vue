@@ -104,7 +104,7 @@ const button = computed(
 )
 const content = computed(
   () =>
-    `z-50 flex ${props.block ? 'min-w-[max(190px,var(--reka-dropdown-menu-trigger-width))]' : 'min-w-[190px]'} flex-col rounded-[12px] border border-line bg-surface p-1.5 shadow-[0_14px_38px_rgba(22,24,27,0.13)]`,
+    `z-50 flex ${props.block ? 'min-w-[var(--reka-dropdown-menu-trigger-width)]' : 'min-w-[190px]'} flex-col rounded-[12px] border border-line bg-surface p-1.5 shadow-[0_14px_38px_rgba(22,24,27,0.13)]`,
 )
 
 const item =
