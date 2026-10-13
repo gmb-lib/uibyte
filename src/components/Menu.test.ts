@@ -361,6 +361,18 @@ describe('LanguageMenu', () => {
     expect(list().getAttribute('data-side')).toBe('top')
   })
 
+  // A menu on a page, opening below its button, lines its list up with the button’s start when the host says so.
+  it('lines its list up with the button’s start edge when its host says so, and with its end otherwise', async () => {
+    const w = mount(LanguageMenu, { props: { languages, modelValue: 'en', label: 'Language', align: 'start' }, attachTo: document.body })
+    await open(w)
+    expect(list().getAttribute('data-align')).toBe('start')
+    w.unmount()
+    document.body.innerHTML = ''
+    const plain = mount(LanguageMenu, { props: { languages, modelValue: 'en', label: 'Language' }, attachTo: document.body })
+    await open(plain)
+    expect(list().getAttribute('data-align')).toBe('end')
+  })
+
   it('spans its column, group and button alike, when told to', () => {
     const w = mount(LanguageMenu, { props: { languages, modelValue: 'en', label: 'Language', block: true } })
     const group = w.get('[role="group"]')

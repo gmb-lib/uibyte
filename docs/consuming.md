@@ -12,7 +12,7 @@ doing together.
 **1. Pin a version.** A tag, never a floating branch.
 
 ```json
-"uibyte": "github:gmb-lib/uibyte#v0.11.0"
+"uibyte": "github:gmb-lib/uibyte#v0.11.1"
 ```
 
 **Upgrading is not just editing the tag.** Changing the version in
@@ -121,6 +121,10 @@ footer and the top-bar actions are yours. `sidebar-extra` renders between the
 navigation and the footer for content that belongs above the signed-in block —
 a notice, an upgrade card. Wanting to put one of your own nouns *inside* a
 component is the signal that it belongs in a slot instead.
+
+On a wide screen the side menu is a fixed width and its column fills it, so the links
+reach its edge and whatever you spread across the footer — a full-width menu, say —
+spans the menu, however short its longest line.
 
 **A status pill has three looks.** The look is volume, never meaning — the
 status role carries the meaning. `soft` (the default) is the familiar derived
@@ -642,7 +646,7 @@ and where a choice is kept are yours.
               :label="t('language')" @update:model-value="(code) => keepInThisBrowser(code)" />
 ```
 
-It takes `side`, `tone` and `block` and hands them to its menu, and when `block` is
+It takes `side`, `tone`, `block` and `align` and hands them to its menu, and when `block` is
 set the group around it spans its container too. A language's `note` reaches its
 item: at the foot of a dark side menu, opening upward across the menu's width, the
 language everyone here has can say so in the page's language.

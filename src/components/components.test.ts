@@ -42,6 +42,13 @@ describe('SidebarContent', () => {
     expect(link.classes().join(' ')).toContain('focus-visible:outline-console-focus')
   })
 
+  // The side menu is a fixed width; its column fills it, so what the host puts in the foot can
+  // span the menu and the links reach its edge, whatever the longest line in it.
+  it('fills the menu it sits in, not just the width of its longest line', () => {
+    const w = mountSidebar()
+    expect(w.classes()).toContain('w-full')
+  })
+
   it('leaves the footer to the host', () => {
     const w = mount(SidebarContent, {
       props: { items, navLabel: 'Primary' },

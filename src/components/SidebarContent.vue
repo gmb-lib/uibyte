@@ -62,7 +62,7 @@ const sections = computed<NavGroup[]>(() =>
 </script>
 
 <template>
-  <div class="flex h-full flex-col px-3.5 pb-[18px]" :class="hideBrand ? 'pt-2' : 'pt-[18px]'">
+  <div class="flex h-full w-full flex-col px-3.5 pb-[18px]" :class="hideBrand ? 'pt-2' : 'pt-[18px]'">
     <div v-if="!hideBrand" class="pb-3">
       <slot name="brand" />
     </div>
