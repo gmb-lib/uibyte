@@ -7,6 +7,74 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.13.0
+
+A field for a person's identity code with the country that issued it chosen beside it, with the rule
+it checks codes by; and one choice of a few, drawn side by side. Both pieces are additive: no
+component you already use draws anything different.
+
+### Added — `IdentityCodeField`: an identity code and its country, as one field
+
+The country's choice and the code's box in one frame, because the two are one value — the same
+digits in two countries are two people. `v-model` holds what is typed, `v-model:country` the chosen
+two-letter code; `label` and `countryLabel` name the box and the choice; `id` lands on the box.
+
+```vue
+<IdentityCodeField
+  v-model="form.code"
+  v-model:country="form.country"
+  :countries="countries"
+  :label="t('person.code')"
+  :country-label="t('person.codeCountry')"
+  :describe="refusal"
+  :note="t('person.codeWhy')"
+/>
+```
+
+The package carries **no countries and no words**. `countries` is yours — a list of `CountryGroup`s,
+each `{ key, label?, countries: { code, label }[] }`, the names already in the reader's language; a
+group with a label is drawn under it as a heading, one without draws its countries plainly. So is
+every sentence: `describe(error, country)` returns what a person is told about a code that cannot be
+used, given why (an `IdentityCodeError`) and the country whose format refused it — the code's own when
+it names one (`PNOEE-…` typed beside Latvia is explained by Estonia's format), otherwise the one it was
+read beside, and carried on the error as `country` for `length` and `digits`; `settled` is an optional
+line once a usable code is settled, and `note` an optional quiet line under the field that the box is
+described by.
+
+The field settles what was typed on leaving the box, on Enter (which does not send the form) and on a
+change of country: a usable code is rewritten as its country writes it, and a code that names its own
+country moves the choice there when you offer it — when you do not, the box keeps the whole code, so
+the code is never read beside the wrong country. A refusal is said under the field in your sentence,
+announced, with the box marked invalid and the frame in the refusal colour; typing again takes it
+away. The empty box shows the chosen country's pattern where its format is known (in the code face), or your
+`placeholder` (in the text face).
+
+### Added — the identity-code rule
+
+`parseIdentityCode(typed, country)` — the one stored spelling of a code, what a person is shown, and
+the code taken apart; or why it cannot be used — `displayIdentityCode(stored)` and
+`identityCodePattern(country)`, with the types `IdentityCode`, `IdentityCodeOk`, `IdentityCodeError`,
+`IdentityCodeProblem` and `IdentityCodeResult`. The field checks codes with it; a form gating its Send
+calls it too, so the two give the same answer. A service receiving a code should canonicalise it
+again — the rule explains a refusal before anything is sent, and cannot decide an identity.
+
+### Added — `SegmentedChoice`: one choice of a few, all in view
+
+Your `options` side by side in one frame, the chosen one filled: `v-model` holds the chosen key and
+`label` names the group for a reader. Each option is a `SegmentedOption`, `{ key, label, disabled? }`,
+its words already translated.
+
+```vue
+<SegmentedChoice v-model="way" :options="ways" :label="t('add.how')" />
+```
+
+It is a radio group with a single stop in the page order: the arrow keys move along it and choose as
+they go, wrapping at the ends; Home and End go to the first and the last; Space and Enter choose the
+option the caret is on; an option that cannot be chosen is shown, announced and stepped over. The
+chosen one is filled, drawn heavier and announced as checked — never its colour alone — and every
+option keeps the room of its heavier words, so choosing one moves nothing along. In a narrow box the
+options wrap onto another line. What each choice shows is yours to draw.
+
 ## v0.12.0
 
 A list whose rows hold controls, two places in a page's header — beside the title, and the title's own — a glyph

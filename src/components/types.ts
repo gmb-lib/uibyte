@@ -321,6 +321,43 @@ export interface DayGroup {
 /** How an act ended, as far as the line that reports it is concerned. */
 export type ActOutcome = 'done' | 'refused'
 
+/** One country an identity code field offers: its two-letter code, and its name. */
+export interface CountryOption {
+  /** The two-letter code the field is told when it is chosen, e.g. `'LV'`. */
+  code: string
+  /** The country's name, in the reader's language. Already translated — the kit names no country. */
+  label: string
+}
+
+/**
+ * A group of countries in an identity code field's choice. A group with a label is
+ * drawn under it as a heading the reader can see and hear; a group without one draws
+ * its countries plainly, so a host offering a few countries passes one group and no
+ * label.
+ */
+export interface CountryGroup {
+  /** Stable identity for the group. */
+  key: string
+  /** The group's heading. Already translated. */
+  label?: string
+  countries: CountryOption[]
+}
+
+/**
+ * One choice in a segmented choice — one of a few ways, all of them in view.
+ *
+ * A disabled option is **shown, never hidden**: drawn dimmed, announced as
+ * unavailable, stepped over by the arrow keys and never chosen.
+ */
+export interface SegmentedOption {
+  /** Stable identity for the choice, and what the host is told when it is made. */
+  key: string
+  /** The visible words. Already translated — the kit does no i18n. */
+  label: string
+  /** Drawn and announced, never chosen. */
+  disabled?: boolean
+}
+
 /** The column headings a diff list draws, already translated. */
 export interface DiffColumns {
   part: string
