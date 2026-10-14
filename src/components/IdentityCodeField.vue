@@ -52,7 +52,7 @@ const props = defineProps<{
   settled?: string
   /** A quiet line under the field — e.g. why the code is asked. The box is described by it. */
   note?: string
-  /** What the empty box shows. By default, the chosen country's pattern where it is known. */
+  /** What the empty box shows, in the text face. By default, the chosen country's pattern where it is known, in the code face. */
   placeholder?: string
   disabled?: boolean
   /** The box's id, so a visible label of the host's can point at it. */
@@ -201,6 +201,7 @@ watch(
         :placeholder="shownPlaceholder || undefined"
         :disabled="disabled"
         class="min-w-0 flex-1 bg-transparent px-[11px] py-2 font-mono text-[13.5px] text-ink placeholder:text-faint focus-visible:outline-none disabled:bg-band disabled:text-muted"
+        :class="{ 'placeholder:font-sans': placeholder !== undefined && placeholder !== '' }"
         @input="onInput"
         @blur="settle(country)"
         @keydown.enter.prevent="settle(country)"

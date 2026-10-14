@@ -46,8 +46,8 @@ change of country: a usable code is rewritten as its country writes it, and a co
 country moves the choice there when you offer it — when you do not, the box keeps the whole code, so
 the code is never read beside the wrong country. A refusal is said under the field in your sentence,
 announced, with the box marked invalid and the frame in the refusal colour; typing again takes it
-away. The empty box shows the chosen country's pattern where its format is known, or your
-`placeholder`.
+away. The empty box shows the chosen country's pattern where its format is known (in the code face), or your
+`placeholder` (in the text face).
 
 ### Added — the identity-code rule
 

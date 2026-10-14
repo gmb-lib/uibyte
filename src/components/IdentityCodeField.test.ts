@@ -300,6 +300,12 @@ describe('IdentityCodeField — the quiet lines and the host’s options', () =>
     expect(field({ placeholder: 'as on the ID card' }).box().attributes('placeholder')).toBe('as on the ID card')
   })
 
+  it('draws the host’s own words in the text face, and keeps the code face for the pattern', () => {
+    // A code is set in the code face, and so is the pattern that stands for one; words are not a code.
+    expect(field().box().classes()).not.toContain('placeholder:font-sans')
+    expect(field({ placeholder: 'as on the ID card' }).box().classes()).toContain('placeholder:font-sans')
+  })
+
   it('draws a note under the field that the box is described by, after any refusal', async () => {
     const f = field({ note: 'To tell two people apart.' })
     const note = f.w.get('p')

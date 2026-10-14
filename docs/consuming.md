@@ -539,7 +539,8 @@ say when the form is sent.
 none is drawn. `note` is a quiet line under the field — the place to say why the code is
 asked — and the box is described by it, so a reader hears it too. The empty box shows
 the chosen country's pattern where its format is known (`XXXXXX-XXXXX` for Latvia), and
-`placeholder` puts your own words there instead. `disabled` holds both halves.
+`placeholder` puts your own words there instead — drawn in the text face, since words are not a code, where
+the pattern keeps the code face. `disabled` holds both halves.
 
 ```vue
 <IdentityCodeField
