@@ -7,6 +7,20 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.13.1
+
+### Fixed — `IdentityCodeField`: the first click after typing a code is no longer lost
+
+A person who typed a code and went straight to the form's button lost that click: leaving the box drew
+the field's `settled` line, the line pushed everything below it down by its height while the mouse was
+pressed, and the release landed above the button, so no click fired. A second click worked.
+
+The field now says a usable code is settled as soon as it reads right, while the box still has the
+focus, so the line is already in place when the button is pressed. Nothing else moves: the code is
+rewritten to its one spelling only when the box is left, as before, and a code that cannot be used is
+still refused only then, never mid-word. No prop or event changes; an application on `v0.13.0` takes it
+by moving the pin.
+
 ## v0.13.0
 
 A field for a person's identity code with the country that issued it chosen beside it, with the rule

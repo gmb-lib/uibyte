@@ -28,7 +28,9 @@ import type { CountryGroup } from './types'
 // A code that cannot be used is refused at once, in the host's sentence, under the field
 // — announced, marked on the box and in the frame's colour, but carried by the words, so
 // colour is never the only cue. Typing again takes the sentence away: a reason about
-// what was typed a moment ago is worse than none. An empty box says nothing.
+// what was typed a moment ago is worse than none. An empty box says nothing. A code that
+// can be used is said to be settled as soon as it reads right, before the box is left,
+// so the line it draws is already in place when the person moves on to the form's button.
 //
 // Whether the code is required, and what is sent, is the host's: it reads the same answer
 // with `parseIdentityCode` itself.
@@ -131,8 +133,14 @@ function settle(country: string): void {
 }
 
 function onInput(e: Event): void {
-  said.value = null
-  emit('update:modelValue', (e.target as HTMLInputElement).value)
+  const typed = (e.target as HTMLInputElement).value
+  // A code that already reads right says so now, in the words it will keep: the line is
+  // drawn while the box has the focus, so leaving it — by pressing the host's button,
+  // say — moves nothing under the press. It is rewritten only when the person is done
+  // with it, and a code that cannot be used is still only refused then.
+  const result = typed.trim() ? parseIdentityCode(typed, props.country) : null
+  said.value = result?.ok ? { about: typed, country: props.country, result } : null
+  emit('update:modelValue', typed)
 }
 
 function onCountry(e: Event): void {
