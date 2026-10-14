@@ -23,6 +23,14 @@ import type { BackLink, LinkComponent } from './types'
 // beside the heading, not inside it: the heading is still named by the title
 // alone, and the mark is heard after it as words of its own. Only a header given
 // a mark has that shared line, so one without is drawn exactly as before.
+//
+// The title's own place can be taken by the host — a form that edits the very
+// thing the page is about, say — while the way back, the area, the quiet line
+// and the actions keep theirs. The page does not lose its heading then: it is
+// still there for a reader, worded by `title`, and hidden from the eye only, so
+// a host that wants the reader told what is being edited says so in `title`.
+// The host's content takes the title's whole line, so a mark beside the title
+// is not drawn with it.
 const props = withDefaults(
   defineProps<{
     title: string
@@ -66,7 +74,11 @@ const link = computed(() => toRaw(props.linkComponent))
       <p v-if="eyebrow" class="mb-0.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
         {{ eyebrow }}
       </p>
-      <div v-if="$slots['title-after']" class="flex flex-wrap items-center gap-2.5">
+      <template v-if="$slots.title">
+        <component :is="heading" class="sr-only">{{ title }}</component>
+        <slot name="title" />
+      </template>
+      <div v-else-if="$slots['title-after']" class="flex flex-wrap items-center gap-2.5">
         <component :is="heading" class="font-bold text-ink" :class="headingSize">
           {{ title }}
         </component>

@@ -9,9 +9,10 @@ build compiles. Nothing here deploys and nothing holds state.
 
 ## v0.12.0
 
-A list whose rows hold controls, a place for a mark beside a page's title, and `FindField`'s several-at-once
-card drawn line first. The first two are additive: a `ListTable` and a `PageHeader` that pass nothing new draw
-exactly the markup they drew in v0.11.1. The third moves the box of a `FindField` with `multiple`.
+A list whose rows hold controls, two places in a page's header — beside the title, and the title's own — a glyph
+of your choosing on a status pill, and `FindField`'s several-at-once card drawn line first. Everything but the
+last is additive: a `ListTable`, a `PageHeader` and a `StatusPill` that pass nothing new draw exactly the markup they
+drew in v0.11.1. The last moves the box of a `FindField` with `multiple`.
 
 ### Added — `ControlList`: rows that hold controls of their own
 
@@ -54,12 +55,40 @@ so the heading is still named by the title alone and a reader hears the mark's w
 ```vue
 <PageHeader :title="area.name">
   <template v-if="area.locked" #title-after>
-    <StatusPill status="idle" look="outline" :label="t('area.locked')" />
+    <StatusPill status="idle" look="outline" icon="lock" :label="t('area.locked')" />
   </template>
 </PageHeader>
 ```
 
 A header given no mark draws exactly what it drew before.
+
+### Added — `PageHeader` `title`: your content in the title's place
+
+A slot drawn **instead of the visible title** — a form that edits the thing the page is about, say — while the way
+back, `eyebrow`, `subtitle` and the actions keep their places. The page keeps its heading, at its level, for a reader
+only, and it says your `title`; so while the slot is drawn, word `title` for what is happening:
+
+```vue
+<PageHeader :title="editing ? t('item.editing', { name: item.name }) : item.name" :back="back" :link-component="RouterLink">
+  <template v-if="editing" #title><ItemForm v-model="draft" @save="save()" @cancel="editing = false" /></template>
+</PageHeader>
+```
+
+The slot takes the title's whole line, so a `title-after` mark is not drawn with it. Without the slot the title is
+drawn as before. If you hid the heading yourself while editing (a class reaching into the header), drop it: the
+header does it now.
+
+### Added — `StatusPill` `icon`: a glyph of yours in the mark's place
+
+A glyph name from the package's set (`Icon`'s names), drawn where the pill's mark sits — the role's glyph in soft
+and solid, the dot in outline — at the pill's size and weight, in the label's colour, hidden from a reader. The
+label still carries the meaning. A name this version does not know draws the role's own mark.
+
+```vue
+<StatusPill status="idle" look="outline" size="sm" icon="lock" :label="t('area.notIncluded')" />
+```
+
+A pill without `icon` draws exactly what it drew before.
 
 ### Changed — `FindField` with `multiple`: the line first, then the box, in one card
 

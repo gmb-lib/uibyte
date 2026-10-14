@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { StatusRole } from '../theme/tokens'
+import { iconGlyphs, isIconName } from './icons'
 import type { PillLook } from './types'
 
 // A status, rendered as colour *and* a mark *and* a text label. Never colour
@@ -15,15 +17,27 @@ import type { PillLook } from './types'
 // The role-distinct glyph belongs to soft and solid; outline's mark is a
 // filled dot in the role colour, and its status is carried by the label plus
 // the look's own structure.
+//
+// A host may say more than the role with a glyph of its own from the package's
+// set — a lock on something not open to the reader, say. It takes the mark's
+// place in every look — the role's glyph in soft and solid, the dot in outline —
+// drawn at the pill's own size and weight, in the label's colour, and hidden
+// from a reader like the mark it replaces: the label still carries the meaning.
+// A name this version does not know draws the role's own mark, so a pill is
+// never left without one.
 const props = withDefaults(
   defineProps<{
     status: StatusRole
     label: string
     size?: 'default' | 'sm'
     look?: PillLook
+    /** A glyph from the package's set drawn in place of the role's mark, e.g. `'lock'`. */
+    icon?: string
   }>(),
   { size: 'default', look: 'soft' },
 )
+
+const glyph = computed(() => (props.icon && isIconName(props.icon) ? iconGlyphs[props.icon] : null))
 
 // Written out as full literal strings so a consumer's utility scan sees every
 // class this component can render.
@@ -70,7 +84,7 @@ const lookClass = (): string => {
     ]"
   >
     <span
-      v-if="look === 'outline'"
+      v-if="look === 'outline' && !glyph"
       class="h-[7px] w-[7px] shrink-0 rounded-pill"
       :class="dotByRole[status]"
       aria-hidden="true"
@@ -87,8 +101,20 @@ const lookClass = (): string => {
       class="shrink-0"
     >
       <!-- One glyph per role, so two roles sharing a hue stay distinguishable. -->
+      <template v-if="glyph">
+        <template v-for="(part, i) in glyph" :key="i">
+          <path
+            v-if="part.shape === 'path'"
+            :d="part.d"
+            :stroke-linecap="part.cap ? 'round' : undefined"
+            :stroke-linejoin="part.join ? 'round' : undefined"
+          />
+          <circle v-else-if="part.shape === 'circle'" :cx="part.cx" :cy="part.cy" :r="part.r" />
+          <rect v-else :x="part.x" :y="part.y" :width="part.width" :height="part.height" :rx="part.rx" />
+        </template>
+      </template>
       <path
-        v-if="status === 'ontrack'"
+        v-else-if="status === 'ontrack'"
         d="M5 13l4 4L19 7"
         stroke-linecap="round"
         stroke-linejoin="round"

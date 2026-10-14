@@ -139,6 +139,19 @@ repointed role stays readable in every look.
 <StatusPill status="ontrack" :label="t('status.inWork')" look="outline" />
 ```
 
+A pill can carry a glyph of yours from the package's set (`Icon`'s names) when it
+says more than the role — a lock on something not open to the reader, say. Give
+`icon` and it takes the mark's place in every look: the role's glyph in soft and
+solid, the dot in outline. It is drawn at the pill's size and weight in the
+label's colour, hidden from a reader like the mark it replaces, and the label still
+carries the meaning — so where two roles share a hue, your glyph no longer tells
+them apart; the words do. A name this version does not know draws the role's own
+mark, so a pill is never left without one.
+
+```vue
+<StatusPill status="idle" look="outline" size="sm" icon="lock" :label="t('area.notIncluded')" />
+```
+
 **Finished work is `closed`, not `ontrack`.** `ontrack` means *on track, valid,
 under way*; `closed` — a muted blue, marked with a check inside a circle — means
 *done and put away*. Before `0.9.0` there was no `closed` and done was drawn in
@@ -382,8 +395,27 @@ before.
 ```vue
 <PageHeader :title="area.name">
   <template v-if="area.locked" #title-after>
-    <StatusPill status="idle" look="outline" :label="t('area.locked')" />
+    <StatusPill status="idle" look="outline" icon="lock" :label="t('area.locked')" />
   </template>
+</PageHeader>
+```
+
+The title's own place can be yours too: the `title` slot is drawn **instead of the
+visible title** — a form that edits the thing the page is about, say — while the
+way back, the `eyebrow`, the `subtitle` and the actions keep their places. The page
+keeps its heading: it is still drawn, at its level, for a reader only, and it says
+your `title`. So while the slot is drawn, `title` is what a reader hears first and
+nobody sees — word it for what is happening (*Edit Van V-2*), not only the name.
+The slot takes the title's whole line; a `title-after` mark is not drawn with it.
+Pass the slot only while it is wanted (`<template v-if="editing" #title>`); without
+it the title is drawn as before.
+
+```vue
+<PageHeader :title="editing ? t('item.editing', { name: item.name }) : item.name" :back="back" :link-component="RouterLink">
+  <template v-if="editing" #title>
+    <ItemForm v-model="draft" @save="save()" @cancel="editing = false" />
+  </template>
+  <template v-if="!editing" #actions><Button variant="outline" @click="editing = true">{{ t('item.edit') }}</Button></template>
 </PageHeader>
 ```
 
