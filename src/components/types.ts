@@ -220,7 +220,8 @@ export interface FindOption {
 }
 
 /**
- * One column of a list table.
+ * One column of a list table, or of a list whose rows hold controls — the two
+ * share one grid, so a column means the same in both.
  *
  * How it folds is said by its priority, because a list shown beside something
  * else is narrow on any screen and the table has to decide from its own width:
@@ -231,7 +232,7 @@ export interface FindOption {
 export interface ListColumn {
   /** Stable identity, and the row field drawn when no cell slot is given. */
   key: string
-  /** The header's words. */
+  /** The header's words. Empty for a column the eye needs no word over, such as one holding an act. */
   label: string
   /** The column's track in the row's grid, e.g. `'76px'` or `'minmax(240px,2fr)'`. */
   width?: string

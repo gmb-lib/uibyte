@@ -342,4 +342,47 @@ describe('FindField — several at once', () => {
     await w.get('input[type="search"]').setValue('oz')
     expect(w.emitted('update:query')).toEqual([['oz']])
   })
+
+  // One card, as drawn: the host's line first, then the box, then the ticks it
+  // narrows — so the line is read before the box it is about.
+  it('says its line first, then the box, then the ticks, all in one card', () => {
+    const w = several({ summary: '4 not added yet' })
+    const line = w.get('p').element
+    const box = w.get('input[type="search"]').element
+    const ticks = w.get('[role="group"]').element
+    expect(line.textContent).toBe('4 not added yet')
+    expect(line.compareDocumentPosition(box) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(box.compareDocumentPosition(ticks) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    const card = line.parentElement as HTMLElement
+    expect(card.contains(box)).toBe(true)
+    expect(card.contains(ticks)).toBe(true)
+    expect(card.classList.contains('rounded-[10px]')).toBe(true)
+    // The line is not one of the ticks, and the box spans the card rather than
+    // standing at a box's width of its own.
+    expect(ticks.contains(line)).toBe(false)
+    expect(box.classList.contains('max-w-[420px]')).toBe(false)
+  })
+
+  // The box does not move while the list is read: someone typing as it arrives
+  // keeps the box they are typing in.
+  it('keeps the box, and the focus in it, when the list arrives', async () => {
+    const w = several({ loading: 'Reading the people…', summary: '4 not added yet' })
+    const box = w.get('input[type="search"]').element as HTMLInputElement
+    box.focus()
+    expect(document.activeElement).toBe(box)
+    await w.setProps({ loading: undefined })
+    expect(w.get('input[type="search"]').element).toBe(box)
+    expect(document.activeElement).toBe(box)
+    expect(w.findAll('input[type="checkbox"]')).toHaveLength(4)
+    w.unmount()
+  })
+
+  // The line counts what is there to choose; while the list is not read there is
+  // nothing to count, and it is not said.
+  it('says no line over a list still being read, or one that could not be read', () => {
+    expect(several({ loading: 'Reading the people…', summary: '4 not added yet' }).text()).not.toContain('4 not added yet')
+    expect(several({ failed: 'The people could not be read', summary: '4 not added yet' }).text()).not.toContain(
+      '4 not added yet',
+    )
+  })
 })

@@ -16,6 +16,13 @@ import type { BackLink, LinkComponent } from './types'
 // when the row is too narrow for both — the title is never the thing that gives
 // way. That wrapping is decided by the header's own row, not by the window: a
 // page shown beside a list is narrow on any screen.
+//
+// Beside the title there is room for a short mark of the host's — a pill saying
+// a thing is locked, say — on the title's own line, going under it when the line
+// is too narrow for both, so here too the title is never squeezed. The mark sits
+// beside the heading, not inside it: the heading is still named by the title
+// alone, and the mark is heard after it as words of its own. Only a header given
+// a mark has that shared line, so one without is drawn exactly as before.
 const props = withDefaults(
   defineProps<{
     title: string
@@ -37,6 +44,9 @@ const props = withDefaults(
 )
 
 const heading = computed(() => `h${props.level}`)
+const headingSize = computed(() =>
+  props.level === 1 ? 'text-[26px] tracking-[-0.015em]' : 'text-[22px] tracking-[-0.01em]',
+)
 // A component handed in as a prop arrives wrapped for reactivity; drawing it
 // needs the component itself.
 const link = computed(() => toRaw(props.linkComponent))
@@ -56,11 +66,13 @@ const link = computed(() => toRaw(props.linkComponent))
       <p v-if="eyebrow" class="mb-0.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
         {{ eyebrow }}
       </p>
-      <component
-        :is="heading"
-        class="font-bold text-ink"
-        :class="level === 1 ? 'text-[26px] tracking-[-0.015em]' : 'text-[22px] tracking-[-0.01em]'"
-      >
+      <div v-if="$slots['title-after']" class="flex flex-wrap items-center gap-2.5">
+        <component :is="heading" class="font-bold text-ink" :class="headingSize">
+          {{ title }}
+        </component>
+        <slot name="title-after" />
+      </div>
+      <component :is="heading" v-else class="font-bold text-ink" :class="headingSize">
         {{ title }}
       </component>
       <p v-if="subtitle" class="mt-0.5 text-[13.5px] text-muted-strong">{{ subtitle }}</p>

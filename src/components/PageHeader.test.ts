@@ -84,4 +84,46 @@ describe('PageHeader', () => {
     expect(w.get('header').classes()).toContain('flex-wrap')
     expect(w.get('header > div').classes()).toContain('flex-[1_1_18rem]')
   })
+
+  describe('a mark beside the title', () => {
+    const marked = (props: Record<string, unknown> = {}) =>
+      mount(PageHeader, {
+        props: { title: 'Settings', subtitle: '18 people', ...props },
+        slots: { 'title-after': '<span class="mark">Not included</span>' },
+      })
+
+    // Beside the heading, not inside it: the heading is still named by the title
+    // alone, and the mark is heard after it, before the quiet line.
+    it('draws the host’s mark on the title’s line, after the title and outside the heading', () => {
+      const w = marked()
+      const heading = w.get('h1').element
+      const mark = w.get('.mark').element
+      expect(heading.textContent?.trim()).toBe('Settings')
+      expect(heading.contains(mark)).toBe(false)
+      expect(mark.parentElement).toBe(heading.parentElement)
+      expect(heading.nextElementSibling).toBe(mark)
+      expect(w.text()).toBe('SettingsNot included18 people')
+    })
+
+    it('keeps the mark beside a lower heading too', () => {
+      const w = marked({ level: 2 })
+      expect(w.get('h2').element.nextElementSibling).toBe(w.get('.mark').element)
+      expect(w.get('h2').classes()).toContain('text-[22px]')
+    })
+
+    // The mark gives way, never the title: the line wraps, and the mark goes under
+    // the title when both do not fit. A layout claim the test environment cannot
+    // measure, so the classes that make it are pinned.
+    it('puts the mark under the title when the line is too narrow for both', () => {
+      const line = marked().get('h1').element.parentElement as HTMLElement
+      expect(Array.from(line.classList)).toEqual(expect.arrayContaining(['flex', 'flex-wrap', 'items-center']))
+    })
+
+    // A header without a mark is drawn as it always was: the heading straight in
+    // the title's column, with no line of its own around it.
+    it('draws no line around the title when there is no mark', () => {
+      const w = mount(PageHeader, { props: { title: 'Settings' } })
+      expect(w.get('h1').element.parentElement?.classList.contains('flex-[1_1_18rem]')).toBe(true)
+    })
+  })
 })
