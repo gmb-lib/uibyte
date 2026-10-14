@@ -514,7 +514,9 @@ in what order and in which language are yours to decide, so the package does not
 
 The field reads what was typed when the person is done with it: on leaving the box, on
 Enter — which settles the box and does not send the form around it — and when the
-country changes. A code it can use is rewritten the one way it will be read back: a
+country changes. One thing comes earlier: a code that already reads right is said to be
+settled as it is typed, so the `settled` line is in place before the person reaches your
+form's button and nothing moves under their click. A code it can use is rewritten the one way it will be read back: a
 personal number as its country writes it, the country left to the choice. A code that
 names its own country — pasted with its type and country in front, `PNOEE-…` — moves the
 choice to that country when you offer it. When you do not, the choice stays and the box
