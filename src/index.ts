@@ -3,6 +3,14 @@
 // move without breaking a host.
 export { cn } from './lib/cn'
 export { findMatches, foldForFind } from './lib/find'
+export { displayIdentityCode, identityCodePattern, parseIdentityCode } from './lib/identity-code'
+export type {
+  IdentityCode,
+  IdentityCodeError,
+  IdentityCodeOk,
+  IdentityCodeProblem,
+  IdentityCodeResult,
+} from './lib/identity-code'
 export type { ClassValue } from 'clsx'
 
 // The token layer. A host importing the stylesheet gets the reference look; a
@@ -56,6 +64,8 @@ export { default as BrandMark } from './components/BrandMark.vue'
 export { default as PageHeader } from './components/PageHeader.vue'
 export { default as StateBlock } from './components/StateBlock.vue'
 export { default as FindField } from './components/FindField.vue'
+export { default as IdentityCodeField } from './components/IdentityCodeField.vue'
+export { default as SegmentedChoice } from './components/SegmentedChoice.vue'
 export { default as ActLine } from './components/ActLine.vue'
 export { default as ConfirmAsk } from './components/ConfirmAsk.vue'
 export { default as Window } from './components/Window.vue'
@@ -74,6 +84,8 @@ export type {
   ActOutcome,
   BackLink,
   CountItem,
+  CountryGroup,
+  CountryOption,
   DayGroup,
   DayLine,
   DiffColumns,
@@ -91,6 +103,7 @@ export type {
   NavItem,
   PillLook,
   ReadState,
+  SegmentedOption,
   ShellLabels,
   TabItem,
 } from './components/types'

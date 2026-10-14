@@ -12,7 +12,7 @@ doing together.
 **1. Pin a version.** A tag, never a floating branch.
 
 ```json
-"uibyte": "github:gmb-lib/uibyte#v0.12.0"
+"uibyte": "github:gmb-lib/uibyte#v0.13.0"
 ```
 
 **Upgrading is not just editing the tag.** Changing the version in
@@ -497,6 +497,132 @@ the box is described by it, so a reader hears it too.
 />
 ```
 
+**An identity code is typed with its country beside it.** `IdentityCodeField` draws the
+two as one field — a choice of the country that issued the code, then the box the code
+is typed in — because they are one value: the same digits in two countries are two
+people. Hold the code with `v-model` and the country, a two-letter code, with
+`v-model:country`. `label` names the box and `countryLabel` the choice, for a reader;
+give `id` and a visible label of yours can point at the box.
+
+**The countries and every word are yours.** This package carries no list of countries,
+no country's name and no sentence. `countries` is a list of `CountryGroup`s, each
+`{ key, label?, countries }`, every country a `{ code, label }` already named in the
+reader's language. A group with a `label` is drawn under that heading; a group without
+one draws its countries plainly, so a short list is one group with no label. Naming the
+countries is a few lines of `Intl.DisplayNames` in your application — which countries,
+in what order and in which language are yours to decide, so the package does not do it.
+
+The field reads what was typed when the person is done with it: on leaving the box, on
+Enter — which settles the box and does not send the form around it — and when the
+country changes. A code it can use is rewritten the one way it will be read back: a
+personal number as its country writes it, the country left to the choice. A code that
+names its own country — pasted with its type and country in front, `PNOEE-…` — moves the
+choice to that country when you offer it. When you do not, the choice stays and the box
+keeps the whole code, country and all, so the code is never read beside the wrong
+country as somebody else's.
+
+A code it cannot use is refused under the field, in your sentence. `describe` is given
+the reason and a country, and returns what a person should be told. The country is the
+one whose format refused the code: the code's own when it names one — `PNOEE-…` typed
+beside Latvia is held to Estonia's format, and your sentence should say Estonia — and
+otherwise the one it was read beside. The reason is an `IdentityCodeError`: its `problem`
+is one of `empty`, `malformed`, `unknownType`, `notAPerson`, `ambiguous`,
+`countryMissing`, `length` and `digits`, with the identity `type` it names for
+`unknownType` and `notAPerson`, the `country` whose format refused it for `length` and
+`digits`, and the `expected` and `actual` digit counts for `length`. The sentence is
+announced at once, the box is marked invalid and described by it, and the frame takes
+the refusal colour — the words carry the refusal, never the colour alone. Typing again
+takes it away, and an empty box says nothing: whether the code is required is yours to
+say when the form is sent.
+
+`settled` is a line drawn, with a check, once a usable code is settled; leave it out and
+none is drawn. `note` is a quiet line under the field — the place to say why the code is
+asked — and the box is described by it, so a reader hears it too. The empty box shows
+the chosen country's pattern where its format is known (`XXXXXX-XXXXX` for Latvia), and
+`placeholder` puts your own words there instead. `disabled` holds both halves.
+
+```vue
+<IdentityCodeField
+  id="person-code"
+  v-model="form.code"
+  v-model:country="form.country"
+  :countries="countries"
+  :label="t('person.code')"
+  :country-label="t('person.codeCountry')"
+  :describe="refusal"
+  :note="t('person.codeWhy')"
+/>
+```
+
+```ts
+import type { CountryGroup, IdentityCodeError } from 'uibyte'
+
+const names = new Intl.DisplayNames([locale.value], { type: 'region' })
+const countries: CountryGroup[] = [
+  { key: 'all', countries: ['LV', 'EE', 'LT'].map((code) => ({ code, label: names.of(code) ?? code })) },
+]
+
+function refusal(e: IdentityCodeError, country: string): string {
+  switch (e.problem) {
+    case 'length':
+      return t('code.length', { country: names.of(country), want: e.expected, got: e.actual })
+    case 'unknownType':
+    case 'notAPerson':
+      return t(`code.${e.problem}`, { type: e.type })
+    default:
+      return t(`code.${e.problem}`)
+  }
+}
+```
+
+**The rule is exported**, so a form's Send is held to the same answer the field shows:
+`parseIdentityCode(typed, country)` returns `{ ok: true, stored, display, code }` —
+`stored` the one spelling a service compares, `display` what a person is shown — or the
+same `IdentityCodeError` the field describes. The field never decides whether a form may
+be sent; your Send does, with this. `displayIdentityCode(stored)` shows a stored code the
+way a person recognises it, and `identityCodePattern(country)` is the example the empty
+box shows. A service receiving the code should canonicalise it again: this copy of the
+rule is there to explain a refusal before anything is sent, and cannot decide an
+identity.
+
+**One choice of a few, all in view, is a segmented choice.** `SegmentedChoice` draws
+your `options` side by side in one frame — two or three ways of doing one thing — and
+fills the chosen one. You own which one is chosen, with `v-model` on its key, and
+`label` names the group for a reader. Each option is a `SegmentedOption`: a `key` (what
+you are told), a `label` already translated, and `disabled` for a way that is shown and
+announced but cannot be taken.
+
+It is a radio group, and keeps the promise one makes: it is a **single** stop in the
+page order — on the chosen option, or on the first that can be chosen while none is —
+the arrow keys move along it and choose as they go, wrapping at the ends, Home and End
+go to the first and the last, and Space and Enter choose the option the caret is on. An
+option that cannot be chosen is stepped over and never takes the stop. A key held with
+Alt, Control or Meta is left to the browser. The chosen option is filled, its words are
+drawn heavier and it is announced as checked, so the fill is never the only sign of it;
+every option keeps the room its heavier words take, so choosing one does not shift the
+rest. In a narrow box the options wrap onto another line rather than scroll out of
+sight.
+
+It holds a value — a setting a form keeps, or which way the part after it is drawn —
+and what each choice shows is yours: draw it under the group, by the key. Sections of a
+page, each a panel the strip names, are `Tabs`; counts that filter a list are
+`CountStrip`; several at once is `FindField` with `multiple`, or ticks.
+
+```vue
+<SegmentedChoice v-model="way" :options="ways" :label="t('add.how')" />
+<ChooseFromList v-if="way === 'listed'" />
+<DescribeNew v-else />
+```
+
+```ts
+import type { SegmentedOption } from 'uibyte'
+
+const ways: SegmentedOption[] = [
+  { key: 'listed', label: t('add.fromList') },
+  { key: 'new', label: t('add.new') },
+]
+```
+
 **Every act ends in a sentence.** `ActLine` says what an act did (`outcome="done"`,
 announced politely) or why it was refused (`outcome="refused"`, announced at once),
 in your `text`, toned by the outcome. A way on — *Open it* after something was
@@ -862,7 +988,8 @@ telling the package you know better, and it believes you.
 - **A control that announces a keyboard contract honours it.** A tab strip is one
   stop in the page order with the arrow keys moving along it, not one stop per
   choice — four choices meaning four stops is how a keyboard reader ends up
-  pressing Tab eleven times to get past a row of chips.
+  pressing Tab eleven times to get past a row of chips. The same holds for every
+  radio group here: `IconPicker` and `SegmentedChoice`.
 - **Nothing pressable sits inside something else pressable.** A list row that is
   a link or a button (`ListTable`) holds no control of its own, and a row that
   holds controls (`ControlList`) is not itself a link or a button — a control
