@@ -7,6 +7,97 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.12.0
+
+A list whose rows hold controls, two places in a page's header — beside the title, and the title's own — a glyph
+of your choosing on a status pill, and `FindField`'s several-at-once card drawn line first. Everything but the
+last is additive: a `ListTable`, a `PageHeader` and a `StatusPill` that pass nothing new draw exactly the markup they
+drew in v0.11.1. The last moves the box of a `FindField` with `multiple`.
+
+### Added — `ControlList`: rows that hold controls of their own
+
+For a list whose rows are not a way into something but hold your controls — a choice made in place, an act on
+that row, a link elsewhere. `ListTable` cannot carry such a row: its whole row is one link or one button, and a
+control inside a link or a button is two targets at once. `ControlList` is the same list with plain rows: the
+same `columns`, `rows`, `rowKey`, `label`, `sort`, `sortedLabels`, `sort` event and `footer` slot, the same
+card, header and grid, folding the same way by its own width. Each row is its cells and nothing else — never a
+link, a button or a stop of its own — and each control you put in a `cell-<key>` slot is its own stop in the page
+order. The header is for the eye, so name each control for its row.
+
+`row-after` draws something about one row under its cells, inside its entry — the question asked before an act
+on it, say:
+
+```vue
+<ControlList :columns="columns" :rows="page" :row-key="(p) => p.id" :label="t('people.title')">
+  <template #cell-access="{ row }">
+    <select :value="row.access" :aria-label="t('people.accessOf', { name: row.name })" @change="change(row, $event)">
+      <option v-for="a in levels" :key="a.id" :value="a.id">{{ a.name }}</option>
+    </select>
+  </template>
+  <template #cell-act="{ row }"><Button size="sm" variant="ghost" @click="asking = row.id">{{ t('people.remove') }}</Button></template>
+  <template #row-after="{ row }">
+    <ConfirmAsk v-if="asking === row.id" :question="t('people.removeAsk', { name: row.name })" :confirm-label="t('people.remove')"
+                :keep-label="t('common.keep')" danger @confirm="remove(row)" @keep="asking = ''" />
+  </template>
+</ControlList>
+```
+
+A column that holds only an act takes an empty `label`. `ListTable` does not change: every row of it is still one
+target, and there is no setting that makes it otherwise — a list whose whole row opens one thing stays a
+`ListTable`.
+
+### Added — `PageHeader` `title-after`: a mark beside the title
+
+A slot for one short mark of yours — a pill saying the page's subject is locked, say — drawn on the title's line,
+after it, and going under the title when the line is too narrow for both. It sits beside the heading, not in it,
+so the heading is still named by the title alone and a reader hears the mark's words after it:
+
+```vue
+<PageHeader :title="area.name">
+  <template v-if="area.locked" #title-after>
+    <StatusPill status="idle" look="outline" icon="lock" :label="t('area.locked')" />
+  </template>
+</PageHeader>
+```
+
+A header given no mark draws exactly what it drew before.
+
+### Added — `PageHeader` `title`: your content in the title's place
+
+A slot drawn **instead of the visible title** — a form that edits the thing the page is about, say — while the way
+back, `eyebrow`, `subtitle` and the actions keep their places. The page keeps its heading, at its level, for a reader
+only, and it says your `title`; so while the slot is drawn, word `title` for what is happening:
+
+```vue
+<PageHeader :title="editing ? t('item.editing', { name: item.name }) : item.name" :back="back" :link-component="RouterLink">
+  <template v-if="editing" #title><ItemForm v-model="draft" @save="save()" @cancel="editing = false" /></template>
+</PageHeader>
+```
+
+The slot takes the title's whole line, so a `title-after` mark is not drawn with it. Without the slot the title is
+drawn as before. If you hid the heading yourself while editing (a class reaching into the header), drop it: the
+header does it now.
+
+### Added — `StatusPill` `icon`: a glyph of yours in the mark's place
+
+A glyph name from the package's set (`Icon`'s names), drawn where the pill's mark sits — the role's glyph in soft
+and solid, the dot in outline — at the pill's size and weight, in the label's colour, hidden from a reader. The
+label still carries the meaning. A name this version does not know draws the role's own mark.
+
+```vue
+<StatusPill status="idle" look="outline" size="sm" icon="lock" :label="t('area.notIncluded')" />
+```
+
+A pill without `icon` draws exactly what it drew before.
+
+### Changed — `FindField` with `multiple`: the line first, then the box, in one card
+
+The several-at-once field is now one card: your `summary` line at the top, then the box, then the ticks — it was
+the box alone, with the line at the top of the ticks' card under it. The box spans the card. What changes for an
+app already built on it: the box moves into the card, under the line, and is as wide as the card; while the list
+is being read or could not be read, its words sit in the card under the box. `summary` is still not drawn until the
+list is read. The one-at-a-time field is unchanged.
+
 ## v0.11.1
 
 A fix to the side menu's width, and `align` on `LanguageMenu`.

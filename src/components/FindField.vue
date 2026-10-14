@@ -17,8 +17,11 @@ import type { FindOption } from './types'
 // a box left with half a name in it goes back to the name actually chosen, so it
 // never shows a choice it does not hold.
 //
-// Choosing several is a list of ticks under the box, filtered by it, with what is
-// already ticked kept in view at the top, so a search never hides a choice made.
+// Choosing several is one card, since its ticks are always open: the host's line
+// first — how many there are to choose from, say — then the box, then the ticks
+// it filters, with what is already ticked kept in view at the top, so a search
+// never hides a choice made. The box stays in the card while the list is read
+// and after, so a person typing as it arrives keeps their place.
 //
 // What it refuses is the fallback the hand-built pickers had: when the list could
 // not be read, they offered a box to type the key in. A key is not something a
@@ -38,7 +41,7 @@ const props = withDefaults(
     noMatch: string
     /** Offers the way back to nothing chosen, in these words. One at a time only. */
     clearLabel?: string
-    /** A line above the ticks, e.g. how many are not added yet. Several only. */
+    /** A line at the top of the card, above the box, e.g. how many are not added yet. Several only. */
     summary?: string
     /** How many matches are drawn before the rest wait for more typing. */
     limit?: number
@@ -200,126 +203,134 @@ function toggle(option: FindOption): void {
 }
 
 // The side padding is set per box rather than here, so the one-at-a-time box can
-// open room on its left for a glyph without two paddings competing.
-const box =
-  'w-full max-w-[420px] rounded-[9px] border border-line bg-surface py-2 text-[13.5px] text-ink placeholder:text-faint focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus disabled:bg-band disabled:text-muted'
+// open room on its left for a glyph without two paddings competing. Its width is
+// set per box too: the one-at-a-time box stands alone, the several-at-once box
+// spans the card it sits in.
+const boxLook =
+  'rounded-[9px] border border-line bg-surface py-2 text-[13.5px] text-ink placeholder:text-faint focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus disabled:bg-band disabled:text-muted'
+const box = `w-full max-w-[420px] ${boxLook}`
 </script>
 
 <template>
   <div>
-    <div v-if="!multiple" class="relative max-w-[420px]">
-      <Icon
-        v-if="boxIcon"
-        :name="boxIcon"
-        :size="16"
-        class="pointer-events-none absolute left-[11px] top-1/2 -translate-y-1/2 text-muted-strong"
-      />
-      <input
-        type="text"
-        role="combobox"
-        autocomplete="off"
-        aria-autocomplete="list"
-        :aria-label="label"
-        :aria-expanded="expanded"
-        :aria-controls="expanded ? listId : undefined"
-        :aria-activedescendant="expanded && active >= 0 ? optionId(active) : undefined"
-        :aria-describedby="expanded && footer ? footerId : undefined"
-        :placeholder="placeholder"
-        :value="query"
-        :disabled="disabled || !!failed"
-        :class="[box, 'pr-[11px]', boxIcon ? 'pl-[34px]' : 'pl-[11px]']"
-        @input="onInput"
-        @keydown="onKeydown"
-        @focus="openList"
-        @click="openList"
-        @blur="onBlur"
-      />
-    </div>
-    <input
-      v-else
-      type="search"
-      autocomplete="off"
-      :aria-label="label"
-      :aria-controls="listId"
-      :aria-describedby="footer && !failed && !loading ? footerId : undefined"
-      :placeholder="placeholder"
-      :value="query"
-      :disabled="disabled || !!failed"
-      :class="[box, 'px-[11px]']"
-      @input="onInput"
-    />
+    <template v-if="!multiple">
+      <div class="relative max-w-[420px]">
+        <Icon
+          v-if="boxIcon"
+          :name="boxIcon"
+          :size="16"
+          class="pointer-events-none absolute left-[11px] top-1/2 -translate-y-1/2 text-muted-strong"
+        />
+        <input
+          type="text"
+          role="combobox"
+          autocomplete="off"
+          aria-autocomplete="list"
+          :aria-label="label"
+          :aria-expanded="expanded"
+          :aria-controls="expanded ? listId : undefined"
+          :aria-activedescendant="expanded && active >= 0 ? optionId(active) : undefined"
+          :aria-describedby="expanded && footer ? footerId : undefined"
+          :placeholder="placeholder"
+          :value="query"
+          :disabled="disabled || !!failed"
+          :class="[box, 'pr-[11px]', boxIcon ? 'pl-[34px]' : 'pl-[11px]']"
+          @input="onInput"
+          @keydown="onKeydown"
+          @focus="openList"
+          @click="openList"
+          @blur="onBlur"
+        />
+      </div>
 
-    <p v-if="failed" role="alert" class="mt-1.5 text-[12.5px] text-muted-strong">{{ failed }}</p>
-    <p v-else-if="loading" role="status" class="mt-1.5 text-[12.5px] text-muted-strong">{{ loading }}</p>
+      <p v-if="failed" role="alert" class="mt-1.5 text-[12.5px] text-muted-strong">{{ failed }}</p>
+      <p v-else-if="loading" role="status" class="mt-1.5 text-[12.5px] text-muted-strong">{{ loading }}</p>
 
-    <template v-else-if="!multiple">
-      <!-- In the page's flow, not floating over it: nothing can clip it, and what
+      <template v-else>
+        <!-- In the page's flow, not floating over it: nothing can clip it, and what
            sits below simply moves down while it is open. The footer line sits in
            the same card under the options, outside the listbox: it is said, not chosen. -->
-      <div
-        v-if="expanded"
-        class="mt-1 max-w-[420px] overflow-hidden rounded-[10px] border border-line bg-surface shadow-[0_6px_18px_rgba(0,0,0,0.06)]"
-      >
-        <ul :id="listId" role="listbox" :aria-label="label">
-          <li
-            v-for="(entry, i) in entries"
-            :id="optionId(i)"
-            :key="entry.key"
-            role="option"
-            :aria-selected="entry.key === modelValue"
-            :aria-disabled="entry.disabled || undefined"
-            class="border-t border-line px-3 py-2 text-[13.5px] first:border-t-0"
-            :class="[
-              i === active ? 'bg-band font-semibold' : '',
-              entry.disabled ? 'cursor-not-allowed text-muted' : 'cursor-pointer',
-            ]"
-            @mousedown.prevent
-            @click="choose(entry)"
-          >
-            <Icon v-if="entry.icon" :name="entry.icon" :size="16" class="mr-2 inline-block align-[-3px]" />
-            {{ entry.label }}
-            <!-- Under the name, not under the glyph: indented by the glyph and its gap. -->
-            <small v-if="entry.note" class="block text-[12px] font-normal text-muted" :class="{ 'pl-6': drawsIcon(entry) }">{{ entry.note }}</small>
-          </li>
-        </ul>
-        <p v-if="footer" :id="footerId" class="border-t border-line px-3 py-2 text-[12px] text-muted">{{ footer }}</p>
-      </div>
-      <p v-if="open && nothingMatches" role="status" class="mt-1.5 text-[12.5px] text-muted-strong">{{ noMatch }}</p>
-      <p v-else-if="expanded && moreThanShown && moreText" class="mt-1.5 text-[12px] text-muted">{{ moreText }}</p>
+        <div
+          v-if="expanded"
+          class="mt-1 max-w-[420px] overflow-hidden rounded-[10px] border border-line bg-surface shadow-[0_6px_18px_rgba(0,0,0,0.06)]"
+        >
+          <ul :id="listId" role="listbox" :aria-label="label">
+            <li
+              v-for="(entry, i) in entries"
+              :id="optionId(i)"
+              :key="entry.key"
+              role="option"
+              :aria-selected="entry.key === modelValue"
+              :aria-disabled="entry.disabled || undefined"
+              class="border-t border-line px-3 py-2 text-[13.5px] first:border-t-0"
+              :class="[
+                i === active ? 'bg-band font-semibold' : '',
+                entry.disabled ? 'cursor-not-allowed text-muted' : 'cursor-pointer',
+              ]"
+              @mousedown.prevent
+              @click="choose(entry)"
+            >
+              <Icon v-if="entry.icon" :name="entry.icon" :size="16" class="mr-2 inline-block align-[-3px]" />
+              {{ entry.label }}
+              <!-- Under the name, not under the glyph: indented by the glyph and its gap. -->
+              <small v-if="entry.note" class="block text-[12px] font-normal text-muted" :class="{ 'pl-6': drawsIcon(entry) }">{{ entry.note }}</small>
+            </li>
+          </ul>
+          <p v-if="footer" :id="footerId" class="border-t border-line px-3 py-2 text-[12px] text-muted">{{ footer }}</p>
+        </div>
+        <p v-if="open && nothingMatches" role="status" class="mt-1.5 text-[12.5px] text-muted-strong">{{ noMatch }}</p>
+        <p v-else-if="expanded && moreThanShown && moreText" class="mt-1.5 text-[12px] text-muted">{{ moreText }}</p>
+      </template>
     </template>
 
-    <div
-      v-else
-      :id="listId"
-      role="group"
-      :aria-label="label"
-      class="mt-3 overflow-hidden rounded-[10px] border border-line bg-surface"
-    >
-      <p v-if="summary" class="bg-band px-3 py-2 text-[12.5px] text-muted-strong">{{ summary }}</p>
-      <label
-        v-for="option in ticks"
-        :key="option.key"
-        class="flex items-baseline gap-2.5 border-t border-line px-3 py-[9px] text-[13.5px] first:border-t-0"
-        :class="option.disabled ? 'cursor-not-allowed text-muted' : 'cursor-pointer'"
-      >
+    <div v-else class="overflow-hidden rounded-[10px] border border-line bg-surface">
+      <p v-if="summary && !failed && !loading" class="bg-band px-3 py-2 text-[12.5px] text-muted-strong">{{ summary }}</p>
+      <div class="px-3 py-2">
         <input
-          type="checkbox"
-          class="accent-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus"
-          :checked="chosenKeys.includes(option.key)"
-          :disabled="option.disabled"
-          @change="toggle(option)"
+          type="search"
+          autocomplete="off"
+          :aria-label="label"
+          :aria-controls="listId"
+          :aria-describedby="footer && !failed && !loading ? footerId : undefined"
+          :placeholder="placeholder"
+          :value="query"
+          :disabled="disabled || !!failed"
+          :class="['w-full', boxLook, 'px-[11px]']"
+          @input="onInput"
         />
-        <Icon v-if="option.icon" :name="option.icon" :size="16" class="shrink-0 self-center" />
-        {{ option.label }}
-        <small v-if="option.note" class="ml-auto whitespace-nowrap text-[12px] text-muted">{{ option.note }}</small>
-      </label>
-      <p v-if="nothingMatches" role="status" class="border-t border-line px-3 py-2 text-[12.5px] text-muted-strong">
-        {{ noMatch }}
+      </div>
+
+      <p v-if="failed" role="alert" class="border-t border-line px-3 py-2 text-[12.5px] text-muted-strong">{{ failed }}</p>
+      <p v-else-if="loading" role="status" class="border-t border-line px-3 py-2 text-[12.5px] text-muted-strong">
+        {{ loading }}
       </p>
-      <p v-else-if="moreThanShown && moreText" class="border-t border-line px-3 py-2 text-[12px] text-muted">
-        {{ moreText }}
-      </p>
-      <p v-if="footer" :id="footerId" class="border-t border-line px-3 py-2 text-[12px] text-muted">{{ footer }}</p>
+
+      <div v-else :id="listId" role="group" :aria-label="label">
+        <label
+          v-for="option in ticks"
+          :key="option.key"
+          class="flex items-baseline gap-2.5 border-t border-line px-3 py-[9px] text-[13.5px]"
+          :class="option.disabled ? 'cursor-not-allowed text-muted' : 'cursor-pointer'"
+        >
+          <input
+            type="checkbox"
+            class="accent-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus"
+            :checked="chosenKeys.includes(option.key)"
+            :disabled="option.disabled"
+            @change="toggle(option)"
+          />
+          <Icon v-if="option.icon" :name="option.icon" :size="16" class="shrink-0 self-center" />
+          {{ option.label }}
+          <small v-if="option.note" class="ml-auto whitespace-nowrap text-[12px] text-muted">{{ option.note }}</small>
+        </label>
+        <p v-if="nothingMatches" role="status" class="border-t border-line px-3 py-2 text-[12.5px] text-muted-strong">
+          {{ noMatch }}
+        </p>
+        <p v-else-if="moreThanShown && moreText" class="border-t border-line px-3 py-2 text-[12px] text-muted">
+          {{ moreText }}
+        </p>
+        <p v-if="footer" :id="footerId" class="border-t border-line px-3 py-2 text-[12px] text-muted">{{ footer }}</p>
+      </div>
     </div>
   </div>
 </template>

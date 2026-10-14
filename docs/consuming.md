@@ -12,7 +12,7 @@ doing together.
 **1. Pin a version.** A tag, never a floating branch.
 
 ```json
-"uibyte": "github:gmb-lib/uibyte#v0.11.1"
+"uibyte": "github:gmb-lib/uibyte#v0.12.0"
 ```
 
 **Upgrading is not just editing the tag.** Changing the version in
@@ -137,6 +137,19 @@ repointed role stays readable in every look.
 ```vue
 <StatusPill status="late" :label="t('status.late')" look="solid" />
 <StatusPill status="ontrack" :label="t('status.inWork')" look="outline" />
+```
+
+A pill can carry a glyph of yours from the package's set (`Icon`'s names) when it
+says more than the role — a lock on something not open to the reader, say. Give
+`icon` and it takes the mark's place in every look: the role's glyph in soft and
+solid, the dot in outline. It is drawn at the pill's size and weight in the
+label's colour, hidden from a reader like the mark it replaces, and the label still
+carries the meaning — so where two roles share a hue, your glyph no longer tells
+them apart; the words do. A name this version does not know draws the role's own
+mark, so a pill is never left without one.
+
+```vue
+<StatusPill status="idle" look="outline" size="sm" icon="lock" :label="t('area.notIncluded')" />
 ```
 
 **Finished work is `closed`, not `ontrack`.** `ontrack` means *on track, valid,
@@ -369,6 +382,43 @@ drawn and hidden from a reader, so write the name alone — *Items*, not
 </PageHeader>
 ```
 
+Beside the title there is room for one short mark of yours — a pill saying the
+page's subject is locked or archived, say — in the `title-after` slot. It is drawn
+on the title's line, after it, and goes under the title when the line is too
+narrow for both; the title is not squeezed for it either. It sits beside the
+heading, not inside it, so the heading is still named by the title alone, and a
+reader hears the mark's words after it as words of their own — so give the mark
+words, not a glyph alone. Pass the slot only when there is a mark
+(`<template v-if="…" #title-after>`); a header without one is drawn exactly as
+before.
+
+```vue
+<PageHeader :title="area.name">
+  <template v-if="area.locked" #title-after>
+    <StatusPill status="idle" look="outline" icon="lock" :label="t('area.locked')" />
+  </template>
+</PageHeader>
+```
+
+The title's own place can be yours too: the `title` slot is drawn **instead of the
+visible title** — a form that edits the thing the page is about, say — while the
+way back, the `eyebrow`, the `subtitle` and the actions keep their places. The page
+keeps its heading: it is still drawn, at its level, for a reader only, and it says
+your `title`. So while the slot is drawn, `title` is what a reader hears first and
+nobody sees — word it for what is happening (*Edit Van V-2*), not only the name.
+The slot takes the title's whole line; a `title-after` mark is not drawn with it.
+Pass the slot only while it is wanted (`<template v-if="editing" #title>`); without
+it the title is drawn as before.
+
+```vue
+<PageHeader :title="editing ? t('item.editing', { name: item.name }) : item.name" :back="back" :link-component="RouterLink">
+  <template v-if="editing" #title>
+    <ItemForm v-model="draft" @save="save()" @cancel="editing = false" />
+  </template>
+  <template v-if="!editing" #actions><Button variant="outline" @click="editing = true">{{ t('item.edit') }}</Button></template>
+</PageHeader>
+```
+
 **A read that has nothing to show says why, and a failed one never says
 "nothing".** `StateBlock` draws a read's `state` — `loading`, `empty` or `failed`
 — from your words: a `title` (what is true) and a `text` (why, or what to do).
@@ -404,8 +454,12 @@ One at a time (the default) it is a combobox: the matches open under the box in
 the page's own flow, the arrow keys move through them and Enter takes one. Typing
 never chooses — `v-model` changes only when a match is taken, and a box left with
 half a name in it goes back to the name actually chosen. Give `clearLabel` to
-offer the way back to nothing. With `multiple` it is a box over ticks, and what is
-ticked stays in view at the top whatever is typed.
+offer the way back to nothing. With `multiple` it is one card, since its ticks are
+always open: your `summary` line first (how many there are to choose from, say —
+it is not drawn while the list is being read or could not be), then the box, then
+the ticks it narrows; what is ticked stays in view at the top whatever is typed.
+The box stays where it is while the list is read and after, so someone typing as
+it arrives keeps their place.
 
 ```vue
 <FindField
@@ -539,6 +593,48 @@ own width — 1100px, then 760px, where the header goes too. Sorting is asked fo
   </template>
 </ListTable>
 ```
+
+**A list whose rows hold controls is drawn on the same grid, and its rows are
+nothing to press.** When a row holds controls of its own — a choice made in place,
+an act on that row, a link to somewhere else — it cannot also be one target: a
+control inside a link or a button is two targets at once, and a reader is told of
+one thing to press with others inside it. `ControlList` takes the same `columns`,
+`rows`, `rowKey`, `label`, `sort`, `sortedLabels`, `sort` event and `footer` slot
+as `ListTable`, and draws the same card, header and grid, folding the same way by
+its own width. What differs is the row: it is its cells and nothing else, each
+cell your `cell-<key>` slot or the row's field, and every control you put in a cell
+is its own stop in the page order. The header is for the eye, so name each
+control for its row — a picker that says *Access — Anna Ozola*, not *Access* —
+and give a column that holds only an act an empty `label`.
+
+Under a row's cells, inside its entry, the `row-after` slot holds something about
+that row alone, such as the `ConfirmAsk` that asks before an act on it; give it
+for the one row that needs it and nothing is drawn for the others.
+
+```vue
+<ControlList :columns="[{ key: 'name', label: t('people.name'), priority: 1, width: 'minmax(220px,1.6fr)' },
+                        { key: 'access', label: t('people.access'), width: '170px' },
+                        { key: 'added', label: t('people.added'), priority: 3 },
+                        { key: 'act', label: '', width: '90px', end: true }]"
+             :rows="page" :row-key="(p) => p.id" :label="t('people.title')">
+  <template #cell-name="{ row }"><b>{{ row.name }}</b> <small v-if="row.id === me">{{ t('people.you') }}</small></template>
+  <template #cell-access="{ row }">
+    <select :value="row.access" :aria-label="t('people.accessOf', { name: row.name })" @change="change(row, $event)">
+      <option v-for="a in levels" :key="a.id" :value="a.id">{{ a.name }}</option>
+    </select>
+  </template>
+  <template #cell-act="{ row }"><Button size="sm" variant="ghost" @click="asking = row.id">{{ t('people.remove') }}</Button></template>
+  <template #row-after="{ row }">
+    <ConfirmAsk v-if="asking === row.id" :question="t('people.removeAsk', { name: row.name })" :confirm-label="t('people.remove')"
+                :keep-label="t('common.keep')" danger @confirm="remove(row)" @keep="asking = ''" />
+  </template>
+</ControlList>
+```
+
+Which of the two a list is follows from its rows, not from its look. If the whole
+row opens one thing and holds nothing else, it is a `ListTable` — a `ControlList`
+whose only control is a link in its name cell is the hand-drawn list `ListTable`
+replaced, where the rest of the row is dead to a click.
 
 **Counts that filter are one strip.** `CountStrip` draws `items` — each a label,
 an optional `count` you have already formatted, and an optional `status` for a
@@ -767,3 +863,8 @@ telling the package you know better, and it believes you.
   stop in the page order with the arrow keys moving along it, not one stop per
   choice — four choices meaning four stops is how a keyboard reader ends up
   pressing Tab eleven times to get past a row of chips.
+- **Nothing pressable sits inside something else pressable.** A list row that is
+  a link or a button (`ListTable`) holds no control of its own, and a row that
+  holds controls (`ControlList`) is not itself a link or a button — a control
+  inside another is two targets under one click and a reader cannot tell which
+  one they are on.
