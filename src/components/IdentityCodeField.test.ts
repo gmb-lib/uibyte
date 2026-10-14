@@ -209,6 +209,26 @@ describe('IdentityCodeField — settling what was typed', () => {
     expect(f.code.value).toBe('   ')
     expect(f.box().attributes('aria-invalid')).toBeUndefined()
   })
+
+  it('says a usable code is settled as it is typed, before the box is left', async () => {
+    // The line is drawn while the box still has the focus, so leaving it — say, by pressing
+    // the host's button — moves nothing under the press.
+    const f = field({ settled: 'One identity.', note: 'To tell two people apart.' })
+    await f.type(LV_WRITTEN)
+    expect(f.w.text()).toContain('One identity.')
+    const lines = f.w.findAll('p').length
+    await f.leave()
+    expect(f.w.text()).toContain('One identity.')
+    expect(f.w.findAll('p')).toHaveLength(lines)
+  })
+
+  it('rewrites the code to its one spelling only when the box is left, not under the typing', async () => {
+    const f = field({ settled: 'One identity.' })
+    await f.type(LV_BARE)
+    expect(f.code.value).toBe(LV_BARE)
+    await f.leave()
+    expect(f.code.value).toBe(LV_WRITTEN)
+  })
 })
 
 describe('IdentityCodeField — a refusal, in the host’s words', () => {
@@ -264,7 +284,16 @@ describe('IdentityCodeField — a refusal, in the host’s words', () => {
     expect(sentence).toHaveBeenCalledWith(expect.objectContaining({ ok: false, problem: 'ambiguous' }), 'LV')
   })
 
-  it('takes both lines away the moment something is typed', async () => {
+  it('says why a code cannot be used only when the box is left, never mid-word', async () => {
+    const f = field({ settled: 'One identity.' })
+    await f.type(LV_BARE.slice(0, 7))
+    expect(f.alert().exists()).toBe(false)
+    expect(f.w.text()).not.toContain('One identity.')
+    await f.leave()
+    expect(f.alert().exists()).toBe(true)
+  })
+
+  it('takes the refusal away the moment something is typed, and the settled line once the code stops reading right', async () => {
     const refused = bare({ modelValue: 'ABCDE12345' })
     await refused.get('input').trigger('blur')
     expect(refused.find('[role="alert"]').exists()).toBe(true)
