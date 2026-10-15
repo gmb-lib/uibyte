@@ -26,8 +26,15 @@ const props = withDefaults(
     label?: string
     /** The item's width beside the list. */
     detailWidth?: string
+    /**
+     * `fill` gives the list all the room the item leaves; `fit` sizes it to its
+     * content (never wider than the room it has) and opens the item right beside
+     * it — for a short list or a tree, where `fill` leaves the item across empty
+     * width.
+     */
+    list?: 'fill' | 'fit'
   }>(),
-  { label: undefined, detailWidth: '390px' },
+  { label: undefined, detailWidth: '390px', list: 'fill' },
 )
 
 const emit = defineEmits<{ back: [] }>()
@@ -59,7 +66,13 @@ async function back(): Promise<void> {
   <div class="@container">
     <div
       class="grid items-start gap-[18px]"
-      :class="open ? 'grid-cols-[minmax(0,1fr)_var(--detail-width)] @max-[760px]:grid-cols-1' : 'grid-cols-1'"
+      :class="
+        open
+          ? list === 'fit'
+            ? 'grid-cols-[minmax(0,max-content)_var(--detail-width)] justify-start @max-[760px]:grid-cols-1'
+            : 'grid-cols-[minmax(0,1fr)_var(--detail-width)] @max-[760px]:grid-cols-1'
+          : 'grid-cols-1'
+      "
       :style="{ '--detail-width': detailWidth }"
     >
       <div ref="listEl" :id="`${uid}-list`" tabindex="-1" class="min-w-0 outline-none" :class="open ? '@max-[760px]:hidden' : ''">

@@ -82,4 +82,31 @@ describe('SplitDetail', () => {
     const w = mount(SplitDetail, { props: { open: true, backLabel: 'Users' }, slots })
     expect(w.get('section button').classes()).toContain('focus-visible:outline-focus')
   })
+
+  describe('list: fit', () => {
+    const grid = (w: ReturnType<typeof mount>) => (w.element as HTMLElement).querySelector(':scope > div')!
+
+    it('fills by default: the list takes the room the item leaves', () => {
+      const w = mount(SplitDetail, { props: { open: true, backLabel: 'Users' }, slots })
+      expect(grid(w).classList.contains('grid-cols-[minmax(0,1fr)_var(--detail-width)]')).toBe(true)
+    })
+
+    it('sizes the list to its content and opens the item beside it, aligned to the start', () => {
+      const w = mount(SplitDetail, { props: { open: true, backLabel: 'Users', list: 'fit' }, slots })
+      const classes = grid(w).classList
+      expect(classes.contains('grid-cols-[minmax(0,max-content)_var(--detail-width)]')).toBe(true)
+      expect(classes.contains('justify-start')).toBe(true)
+      expect(classes.contains('grid-cols-[minmax(0,1fr)_var(--detail-width)]')).toBe(false)
+    })
+
+    it('keeps the fold point, the way back and the single column while nothing is open', () => {
+      const w = mount(SplitDetail, { props: { open: true, backLabel: 'Users', list: 'fit' }, slots })
+      expect(grid(w).classList.contains('@max-[760px]:grid-cols-1')).toBe(true)
+      expect(regions(w)[0].classList.contains('@max-[760px]:hidden')).toBe(true)
+      expect(w.get('section button').classes()).toContain('@max-[760px]:inline-flex')
+      const closed = mount(SplitDetail, { props: { open: false, backLabel: 'Users', list: 'fit' }, slots })
+      expect(grid(closed).classList.contains('grid-cols-1')).toBe(true)
+      expect(grid(closed).classList.contains('justify-start')).toBe(false)
+    })
+  })
 })
