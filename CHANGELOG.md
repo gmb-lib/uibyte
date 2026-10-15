@@ -7,6 +7,30 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.16.0
+
+Options on two list components, for lists that are short, searched, or drawn as rows. Additive: with
+none of them given, both draw and behave exactly as before.
+
+### Added — `list` on `SplitDetail`
+
+`list` is `fill` (the default) or `fit`. With `fit` the list takes the width of its content, never
+wider than the room it has, and the open item sits right beside it, the pair aligned to the start —
+for a short list or a tree, where `fill` leaves the item across empty width. The width below which the
+item replaces the list, the way back and the focus behaviour are unchanged.
+
+### Added — `fewerLabel`, `keep` and `layout` on `FoldMore`
+
+`fewerLabel` gives words for a second button, shown once the list is unfolded, that folds it back to
+the limit; focus returns to the button for the rest. `keep` is a function: items it accepts always
+show, in their place, even beyond the limit, and only the items still hidden are counted — so a search
+can show every match in a list folded after five, and no button appears when nothing is hidden.
+`moreLabel` may now also be a function of how many items are still hidden. `layout` is `inline` (the
+default) or `rows`, which draws each item as a block row with no separators and the buttons under the
+rows.
+
+**To adopt:** move the pin to `v0.16.0`.
+
 ## v0.15.1
 
 ### Fixed — `SelectField` shows its model when a choice is not taken

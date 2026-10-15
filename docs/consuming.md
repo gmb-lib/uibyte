@@ -900,9 +900,26 @@ shown, and back to the row the list marks `aria-current` (as `ListTable` does wi
 </SplitDetail>
 ```
 
+A short list or a tree leaves the item pinned far right across empty width. Give
+`list="fit"` and the list takes its content's width (never wider than the room it
+has, and it still shrinks when space is short) with the item opening right beside
+it, the pair aligned to the start. The default is `list="fill"`. The fold point, the
+way back and focus are the same under both.
+
 **The first few, then the rest.** `FoldMore` shows `limit` items (5) and your
 `moreLabel` for the rest — counted and worded by you. Hold it `open` while a
 search is running: a match behind the fold is a match the person never sees.
+
+Four options, none changing the default. `moreLabel` may be a function of how many
+are still hidden, for a host that does not know the count itself. `fewerLabel`
+adds a second button, once the list is unfolded, that folds it back to the limit;
+focus lands on the button for the rest again (without it, unfolding is one way).
+`keep` is a predicate: items it accepts always show, in their place, even beyond
+the limit, and only the items still hidden are counted — a search can show every
+match in a list folded after five, and when nothing is hidden there is no button
+for the rest. `layout="rows"` draws each item as a block row with no separators
+(your default slot draws the row), the buttons under the rows; the default is
+`inline`. `index` in the slot is the item's place in `items`.
 
 **History is lines under days.** `DayList` draws `days` you have grouped and
 headed (*Today*, *Tuesday 6 October* — where a day begins is the reader's time
