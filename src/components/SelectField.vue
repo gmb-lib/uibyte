@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, useAttrs, useId } from 'vue'
 import { cn } from '../lib/cn'
-import { fieldBorder, fieldBoxClass } from './fieldBox'
+import { fieldBorder, fieldBoxClass, type FieldSize } from './fieldBox'
 import type { SelectOption } from './types'
 
 // One choice from a list, as the platform's own <select> drawn in the same box as
@@ -16,7 +16,7 @@ import type { SelectOption } from './types'
 // other attribute lands on the select itself.
 defineOptions({ inheritAttrs: false })
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   /** The chosen option's value (`v-model`); empty when nothing is chosen. */
   modelValue: string
   options: SelectOption[]
@@ -30,7 +30,9 @@ const props = defineProps<{
   disabled?: boolean
   id?: string
   name?: string
-}>()
+  /** `sm` for a compact box inside a list's row; a form's box otherwise. */
+  size?: FieldSize
+}>(), { size: 'md' })
 
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
@@ -69,7 +71,7 @@ function onChange(e: Event): void {
         :aria-label="label ? undefined : ariaLabel"
         :aria-invalid="isInvalid ? true : undefined"
         :aria-describedby="describedBy"
-        :class="[fieldBoxClass, fieldBorder(isInvalid), 'cursor-pointer appearance-none truncate pr-8']"
+        :class="[fieldBoxClass(size), fieldBorder(isInvalid), 'cursor-pointer appearance-none truncate pr-8']"
         @change="onChange"
       >
         <option v-if="placeholder !== undefined" value="">{{ placeholder }}</option>

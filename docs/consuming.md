@@ -926,7 +926,9 @@ box that the box is described by; `invalid` colours the box and sets `aria-inval
 width is yours: the box fills its container up to 420px, and a `class` you put on the
 component lands on the outer element (so `class="max-w-[240px]"` narrows it); any other
 attribute, such as a `data-` attribute or a key listener, lands on the input itself. The
-package adds no behaviour to a search box — Escape does what the platform does.
+package adds no behaviour to a search box — Escape does what the platform does. `size` is
+`md`, the box of a form, or `sm`, a compact box for a control inside a list's row or beside a
+few words, where a form's box would make the row taller than its text.
 
 ```vue
 <TextField v-model="typed" type="search" :aria-label="t('people.find')"
@@ -940,23 +942,26 @@ so the keyboard, the phone's picker and a screen reader behave as they do everyw
 `value`. A `placeholder` adds a first option with an empty value, shown while nothing is
 chosen. `label`, `ariaLabel`, `id`, `hint`, `invalid`, `error`, `disabled` and the class and
 attribute rules are `TextField`'s. In a row that holds controls, give `ariaLabel` the
-row's name too (*Role — Anna*), so each select is told apart from its neighbours.
+row's name too (*Role — Anna*), so each select is told apart from its neighbours, and
+`size="sm"` so the row keeps the height of its text.
 
 ```vue
 <SelectField v-model="roleId" :options="roles.map((r) => ({ value: r.id, label: r.name }))"
-             :aria-label="t('members.role') + ' — ' + name" class="w-auto" />
+             :aria-label="t('members.role') + ' — ' + name" size="sm" class="w-auto" />
 ```
 
-**An act that adds a file, beside a field or in a row, is `FilePick`.** A quiet, link-like
-button that opens the browser's file chooser and says which files were chosen: `label` is the
-button's words, `accept` and `multiple` go to the input, `disabled` dims it. It emits `files`
+**An act that adds a file, beside a field or in a row, is `FilePick`.** A button that opens the browser's file chooser and says which files were chosen: `label` is the
+button's words, `accept` and `multiple` go to the input, `disabled` dims it. `look` is `link`, quiet text for an act in a row (the default), or
+`button`, the small outline button, for an act beside other buttons; `icon` draws a kit icon
+before the words. It emits `files`
 (never an empty list) and refuses nothing itself — `accept` only filters what the chooser
 offers; a host that must hold a rule checks it on what arrives. The input is emptied after every
 pick, so the same file can be chosen again. Where the act deserves a zone of its own, that is
 `FileDrop`.
 
 ```vue
-<FilePick :label="t('cert.addFile')" accept=".pdf,image/*" multiple @files="(f) => hold(f)" />
+<FilePick :label="t('cert.addFile')" accept=".pdf,image/*" @files="(f) => attach(f[0])" />
+<FilePick :label="t('comment.attach')" look="button" icon="doc" multiple @files="(f) => hold(f)" />
 ```
 
 ## Repointing the palette
