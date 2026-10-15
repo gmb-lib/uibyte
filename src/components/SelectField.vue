@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useAttrs, useId } from 'vue'
+import { computed, nextTick, useAttrs, useId } from 'vue'
 import { cn } from '../lib/cn'
 import { fieldBorder, fieldBoxClass, type FieldSize } from './fieldBox'
 import type { SelectOption } from './types'
@@ -53,8 +53,15 @@ const rest = computed(() => {
 })
 const rootClass = computed(() => cn('w-full max-w-[420px]', attrs.class as string | undefined))
 
-function onChange(e: Event): void {
-  emit('update:modelValue', (e.target as HTMLSelectElement).value)
+// The select shows its model, always. A host that does not take a choice (a change refused, say)
+// leaves the model as it was, and nothing would redraw this select — so after the host has had its
+// turn, the select is put back to the value it holds rather than the one picked. A host that takes
+// the choice later redraws it when the model changes.
+async function onChange(e: Event): Promise<void> {
+  const select = e.target as HTMLSelectElement
+  emit('update:modelValue', select.value)
+  await nextTick()
+  if (select.value !== props.modelValue) select.value = props.modelValue
 }
 </script>
 

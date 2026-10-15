@@ -7,6 +7,17 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.15.1
+
+### Fixed — `SelectField` shows its model when a choice is not taken
+
+A host that does not take a choice — a change the server refused, so the model stays where it was —
+was left with the select showing the option picked, since nothing redrew it. The select now puts itself
+back to its model once the host has had its turn; a host that takes the choice, at once or after an
+answer, sees it as before. No prop changes.
+
+**To adopt:** move the pin to `v0.15.1`.
+
 ## v0.15.0
 
 A second size for the box, and a second look for the file button — both found when an application moved

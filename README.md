@@ -19,7 +19,7 @@ provides the toolchain:
 ## Install
 
 ```
-npm install github:gmb-lib/uibyte#v0.15.0
+npm install github:gmb-lib/uibyte#v0.15.1
 ```
 
 Pin a tag. There is no registry release and no floating version.

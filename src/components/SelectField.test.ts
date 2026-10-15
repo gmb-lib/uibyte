@@ -110,4 +110,22 @@ describe('SelectField', () => {
     expect(row.get('select').classes()).toContain('py-[5px]')
     expect(row.get('select').classes()).not.toContain('py-2')
   })
+
+  it('shows its model, not the pick, when the host does not take the choice', async () => {
+    const options = [{ value: 'manager', label: 'Manager' }, { value: 'worker', label: 'Worker' }]
+    // A host that refuses the change: the model stays where it was.
+    const refusing = mount(SelectField, { props: { modelValue: 'manager', options, ariaLabel: 'Role' } })
+    await refusing.get('select').setValue('worker')
+    expect(refusing.emitted('update:modelValue')).toEqual([['worker']])
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect((refusing.get('select').element as HTMLSelectElement).value).toBe('manager')
+
+    // A host that takes it: the select shows the new choice.
+    const taking = mount(SelectField, {
+      props: { modelValue: 'manager', options, ariaLabel: 'Role', 'onUpdate:modelValue': (v: string) => taking.setProps({ modelValue: v }) },
+    })
+    await taking.get('select').setValue('worker')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect((taking.get('select').element as HTMLSelectElement).value).toBe('worker')
+  })
 })
