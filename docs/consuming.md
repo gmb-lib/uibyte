@@ -915,6 +915,50 @@ zone, so the grouping is yours), each line with its `time`, its `text` (or the
          :older-busy="reading" :note="t('history.shown', { n })" @older="readOlder()" />
 ```
 
+**A short value is typed in `TextField`.** One box for `type` `text`, `search`, `date`,
+`number` or `email`, drawn in the kit's look: `v-model` holds the text in the box (always a
+string — a host that wants a number reads it as one). The box always has a name: give
+`label` to draw one above it, or `ariaLabel` when your own markup draws the label, or
+point your own `<label for>` at the `id` you pass. `placeholder`, `name`, `autocomplete`,
+`inputmode`, `min` and `max` go to the input as they are. `hint` is a quiet line under the
+box that the box is described by; `invalid` colours the box and sets `aria-invalid`, and
+`error` says why under it, announced — an error implies invalid. `disabled` dims it. The
+width is yours: the box fills its container up to 420px, and a `class` you put on the
+component lands on the outer element (so `class="max-w-[240px]"` narrows it); any other
+attribute, such as a `data-` attribute or a key listener, lands on the input itself. The
+package adds no behaviour to a search box — Escape does what the platform does.
+
+```vue
+<TextField v-model="typed" type="search" :aria-label="t('people.find')"
+           :placeholder="t('people.find')" class="max-w-[240px]" @keydown.enter.prevent="run()" />
+<TextField v-model="form.issuer" :label="t('cert.issuer')" :error="issuerRefusal" />
+```
+
+**One choice from a list is `SelectField`.** The platform's own `<select>` in the same box,
+so the keyboard, the phone's picker and a screen reader behave as they do everywhere.
+`options` is `{ value, label, disabled? }[]`, the labels finished; `v-model` holds the chosen
+`value`. A `placeholder` adds a first option with an empty value, shown while nothing is
+chosen. `label`, `ariaLabel`, `id`, `hint`, `invalid`, `error`, `disabled` and the class and
+attribute rules are `TextField`'s. In a row that holds controls, give `ariaLabel` the
+row's name too (*Role — Anna*), so each select is told apart from its neighbours.
+
+```vue
+<SelectField v-model="roleId" :options="roles.map((r) => ({ value: r.id, label: r.name }))"
+             :aria-label="t('members.role') + ' — ' + name" class="w-auto" />
+```
+
+**An act that adds a file, beside a field or in a row, is `FilePick`.** A quiet, link-like
+button that opens the browser's file chooser and says which files were chosen: `label` is the
+button's words, `accept` and `multiple` go to the input, `disabled` dims it. It emits `files`
+(never an empty list) and refuses nothing itself — `accept` only filters what the chooser
+offers; a host that must hold a rule checks it on what arrives. The input is emptied after every
+pick, so the same file can be chosen again. Where the act deserves a zone of its own, that is
+`FileDrop`.
+
+```vue
+<FilePick :label="t('cert.addFile')" accept=".pdf,image/*" multiple @files="(f) => hold(f)" />
+```
+
 ## Repointing the palette
 
 Each status role is set by a **single** value — the saturated one used for the

@@ -77,6 +77,9 @@ export { default as Menu } from './components/Menu.vue'
 export { default as LanguageMenu } from './components/LanguageMenu.vue'
 export { default as SplitDetail } from './components/SplitDetail.vue'
 export { default as FoldMore } from './components/FoldMore.vue'
+export { default as TextField } from './components/TextField.vue'
+export { default as SelectField } from './components/SelectField.vue'
+export { default as FilePick } from './components/FilePick.vue'
 export { default as DayList } from './components/DayList.vue'
 export { Button, buttonVariants } from './components/ui/button'
 export type { ButtonVariants } from './components/ui/button'
@@ -104,6 +107,7 @@ export type {
   PillLook,
   ReadState,
   SegmentedOption,
+  SelectOption,
   ShellLabels,
   TabItem,
 } from './components/types'
