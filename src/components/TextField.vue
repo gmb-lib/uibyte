@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, useAttrs, useId } from 'vue'
 import { cn } from '../lib/cn'
-import { fieldBorder, fieldBoxClass } from './fieldBox'
+import { fieldBorder, fieldBoxClass, type FieldSize } from './fieldBox'
 
 // One box for typing a short value: text, a search, a date, a number or an address.
 //
@@ -42,8 +42,10 @@ const props = withDefaults(
     inputmode?: 'none' | 'text' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search'
     min?: string | number
     max?: string | number
+    /** `sm` for a compact box inside a list's row; a form's box otherwise. */
+    size?: FieldSize
   }>(),
-  { type: 'text' },
+  { type: 'text', size: 'md' },
 )
 
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
@@ -88,7 +90,7 @@ function onInput(e: Event): void {
       :aria-label="label ? undefined : ariaLabel"
       :aria-invalid="isInvalid ? true : undefined"
       :aria-describedby="describedBy"
-      :class="[fieldBoxClass, fieldBorder(isInvalid)]"
+      :class="[fieldBoxClass(size), fieldBorder(isInvalid)]"
       @input="onInput"
     />
     <p v-if="error" :id="errorId" role="alert" class="mt-1.5 text-[12.5px] text-status-late-fg">{{ error }}</p>

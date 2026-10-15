@@ -101,4 +101,13 @@ describe('SelectField', () => {
     expect(w.classes()).toContain('max-w-[180px]')
     expect(select(w).attributes('data-role')).toBeDefined()
   })
+
+  it('draws the box of a form by default, and a compact one inside a row when asked', () => {
+    const options = [{ value: 'a', label: 'A' }]
+    const form = mount(SelectField, { props: { modelValue: 'a', options, ariaLabel: 'x' } })
+    expect(form.get('select').classes()).toContain('py-2')
+    const row = mount(SelectField, { props: { modelValue: 'a', options, ariaLabel: 'x', size: 'sm' } })
+    expect(row.get('select').classes()).toContain('py-[5px]')
+    expect(row.get('select').classes()).not.toContain('py-2')
+  })
 })

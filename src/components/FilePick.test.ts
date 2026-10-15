@@ -82,4 +82,21 @@ describe('FilePick', () => {
     choose(w.get('input').element as HTMLInputElement, [pdf()])
     expect(w.emitted('files')).toBeUndefined()
   })
+
+  it('is quiet text by default, and the small outline button when asked', () => {
+    const link = mount(FilePick, { props: { label: 'Add an attachment' } })
+    expect(link.classes()).toContain('underline')
+    const button = mount(FilePick, { props: { label: 'Attach a file', look: 'button' } })
+    expect(button.classes()).not.toContain('underline')
+    expect(button.classes()).toContain('border')
+    expect(button.text()).toBe('Attach a file')
+  })
+
+  it('draws an icon before the words when given one, and none otherwise', () => {
+    const plain = mount(FilePick, { props: { label: 'Attach' } })
+    expect(plain.find('svg').exists()).toBe(false)
+    const withIcon = mount(FilePick, { props: { label: 'Attach', icon: 'doc' } })
+    expect(withIcon.find('svg').exists()).toBe(true)
+    expect(withIcon.text()).toBe('Attach')
+  })
 })

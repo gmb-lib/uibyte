@@ -122,4 +122,13 @@ describe('TextField', () => {
     await input(w).trigger('keydown', { key: 'Enter' })
     expect(pressed).toBe('Enter')
   })
+
+  it('draws the box of a form by default, and a compact one inside a row when asked', () => {
+    const form = mount(TextField, { props: { modelValue: '', ariaLabel: 'x' } })
+    expect(form.get('input').classes()).toContain('text-[13.5px]')
+    const row = mount(TextField, { props: { modelValue: '', ariaLabel: 'x', size: 'sm' } })
+    expect(row.get('input').classes()).toContain('text-[13px]')
+    expect(row.get('input').classes()).toContain('py-[5px]')
+    expect(row.get('input').classes()).not.toContain('text-[13.5px]')
+  })
 })

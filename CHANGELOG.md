@@ -7,6 +7,25 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.15.0
+
+A second size for the box, and a second look for the file button — both found when an application moved
+its own hand-built copies onto the `v0.14.0` pieces, where one look would have changed a screen already
+drawn. Additive: nothing you use draws differently unless you ask for it.
+
+### Added — `size` on `TextField` and `SelectField`
+
+`size` is `md`, the box of a form (the default, as before), or `sm`, a compact box (13px text, a smaller
+radius and padding) for a control inside a list's row or beside a few words, where the box of a form
+would make the row taller than its text — a role picker in a `ControlList` row, say.
+
+### Added — `look` and `icon` on `FilePick`
+
+`look` is `link`, quiet text for an act in a row (the default, as before), or `button`, the kit's small
+outline button, for an act beside other buttons. `icon` names a kit icon drawn before the words.
+
+**To adopt:** move the pin to `v0.15.0`; nothing changes until you pass `size`, `look` or `icon`.
+
 ## v0.14.0
 
 Three small pieces every form and list ends up drawing: a box for a short value, a choice from a
