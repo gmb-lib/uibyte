@@ -365,3 +365,13 @@ export interface DiffColumns {
   status: string
   detail: string
 }
+
+/** One choice in a `SelectField`. */
+export interface SelectOption {
+  /** What the host is told when it is chosen. */
+  value: string
+  /** The visible words. Already translated — the kit does no i18n. */
+  label: string
+  /** Drawn and announced as unavailable, never chosen. */
+  disabled?: boolean
+}

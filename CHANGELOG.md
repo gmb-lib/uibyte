@@ -7,6 +7,43 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.14.0
+
+Three small pieces every form and list ends up drawing: a box for a short value, a choice from a
+list in the same box, and a button that opens the file chooser. All three are additive: no component
+you already use draws anything different.
+
+### Added — `TextField`: a box for a short value
+
+One box for `type` `text`, `search`, `date`, `number` or `email`, in the kit's look. `v-model` holds the
+text in the box. The box always has a name: `label` draws one above it, `ariaLabel` names it when your
+markup draws the label, and `id` lets your own `<label for>` reach it. `placeholder`, `name`,
+`autocomplete`, `inputmode`, `min` and `max` go to the input as they are; `hint` is a quiet line the box
+is described by; `invalid` and `error` colour the box, set `aria-invalid` and say why, announced;
+`disabled` dims it. A `class` you pass lands on the outer element (set the width there; it fills its
+container up to 420px by default) and any other attribute lands on the input.
+
+### Added — `SelectField`: a choice from a list, in the same box
+
+The platform's own `<select>`, so keyboard, phone picker and screen readers behave as they do
+elsewhere. `options` is `{ value, label, disabled? }[]` (the type is `SelectOption`), `v-model` holds the
+chosen `value`, and `placeholder` adds an empty first option. The name, hint, invalid, error, disabled,
+`id` and class rules are `TextField`'s.
+
+### Added — `FilePick`: a quiet button that opens the file chooser
+
+A link-like button around a hidden native file input: `label`, `accept`, `multiple`, `disabled`; it emits
+`files` (never empty) and empties the input after each pick so the same file can be chosen again. It
+refuses nothing itself. For a drop zone, `FileDrop` is unchanged.
+
+### Changed — docs only
+
+The consuming guide now says that a usable identity code is settled as it is typed (the `v0.13.1`
+behaviour).
+
+**To adopt:** move the pin to `v0.14.0`. An application that hand-builds the same box, select or hidden
+file input can replace them with these pieces; nothing requires it.
+
 ## v0.13.1
 
 ### Fixed — `IdentityCodeField`: the first click after typing a code is no longer lost
