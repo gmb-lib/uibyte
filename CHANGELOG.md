@@ -7,6 +7,23 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.17.0
+
+A new component for a short name in a pill. Additive: nothing changes for an application that does not
+use it.
+
+### Added — `Chip`
+
+`Chip` draws a short name as a pill: a hairline border, 12px text, on the band fill or, with
+`tone="surface"`, the surface fill. Its content is the default slot, so an application may put a
+control of its own inside — a button that takes the thing away; the package draws none. `given` draws
+the border dashed, in the muted colour so the dash can be seen, for a thing held because of something
+else, and `note` says what it is given by:
+it is the pill's `title` and is also placed after the content, visually hidden, so a screen reader
+hears it. Attributes and `class` reach the pill.
+
+**To adopt:** move the pin to `v0.17.0`.
+
 ## v0.16.0
 
 Options on two list components, for lists that are short, searched, or drawn as rows. Additive: with

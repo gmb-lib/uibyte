@@ -192,6 +192,25 @@ keeps its own accessible name and focus ring.
 </FileChip>
 ```
 
+**A short name in a pill is `Chip`.** A hairline border, 12px text, on the band fill
+(`tone="band"`, the default) or the surface fill (`tone="surface"`). The words are the
+default slot, already translated. A control of your own goes in the slot too — a button
+that takes the thing away keeps its own accessible name and focus ring; the chip draws
+no remove control. It is for naming a thing; a status is a `StatusPill`.
+
+`given` draws the border dashed, for something held because of something else, and in
+the muted colour, so the dash clears the 3:1 a visible state needs (the hairline does
+not). A dashed line carries nothing to a reader who cannot see it, so pass `note` with it, in your words
+— what it is given by. The note is the pill's `title` and is also said to a screen reader
+after the content, visually hidden. A `given` chip without a note still draws dashed.
+Attributes and `class` reach the pill.
+
+```vue
+<Chip>{{ tag.name }}</Chip>
+<Chip tone="surface" given :note="t('tag.givenBy', { name: group.name })">{{ tag.name }}</Chip>
+<Chip>{{ tag.name }} <button type="button" :aria-label="t('tag.remove', { name: tag.name })" @click="remove(tag)">×</button></Chip>
+```
+
 **A tab strip is a keyboard contract, not a row of buttons.** `Tabs` draws the
 choices and, on request, the panel under them. You own which one is chosen —
 `v-model` on the key — and the component owns everything a reader needs for the
