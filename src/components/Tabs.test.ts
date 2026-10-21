@@ -165,3 +165,94 @@ describe('Tabs', () => {
     expect(new Set(ids).size).toBe(ids.length)
   })
 })
+
+/** A strip of a given width over tabs of given places, as a browser lays them out. */
+function layOut(strip: HTMLElement, width: number, places: [left: number, width: number][]) {
+  const scroll = places.length ? places[places.length - 1]![0] + places[places.length - 1]![1] : 0
+  Object.defineProperty(strip, 'clientWidth', { configurable: true, value: width })
+  Object.defineProperty(strip, 'scrollWidth', { configurable: true, value: Math.max(scroll, width) })
+  Array.from(strip.children).forEach((el, i) => {
+    Object.defineProperty(el, 'offsetLeft', { configurable: true, value: places[i]?.[0] ?? 0 })
+    Object.defineProperty(el, 'offsetWidth', { configurable: true, value: places[i]?.[1] ?? 0 })
+  })
+}
+
+describe('Tabs, the look', () => {
+  it('underlines the chosen one in ink, the others not, in a strip that never wraps', () => {
+    const w = mountTabs('two')
+    const strip = w.get('[role="tablist"]')
+    expect(strip.classes()).toEqual(expect.arrayContaining(['flex-nowrap', 'overflow-x-auto']))
+    expect(strip.classes()).not.toContain('flex-wrap')
+    const [one, two] = w.findAll('[role="tab"]')
+    expect(two!.classes()).toEqual(expect.arrayContaining(['border-b-2', 'border-ink', 'font-semibold']))
+    expect(one!.classes()).toEqual(expect.arrayContaining(['border-b-2', 'border-transparent']))
+    expect(w.html()).not.toContain('rounded-pill')
+  })
+
+  it('fades the side that has more, and only that side', async () => {
+    const w = mountTabs('one')
+    const strip = w.get('[role="tablist"]').element as HTMLElement
+    const more = () => w.get('[data-strip]').attributes('data-more')
+
+    layOut(strip, 400, [[0, 100], [104, 100], [208, 100], [312, 100]])
+    strip.scrollLeft = 0
+    await w.get('[role="tablist"]').trigger('scroll')
+    expect(more()).toBe('right')
+
+    strip.scrollLeft = 6
+    await w.get('[role="tablist"]').trigger('scroll')
+    expect(more()).toBe('both')
+
+    strip.scrollLeft = 12
+    await w.get('[role="tablist"]').trigger('scroll')
+    expect(more()).toBe('left')
+
+    layOut(strip, 600, [[0, 100], [104, 100], [208, 100], [312, 100]])
+    strip.scrollLeft = 0
+    await w.get('[role="tablist"]').trigger('scroll')
+    expect(more()).toBe('none')
+  })
+
+  it('brings the chosen one into view within the strip, never moving the page', async () => {
+    const w = mountTabs('one')
+    const strip = w.get('[role="tablist"]').element as HTMLElement
+    layOut(strip, 200, [[0, 100], [104, 100], [208, 100], [312, 100]])
+    strip.scrollLeft = 0
+
+    await w.setProps({ modelValue: 'four' })
+    // Its far edge in view, with room for the fade beside it.
+    expect(strip.scrollLeft).toBe(312 + 100 - 200 + 28)
+
+    await w.setProps({ modelValue: 'one' })
+    expect(strip.scrollLeft).toBe(0)
+  })
+})
+
+describe('Tabs, as links', () => {
+  const places: TabItem[] = [
+    { key: 'types', label: 'Task types', linkProps: { href: '/types' } },
+    { key: 'stages', label: 'Stages', tag: '4', linkProps: { href: '/stages' } },
+    { key: 'later', label: 'Later', disabled: true, linkProps: { href: '/later' } },
+  ]
+  const mountLinks = (modelValue = 'stages') =>
+    mount(Tabs, { props: { tabs: places, modelValue, label: 'Tasks & workflow', linkComponent: 'a' }, attachTo: document.body })
+
+  it('draws the screens of a place as navigation: links to their addresses, the one open marked as the page', () => {
+    const w = mountLinks()
+    expect(w.find('[role="tablist"]').exists()).toBe(false)
+    expect(w.get('nav').attributes('aria-label')).toBe('Tasks & workflow')
+    const links = w.findAll('a')
+    expect(links.map((a) => [a.text(), a.attributes('href'), a.attributes('aria-current')])).toEqual([
+      ['Task types', '/types', undefined],
+      ['Stages 4', '/stages', 'page'],
+    ])
+    expect(links[1]!.classes()).toEqual(expect.arrayContaining(['border-b-2', 'border-ink']))
+  })
+
+  it('draws a screen that cannot be opened yet, announced, and leading nowhere', () => {
+    const later = mountLinks().get('[aria-disabled="true"]')
+    expect(later.element.tagName).toBe('SPAN')
+    expect(later.attributes('href')).toBeUndefined()
+    expect(later.text()).toBe('Later')
+  })
+})
