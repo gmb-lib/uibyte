@@ -30,6 +30,12 @@ export interface TabItem {
   tag?: string
   /** Drawn and announced, never activated. */
   disabled?: boolean
+  /**
+   * Where the choice leads, when the strip draws links (`linkComponent` on the
+   * strip): handed to that component as it is — `{ to: … }` for a router link,
+   * `{ href: … }` for an anchor.
+   */
+  linkProps?: Record<string, unknown>
 }
 
 /**

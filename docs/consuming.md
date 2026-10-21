@@ -92,6 +92,22 @@ const items: NavItem[] = [
 </AppShell>
 ```
 
+**A place whose screens each have an address uses `Tabs` as links.** The same
+strip, the same underline, but each choice a link and the one open marked as the
+page — the page below is yours, not a panel of the strip:
+
+```vue
+<Tabs
+  :tabs="screens.map((s) => ({ key: s.name, label: t(s.word), linkProps: { to: { name: s.name } } }))"
+  :model-value="current"
+  :label="t('area.title')"
+  :link-component="RouterLink"
+/>
+```
+
+A strip wider than its room never wraps: it scrolls sideways within itself, the
+chosen one is brought into view, and the side that has more fades.
+
 **Navigation can be flat or grouped.** Pass `items` for a single list under the
 optional `labels.section` eyebrow, or pass `groups` (each a labelled set of
 items) and the sidebar draws one eyebrow per group. The mobile bottom bar

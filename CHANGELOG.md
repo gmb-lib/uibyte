@@ -7,6 +7,28 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.18.0
+
+`Tabs` takes the underline look, and can draw a place's screens as links. Every strip of tabs in an
+application changes look when it moves to this version; nothing about choosing, the keys or the panel
+changes.
+
+### Changed
+
+- **`Tabs` is drawn as an underline:** the chosen choice in ink with a 2px rule under it, the others
+  muted with a light rule on hover, a choice that cannot be made faint; the tag sits after the label in
+  small mono. The pills are gone.
+- **A strip wider than its room never wraps.** It scrolls sideways within itself (no scrollbar drawn),
+  the chosen choice is brought into view by scrolling the strip alone — never the page — and the side
+  that has more fades out.
+
+### Added
+
+- **`linkComponent` on `Tabs`, and `linkProps` on a `TabItem`:** the strip draws each choice as that
+  component (a router link, or `'a'`) with `linkProps` handed to it (`{ to: … }`, `{ href: … }`), inside
+  a `nav` named by `label`; the one whose key is `modelValue` is marked `aria-current="page"`; one that
+  cannot be opened yet is drawn, announced and leads nowhere. There is no panel: the page is the host's.
+
 ## v0.17.0
 
 A new component for a short name in a pill. Additive: nothing changes for an application that does not
