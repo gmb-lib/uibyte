@@ -82,6 +82,7 @@ export { default as TextField } from './components/TextField.vue'
 export { default as SelectField } from './components/SelectField.vue'
 export { default as FilePick } from './components/FilePick.vue'
 export { default as DayList } from './components/DayList.vue'
+export { default as StepsCard } from './components/StepsCard.vue'
 export { Button, buttonVariants } from './components/ui/button'
 export type { ButtonVariants } from './components/ui/button'
 export type {
@@ -110,5 +111,7 @@ export type {
   SegmentedOption,
   SelectOption,
   ShellLabels,
+  StepAction,
+  StepItem,
   TabItem,
 } from './components/types'

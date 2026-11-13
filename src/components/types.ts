@@ -107,6 +107,27 @@ export interface NavGroup {
 export type LinkComponent = Component | string
 
 /**
+ * The way to a step: an address outside the application (`href`, drawn as a
+ * plain anchor) or a place inside it (`linkProps`, handed as they are to the
+ * card's link component). One or the other, never both.
+ */
+export type StepAction =
+  | { label: string; href: string; linkProps?: never }
+  | { label: string; linkProps: Record<string, unknown>; href?: never }
+
+/** One step of a `StepsCard`. All text is already translated. */
+export interface StepItem {
+  /** Stable identity for the step, also written on its element as `data-step`. */
+  key: string
+  title: string
+  text: string
+  /** Whether the step is finished. The first that is not is the one to do now. */
+  done: boolean
+  /** The way to the step; drawn only while it is the one to do now. */
+  action?: StepAction
+}
+
+/**
  * Every piece of text the shell renders. Supplied already translated: the kit
  * does no i18n, so a host keeps one translation system instead of configuring a
  * second one inside a dependency.
