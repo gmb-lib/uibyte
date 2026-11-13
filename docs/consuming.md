@@ -967,6 +967,47 @@ zone, so the grouping is yours), each line with its `time`, its `text` (or the
          :older-busy="reading" :note="t('history.shown', { n })" @older="readOlder()" />
 ```
 
+**A few first steps, in order, are a `StepsCard`.** It draws how many are done, which one is
+next and the way to it. `heading` is the card's heading with whatever count you want in it
+(*2 of 3 done*), `note` a quiet line beside it (nothing is drawn without one), and `steps` the
+steps in their order: each a `key`, a `title`, a `text` and `done`, and, where there is a way
+to it, an `action`. The step to do now is the first whose `done` is false; the card works it
+out, and only that step draws its action. An action is `{ label, href }` for an address outside
+your application (a plain `a`) or `{ label, linkProps }` for a place inside it, drawn with
+your `linkComponent` and handed `linkProps` as they are (`{ to: … }` for a router link; the
+default is `a`). A type keeps you from giving both. A step to do now with no action draws
+nothing that looks like a link. `columns` is `3` (the default) or `5` at full width; five fold
+to three below 980px of the card's own width, and both to one below 640px, so the card fits
+whatever column you put it in. Every word arrives translated; the kit formats nothing.
+
+```vue
+<StepsCard
+  :heading="t('setup.heading', { done: 1, all: 3 })"
+  :note="t('setup.note')"
+  :steps="[
+    { key: 'unbox', title: t('setup.unbox.title'), text: t('setup.unbox.text'), done: true },
+    { key: 'printer', title: t('setup.printer.title'), text: t('setup.printer.text'), done: false,
+      action: { label: t('setup.printer.go'), linkProps: { to: { name: 'printer' } } } },
+    { key: 'invite', title: t('setup.invite.title'), text: t('setup.invite.text'), done: false },
+  ]"
+  :link-component="RouterLink"
+  :labels="{ done: t('setup.done'), now: t('setup.now') }"
+/>
+```
+
+For a screen reader the steps are an ordered list and the card is a region named by its heading.
+`level` (2, 3 or 4; the default is 3) is that heading's level: pick the one that sits directly
+under the heading your page has at that spot, so the outline has no gap. Pass `labels.done` and
+`labels.now`: the tick is hidden from a screen reader, so a finished step says your *done* word
+and the step to do now says your *now* word (and carries `aria-current="step"`), each after the
+title and apart from it. Colour and the outline carry nothing alone. The action has the kit's
+focus ring, and a long word in a title or a text wraps inside its column. Each step's element
+carries `data-step="<key>"` and `data-step-state="done"`, `"now"` or `"open"`.
+
+It does not hide itself when every step is done (that is your call: with all steps done none is
+the one to do now and no action is drawn), it does not count, and it remembers nothing; an empty
+`steps` draws the heading and an empty list.
+
 **A short value is typed in `TextField`.** One box for `type` `text`, `search`, `date`,
 `number` or `email`, drawn in the kit's look: `v-model` holds the text in the box (always a
 string — a host that wants a number reads it as one). The box always has a name: give

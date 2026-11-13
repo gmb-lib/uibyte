@@ -7,6 +7,22 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.19.0
+
+A new component for a card of first steps. Additive: nothing changes for an application that does not
+use it.
+
+### Added — `StepsCard`
+
+`StepsCard` draws a few steps in their order on a card: a heading (its level is a prop), an optional quiet
+note, and the steps as an ordered list on three or five columns that fold with the card's own width (five to
+three below 980px, both to one below 640px). The first step not done is the one to do now: outlined in ink,
+marked `aria-current="step"`, and the only one to draw its action, a plain link with `href` or your
+`linkComponent` with `linkProps`. A finished step carries a tick and its title in the on-track colour; a later
+step sits on the band fill. A finished step and the one to do now each say a word of yours (`labels`) to a
+screen reader. Each step's element carries `data-step` and `data-step-state`. Exports `StepItem` and
+`StepAction`; every word arrives translated.
+
 ## v0.18.0
 
 `Tabs` takes the underline look, and can draw a place's screens as links. Every strip of tabs in an
