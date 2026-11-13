@@ -309,6 +309,22 @@ export interface MenuItem {
   note?: string
 }
 
+/** One row of a `ChoiceRows` list. */
+export interface ChoiceRow {
+  /** Stable identity, and what the host is told when the row is pressed. Two rows may share words and never share a key. */
+  key: string
+  /** The row's words. Already translated — the kit does no i18n. */
+  label: string
+}
+
+/** One place a `ScopeMenu` offers. */
+export interface ScopeOption {
+  /** Stable identity, and what the host is told when it is chosen. */
+  key: string
+  /** The words. Already translated. */
+  label: string
+}
+
 /** One language an application carries, named in itself: `{ code: 'lv', name: 'Latviešu' }`. */
 export interface LanguageOption {
   /** The code the host uses for it, and the `lang` it is marked with. */

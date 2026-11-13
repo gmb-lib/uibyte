@@ -83,11 +83,15 @@ export { default as SelectField } from './components/SelectField.vue'
 export { default as FilePick } from './components/FilePick.vue'
 export { default as DayList } from './components/DayList.vue'
 export { default as StepsCard } from './components/StepsCard.vue'
+export { default as ChoiceRows } from './components/ChoiceRows.vue'
+export { default as ScopeMenu } from './components/ScopeMenu.vue'
+export { default as HoldNotice } from './components/HoldNotice.vue'
 export { Button, buttonVariants } from './components/ui/button'
 export type { ButtonVariants } from './components/ui/button'
 export type {
   ActOutcome,
   BackLink,
+  ChoiceRow,
   CountItem,
   CountryGroup,
   CountryOption,
@@ -108,6 +112,7 @@ export type {
   NavItem,
   PillLook,
   ReadState,
+  ScopeOption,
   SegmentedOption,
   SelectOption,
   ShellLabels,

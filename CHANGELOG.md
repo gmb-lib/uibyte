@@ -7,6 +7,54 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.20.0
+
+New parts for naming where a person is and moving them elsewhere. Additive: nothing a person sees changes for an
+application that does not use them (the markup detail under `heading` on `Menu` is the one thing that does),
+and every existing test passes unchanged.
+
+### Added — `ChoiceRows`
+
+A short list of choices, each one a whole row pressed once: `items` (`{ key, label }`, exported as
+`ChoiceRow`), `label` (the list's accessible name) and `busy` (the key being acted on). Each row is a
+`button` with its words at the start and a drawn arrow at the end; pressing one emits `choose` with its key.
+The list is `role="list"`. While `busy` names a key that row is `aria-busy` and every row is
+`aria-disabled` and takes no press (not `disabled`, so focus stays on the row just pressed); set `busy` on the
+first `choose`, since two presses before it may both be told. A long label wraps; each row carries
+`data-choice`. It draws no title or other action.
+
+### Added — `heading` on `Menu`
+
+`Menu` takes an optional `heading`: a small quiet line above the choices in the opened list. It is not an
+item (no focus, not pressable, passed over by the arrow keys) and names the group of choices for a reader.
+For a `Menu` given no `heading` nothing a person sees changes; in the markup, one more generated id is drawn
+per menu (ids after it shift), the opened list begins with an empty placeholder comment, and the choice group's
+`aria-labelledby`, which pointed at no element, is no longer drawn. With `block`, a headed list is held to the button's width so a long
+choice wraps instead of running past the column.
+
+### Added — `ScopeMenu`
+
+A thin wrapper over `Menu` for the line that names where a person is: `label`, `current`, `options`
+(`{ key, label }`, exported as `ScopeOption`) and `tone`, `block`, `side`, `align`. With several options it is
+a menu as a choice headed by `label`, and `select` is emitted only for a key other than `current`. With one
+option, the current one, it draws the words as plain text with nothing to press, focus or open. With no
+options, or a `current` that is not among them, it draws nothing. It carries `data-scope`.
+
+### Added — `sidebar-top` slot on `AppShell`
+
+Drawn directly under the brand and above the navigation, in the side menu and in the drawer. A frame that
+fills nothing there renders exactly as before, with no wrapper and no spacing. A slot whose content renders
+nothing leaves no box: the wrapper carries `empty:hidden`.
+
+### Added — `HoldNotice`
+
+A notice over the page with one button, for a page that must not be used any further: `open`, `actionLabel`
+and the default slot for the sentence; it emits `act`. Built on the alert dialog primitives, so it is
+announced at once with the sentence as its name (read once, no separate description), the page under it is
+hidden and held still (`aria-modal`), and focus is on the button. It is drawn above every other layer the kit
+draws, an open drawer or list included, and a long translated button label wraps inside the panel. It cannot
+be dismissed: Escape and a press outside do nothing and there is no close mark. The panel carries `data-hold`.
+
 ## v0.19.0
 
 A new component for a card of first steps. Additive: nothing changes for an application that does not
