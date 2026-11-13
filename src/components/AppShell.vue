@@ -82,6 +82,9 @@ function onNavigate(item: NavItem): void {
         @navigate="onNavigate"
       >
         <template #brand><slot name="brand" /></template>
+        <template v-if="$slots['sidebar-top']" #top>
+          <div class="-mt-1.5 pb-3 empty:hidden"><slot name="sidebar-top" /></div>
+        </template>
         <template #extra><slot name="sidebar-extra" /></template>
         <template #footer><slot name="sidebar-footer" /></template>
       </SidebarContent>
@@ -168,6 +171,9 @@ function onNavigate(item: NavItem): void {
         :locked-label="labels.locked"
         @navigate="onNavigate"
       >
+        <template v-if="$slots['sidebar-top']" #top>
+          <div class="pb-3 empty:hidden"><slot name="sidebar-top" /></div>
+        </template>
         <template #extra><slot name="sidebar-extra" /></template>
         <template #footer><slot name="sidebar-footer" /></template>
       </SidebarContent>

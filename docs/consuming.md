@@ -135,7 +135,10 @@ access level.
 **Anything specific to your product is a slot.** The brand mark, the sidebar
 footer and the top-bar actions are yours. `sidebar-extra` renders between the
 navigation and the footer for content that belongs above the signed-in block —
-a notice, an upgrade card. Wanting to put one of your own nouns *inside* a
+a notice, an upgrade card. `sidebar-top` renders directly under the brand and above the
+navigation, in the side menu and in the drawer, for a line that says where the person is
+(`ScopeMenu`); left empty, nothing is drawn for it, and a slot whose content renders nothing
+(a `ScopeMenu` with no options) leaves no box either: its wrapper carries `empty:hidden`. Wanting to put one of your own nouns *inside* a
 component is the signal that it belongs in a slot instead.
 
 On a wide screen the side menu is a fixed width and its column fills it, so the links
@@ -919,6 +922,74 @@ language everyone here has can say so in the page's language.
 </template>
 ```
 
+**A menu's list can carry a heading.** Give `Menu` a `heading` and the opened list draws it
+above the choices as a small quiet line. It is not an item: it cannot be focused or pressed,
+the arrow keys pass over it, and a reader hears it as the name of the group of choices below.
+For a menu given no `heading`, nothing a person sees changes; in the markup, one more generated
+id is drawn per menu (the ids after it shift), the opened list starts with an empty placeholder
+comment, and the choice group's `aria-labelledby`, which pointed at no element, is gone. With `block` as well, the list is held
+to the button's width, so a long choice wraps inside the column it sits in.
+
+```vue
+<Menu :label="current.name" :heading="t('place')" :items="places" :model-value="current.key" @select="go" />
+```
+
+**The place a person is in, and the way to another, is a `ScopeMenu`.** A thin wrapper over
+`Menu`, made for the line under the brand: `label` is what the line names, in your word (its
+accessible name and the list's heading), `current` the key of the place the person is in, and
+`options` the places, each `{ key, label }`. With two or more it is a menu as a choice: the
+button wears the current place's words and the list is headed by `label`, the current one
+marked. Choosing another place emits `select` with its key; choosing the current one emits
+nothing. With exactly one option, which is the current one, there is nothing to change to, so
+it draws the words as plain text where the button's would be: no button, nothing to focus, no
+arrow. With no options, or a `current` that is not among them, it draws nothing. It takes
+`side`, `tone`, `block` and `align` as `LanguageMenu` does, and carries `data-scope="<current>"`
+on its root. It is meant for `AppShell`'s `sidebar-top` slot, drawn directly under the brand and
+above the navigation, in the side menu and in the drawer; a frame that fills nothing there is
+drawn exactly as before.
+
+```vue
+<AppShell :items="items" :labels="labels" link-component="a">
+  <template #sidebar-top>
+    <ScopeMenu :label="t('place')" :current="place.key" :options="places" tone="console" block
+               @select="(key) => moveTo(key)" />
+  </template>
+</AppShell>
+```
+
+**A short list of choices, each pressed once, is `ChoiceRows`.** For a page whose whole job is
+to take the person to one of a few places: `items` are the rows, each `{ key, label }`, in the
+order given, and `label` names the list for a reader. Every row is one button across the full
+width, its words at the start and a small arrow at the end; pressing it emits `choose` with its
+key. While `busy` names a key, that row is marked `aria-busy`, every row is disabled and no
+press emits, so a second act cannot start under the first. The rows are marked
+`aria-disabled`, not `disabled`, so focus stays on the row just pressed. Set `busy` on the
+first `choose`: two presses before it is set may both be told. A long label wraps inside its row;
+two rows with the same words are told apart by their keys, and each carries
+`data-choice="<key>"`. It draws no title, no lead text and no other action: those are your
+page's.
+
+```vue
+<h1>{{ t('choose.title') }}</h1>
+<ChoiceRows :items="places" :label="t('choose.list')" :busy="moving" @choose="(key) => moveTo(key)" />
+```
+
+**A page that must not be used any further says so with `HoldNotice`.** A notice over the page
+with one button: `open` shows it, `actionLabel` is the button's words and the default slot is
+your sentence. Pressing the button emits `act`. **It cannot be closed:** Escape does nothing, a
+press outside does nothing and there is no close mark; the only way on is the button, and
+`open` is yours alone. Use it only where a notice that could be waved away would leave the page
+looking usable while it is not. While it is open the page under it is hidden from a reader and
+held still, and focus is on the button; while `open` is false none of it is in the page. It is
+drawn above every other layer the kit draws, an open drawer or list included, and a long
+translated button label wraps inside the panel. The panel carries `data-hold`.
+
+```vue
+<HoldNotice :open="stale" :action-label="t('stale.reload')" @act="reload()">
+  {{ t('stale.sentence') }}
+</HoldNotice>
+```
+
 **An item opens beside its list, or instead of it.** `SplitDetail` takes the
 `list` and `detail` slots and `open`. With room — decided by its own width, so a
 narrow column behaves the same on any screen — the item sits beside the list
@@ -1140,3 +1211,15 @@ telling the package you know better, and it believes you.
   holds controls (`ControlList`) is not itself a link or a button — a control
   inside another is two targets under one click and a reader cannot tell which
   one they are on.
+- **`ChoiceRows`:** a reader hears a list (`role="list"`) with the name you gave and each
+  row as a button; the arrow is hidden. While one is being acted on, that row is announced
+  busy and every row unavailable, with focus left where it was.
+- **`ScopeMenu`:** a reader hears a group with your `label` and, with several places,
+  a button that opens a list headed by it, the current place checked; with one place it
+  hears the words under that name and nothing that can be pressed.
+- **A `Menu` heading:** a reader hears it as the name of the group of choices; it is not
+  a stop for the keyboard.
+- **`HoldNotice`:** a reader hears an alert dialog at once, with your sentence as its
+  name, read once; the page behind is hidden from a reader and cannot be reached by the
+  keyboard, and focus is on the button. It cannot be dismissed, so give it a button whose
+  words say what happens next.

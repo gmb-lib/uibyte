@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useId } from 'vue'
 import {
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuPortal,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -42,6 +44,14 @@ import type { MenuItem } from './types'
 // part of the item's name, after a space that keeps the two apart when heard.
 // An item without a note is drawn exactly as it always was.
 //
+// A list may carry a `heading`: a small quiet line above the choices that says
+// what they are choices of. It is not an item — it takes no focus, cannot be
+// pressed and the arrow keys pass over it — and it names the group of choices
+// below it for a reader. Without one the list is drawn exactly as it always was.
+// A list with a heading under a button that spans its column is held to that
+// column's width, so a long choice wraps inside it rather than running past the
+// edge of the menu it sits in.
+//
 // The words on the button, the choices and their order are the host's.
 const props = withDefaults(
   defineProps<{
@@ -62,9 +72,22 @@ const props = withDefaults(
     tone?: 'surface' | 'console'
     /** The button takes the full width of its container. */
     block?: boolean
+    /** A quiet line above the choices in the opened list, naming the group of them. Not an item. */
+    heading?: string
   }>(),
-  { modelValue: undefined, align: 'end', lang: undefined, about: undefined, side: 'bottom', tone: 'surface', block: false },
+  {
+    modelValue: undefined,
+    align: 'end',
+    lang: undefined,
+    about: undefined,
+    side: 'bottom',
+    tone: 'surface',
+    block: false,
+    heading: undefined,
+  },
 )
+
+const headingId = useId()
 
 const emit = defineEmits<{ select: [key: string]; 'update:modelValue': [key: string] }>()
 
@@ -104,11 +127,13 @@ const button = computed(
 )
 const content = computed(
   () =>
-    `z-50 flex ${props.block ? 'min-w-[var(--reka-dropdown-menu-trigger-width)]' : 'min-w-[190px]'} flex-col rounded-[12px] border border-line bg-surface p-1.5 shadow-[0_14px_38px_rgba(22,24,27,0.13)]`,
+    `z-50 flex ${props.block ? 'min-w-[var(--reka-dropdown-menu-trigger-width)]' : 'min-w-[190px]'}${props.block && props.heading ? ' max-w-[var(--reka-dropdown-menu-trigger-width)]' : ''} flex-col rounded-[12px] border border-line bg-surface p-1.5 shadow-[0_14px_38px_rgba(22,24,27,0.13)]`,
 )
 
 const item =
   'flex cursor-pointer select-none items-center justify-between gap-3 rounded-[8px] px-2.5 py-[7px] text-[13px] text-ink outline-none data-[highlighted]:bg-band focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus data-[disabled]:cursor-not-allowed data-[disabled]:text-muted'
+const headingClass =
+  'select-none px-2.5 pb-1 pt-1.5 font-mono text-[10px] font-medium uppercase leading-snug tracking-[0.14em] text-muted-strong'
 const note = 'ml-auto whitespace-nowrap pl-2.5 font-mono text-[11px] font-normal text-muted'
 </script>
 
@@ -122,7 +147,12 @@ const note = 'ml-auto whitespace-nowrap pl-2.5 font-mono text-[11px] font-normal
 
     <DropdownMenuPortal>
       <DropdownMenuContent :align="align" :side="side" :side-offset="6" :class="content">
-        <DropdownMenuRadioGroup v-if="modelValue !== undefined" :model-value="modelValue">
+        <DropdownMenuLabel v-if="heading" :id="headingId" :class="headingClass">{{ heading }}</DropdownMenuLabel>
+        <DropdownMenuRadioGroup
+          v-if="modelValue !== undefined"
+          :model-value="modelValue"
+          :aria-labelledby="heading ? headingId : undefined"
+        >
           <DropdownMenuRadioItem
             v-for="option in items"
             :key="option.key"
@@ -142,6 +172,21 @@ const note = 'ml-auto whitespace-nowrap pl-2.5 font-mono text-[11px] font-normal
             </template>
           </DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
+        <DropdownMenuGroup v-else-if="heading" :aria-labelledby="headingId">
+          <DropdownMenuItem
+            v-for="option in items"
+            :key="option.key"
+            :disabled="option.disabled"
+            :lang="option.note ? undefined : option.lang"
+            :class="item"
+            @select="choose(option.key)"
+          >
+            <template v-if="option.note">
+              <span :lang="option.lang">{{ option.label }}</span>{{ ' ' }}<span :class="note">{{ option.note }}</span>
+            </template>
+            <template v-else>{{ option.label }}</template>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
         <template v-else>
           <DropdownMenuItem
             v-for="option in items"

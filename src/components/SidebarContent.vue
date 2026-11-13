@@ -18,7 +18,9 @@ import type { LinkComponent, NavGroup, NavItem } from './types'
 // a sidebar is always product-specific (a signed-in identity, a notice, a
 // support link), and the moment this component picks one it stops fitting the
 // next application. The `extra` slot is the same idea for content that belongs
-// between the navigation and the footer.
+// between the navigation and the footer, and `top` for a line that belongs
+// directly under the brand and above the navigation — where the person is, say.
+// Nothing is drawn around `top`: the frame that passes it also gives it its room.
 const props = withDefaults(
   defineProps<{
     /** Flat navigation. Ignored when `groups` is supplied. */
@@ -66,6 +68,8 @@ const sections = computed<NavGroup[]>(() =>
     <div v-if="!hideBrand" class="pb-3">
       <slot name="brand" />
     </div>
+
+    <slot name="top" />
 
     <nav class="flex flex-col gap-[3px]" :aria-label="navLabel">
       <template v-for="(group, groupIndex) in sections" :key="group.key">
