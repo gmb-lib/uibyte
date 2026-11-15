@@ -7,6 +7,12 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.21.0
+
+`ActLine` takes a third outcome, `notice`, for something that happened to the person that is neither an act they
+finished nor a refusal; it is drawn in the amber the `blocked` status uses. Additive: `done` and `refused` are drawn
+as before, and nothing needs changing in an application that does not use it.
+
 ## v0.20.0
 
 New parts for naming where a person is and moving them elsewhere. Additive: nothing a person sees changes for an

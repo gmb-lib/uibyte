@@ -361,8 +361,15 @@ export interface DayGroup {
   lines: DayLine[]
 }
 
-/** How an act ended, as far as the line that reports it is concerned. */
-export type ActOutcome = 'done' | 'refused'
+/**
+ * What the line that reports an act says, as far as its tone is concerned.
+ *
+ * - `done` — an act the person finished; drawn green and announced politely.
+ * - `refused` — an act that was turned down; drawn red and announced at once.
+ * - `notice` — something that happened to the person, neither an act they finished nor a
+ *   refusal (their access to a place ended, say); drawn amber and announced politely.
+ */
+export type ActOutcome = 'done' | 'refused' | 'notice'
 
 /** One country an identity code field offers: its two-letter code, and its name. */
 export interface CountryOption {
