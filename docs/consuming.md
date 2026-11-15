@@ -666,7 +666,9 @@ const ways: SegmentedOption[] = [
 
 **Every act ends in a sentence.** `ActLine` says what an act did (`outcome="done"`,
 announced politely) or why it was refused (`outcome="refused"`, announced at once),
-in your `text`, toned by the outcome. A way on — *Open it* after something was
+in your `text`, toned by the outcome. For something that happened to the person
+and was neither an act they finished nor a refusal — their access to a place
+ended — use `outcome="notice"`: drawn amber, announced politely. A way on — *Open it* after something was
 made — goes in the `action` slot, outside the announcement. It stays until you
 take it away, usually with the next act: a line that fades on a timer is gone
 before a slow reader reaches it.
