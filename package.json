@@ -47,18 +47,24 @@
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.0.0",
-    "@types/node": "^22.10.5",
-    "@vitejs/plugin-vue": "^5.2.1",
-    "@vue/test-utils": "^2.4.6",
-    "@vue/tsconfig": "^0.7.0",
-    "jsdom": "^25.0.1",
-    "tailwindcss": "^4.0.0",
-    "typescript": "~5.7.2",
-    "vite": "^6.0.7",
-    "vite-node": "^3.2.4",
-    "vitest": "^3.2.4",
-    "vue": "^3.5.13",
-    "vue-tsc": "^2.2.0"
+    "@tailwindcss/vite": "^4.3.5",
+    "@types/node": "^24.19.2",
+    "@vitejs/plugin-vue": "^6.0.11",
+    "@vue/test-utils": "^2.6.0",
+    "@vue/tsconfig": "^0.9.1",
+    "jsdom": "^31.0.1",
+    "tailwindcss": "^4.3.5",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.8",
+    "vite-node": "^6.0.0",
+    "vitest": "^5.1.1",
+    "vue": "^3.5.46",
+    "vue-tsc": "^3.3.14"
+  },
+  "overrides": {
+    "js-beautify": {
+      "editorconfig": "^4.0.1",
+      "glob": "^14.0.6"
+    }
   }
 }
