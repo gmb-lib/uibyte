@@ -1130,6 +1130,36 @@ pick, so the same file can be chosen again. Where the act deserves a zone of its
 <FilePick :label="t('comment.attach')" look="button" icon="doc" multiple @files="(f) => hold(f)" />
 ```
 
+**A setting that needs a few sentences is `InfoTip`.** A small round "i" button to put beside a
+label; its default slot is the description, shown in a dark floating panel under the button. `label`
+is required: the button's accessible name, already translated (*About this setting*). It opens when
+the pointer is over it, when it takes keyboard focus and when it is pressed (the only way on a touch
+screen). Opened by the pointer, it closes when the pointer leaves (after a short delay, so the pointer
+can move into the panel and the text can be selected). Opened by a press, it stays open when the pointer
+leaves. Either way it closes when the button loses focus, on Escape (focus stays on the button), on a
+second press and on a press outside it. The pressable button is 24 x 24 px around an 18 px drawn circle.
+
+It is a disclosure rather than a tooltip, because the text is long enough to read slowly and opens on
+a press: the button carries `aria-expanded` and `aria-controls`, and the panel stays in the page,
+hidden while closed. The panel is at most 440 px wide and never wider than the window less a margin,
+and slides sideways to stay inside the window near either edge. It opens under the button; when
+that would run its bottom past the window's bottom edge (less a margin) and there is more room above the
+button than below, it opens above instead, with the same small gap, so a button near the foot of the
+window, over a fixed bottom bar, still shows all of the text.
+
+```vue
+<div class="flex items-center gap-2">
+  <label class="flex items-center gap-2">
+    <input type="checkbox" v-model="form.summaryLine" />
+    {{ t('details.summaryLine') }}
+  </label>
+  <InfoTip :label="t('details.summaryLineAbout')">{{ t('details.summaryLineText') }}</InfoTip>
+</div>
+```
+
+Put the `InfoTip` beside a `<label>`, not inside it: a press on the "i" inside a label would also
+press the control the label wraps.
+
 ## Repointing the palette
 
 Each status role is set by a **single** value — the saturated one used for the
