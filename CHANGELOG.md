@@ -7,6 +7,18 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.22.0
+
+New part: `InfoTip`, a small round "i" button for a label whose meaning needs a few sentences, with the
+description (its default slot) in a dark floating panel under the button. `label` is required and is the
+button's accessible name. It opens on pointer hover, on keyboard focus and on a press. Opened by the pointer it closes when the pointer leaves
+(after a short delay, so the text can be selected); opened by a press it stays open when the pointer leaves.
+Either way it closes on blur, on Escape (focus stays on the button), on a second press and on a press outside.
+The pressable button is 24 x 24 px around an 18 px drawn circle. It is a disclosure (`aria-expanded`,
+`aria-controls`), at most 440 px wide, and stays inside the window near its edges: it slides sideways, and opens
+above the button instead of under it when it would run past the window's bottom and there is more room above. Additive: nothing changes for an application that does
+not use it.
+
 ## v0.21.0
 
 `ActLine` takes a third outcome, `notice`, for something that happened to the person that is neither an act they
