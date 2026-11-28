@@ -7,6 +7,25 @@ on it.
 This package ships **source**, compiled by the host, so every entry below is a change to what your
 build compiles. Nothing here deploys and nothing holds state.
 
+## v0.23.0
+
+New part: `SuggestField`, a text box whose typed text is its value and which proposes matches you give it. `v-model`
+is exactly what is typed, letter by letter; a match never replaces it. `matches` (`SuggestMatch`: `id`, `label`,
+optional `hint`, exported as a type) is your list, already filtered and ordered; the field filters and sorts nothing. While
+the box has focus, holds text and `matches` is not empty, the matches open under it in the page's own flow (nothing
+floats), each with its hint under it in muted text, and an optional `footer` slot says one line under them. Pressing a
+match, or Enter on the highlighted one, emits `take` with it and closes the list; the text is left for you to change.
+Keyboard: the arrow keys move a highlight (none at first), Enter with none highlighted does nothing to the list and does
+not block the form, Escape closes the list and keeps text and focus, Tab leaves without taking, and blur closes it. It is a
+combobox with a listbox (`role="combobox"`, `aria-expanded`, `aria-controls`, `aria-autocomplete="list"`,
+`aria-activedescendant`). It is named as `TextField` is: `label` drawn above, or `ariaLabel` when you draw your own. It
+takes `error` and `invalid` as `TextField` does.
+
+An optional `fixed` string is drawn shaded at the start of the box, wrapping when the box is narrow; it is not editable and
+not part of `v-model`. Backspace with the caret at the very start of the box, or a press on the fixed part, emits
+`release-fixed` with that text and changes nothing itself. While `fixed` is set no matches are shown. Additive: nothing
+changes for an application that does not use it.
+
 ## v0.22.0
 
 New part: `InfoTip`, a small round "i" button for a label whose meaning needs a few sentences, with the
