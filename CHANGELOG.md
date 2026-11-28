@@ -23,7 +23,8 @@ takes `error` and `invalid` as `TextField` does.
 
 An optional `fixed` string is drawn shaded at the start of the box, wrapping when the box is narrow; it is not editable and
 not part of `v-model`. Backspace with the caret at the very start of the box, or a press on the fixed part, emits
-`release-fixed` with that text and changes nothing itself. While `fixed` is set no matches are shown. Additive: nothing
+`release-fixed` with that text and changes nothing itself. The input is never narrower than 8rem: when the fixed
+text and that width do not fit on one line, the input moves to its own line under the fixed part, inside the same box. While `fixed` is set no matches are shown. Additive: nothing
 changes for an application that does not use it.
 
 ## v0.22.0

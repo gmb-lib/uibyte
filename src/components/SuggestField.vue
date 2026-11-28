@@ -165,9 +165,9 @@ function onKeydown(e: KeyboardEvent): void {
 }
 
 const shell =
-  'flex w-full overflow-hidden rounded-[9px] border bg-surface focus-within:outline focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-focus'
+  'flex w-full flex-wrap overflow-hidden rounded-[9px] border bg-surface focus-within:outline focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-focus'
 const inputClass =
-  'min-w-0 flex-1 bg-transparent px-[11px] py-2 text-[13.5px] text-ink outline-none placeholder:text-faint disabled:cursor-not-allowed disabled:text-muted'
+  'min-w-[8rem] flex-[1_1_8rem] bg-transparent px-[11px] py-2 text-[13.5px] text-ink outline-none placeholder:text-faint disabled:cursor-not-allowed disabled:text-muted'
 </script>
 
 <template>
@@ -179,7 +179,7 @@ const inputClass =
         v-if="fixed"
         :id="fixedId"
         data-fixed
-        class="max-w-[70%] shrink-0 cursor-pointer break-words border-r border-line bg-band px-[11px] py-2 text-[13.5px] text-muted-strong"
+        class="max-w-full cursor-pointer break-words border-r border-line bg-band px-[11px] py-2 text-[13.5px] text-muted-strong"
         @mousedown.prevent
         @click="emit('release-fixed', fixed)"
       >{{ fixed }}</span>

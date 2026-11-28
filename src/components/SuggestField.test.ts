@@ -271,6 +271,21 @@ describe('SuggestField — a fixed leading part', () => {
     expect(w.get('input').attributes('aria-expanded')).toBe('false')
   })
 
+  // jsdom does no layout, so this asserts the classes that make the box wrap, not the wrap itself:
+  // the shell wraps, the input asks for 8rem and will not go under it, and the fixed part is not
+  // capped, so a long fixed text sends the input to its own line instead of squeezing it.
+  it('keeps the input at least 8rem wide, moving it to its own line when the fixed text is long', () => {
+    const w = make({ fixed: 'A very long fixed text that fills the box' })
+    expect(w.get('[data-fixed]').element.parentElement!.className).toMatch(/\bflex-wrap\b/)
+    const input = w.get('input').element.className
+    expect(input).toContain('min-w-[8rem]')
+    expect(input).toContain('flex-[1_1_8rem]')
+    const fixed = w.get('[data-fixed]').element.className
+    expect(fixed).not.toMatch(/max-w-\[\d+%\]/)
+    expect(fixed).toContain('max-w-full')
+    expect(fixed).not.toContain('shrink-0')
+  })
+
   it('has no fixed part when none is given', () => {
     expect(make().find('[data-fixed]').exists()).toBe(false)
   })
