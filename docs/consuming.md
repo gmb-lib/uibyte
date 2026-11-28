@@ -535,6 +535,37 @@ the box is described by it, so a reader hears it too.
 />
 ```
 
+**A name typed freely, with entries proposed as it is typed, is `SuggestField`.** Where `FindField`
+never keeps typed text (it holds a choice), `SuggestField`'s value is the typed text: `v-model` is exactly
+what was typed, every keystroke, and nothing replaces it unless you decide so. Give it `matches` — each a
+`SuggestMatch` with an `id`, a `label` and an optional `hint` — already filtered and in the order to show; it
+filters and sorts nothing. While the box has focus, holds text and `matches` is not empty, they open under the
+box in the page's own flow (what is below moves down), each label with its hint under it. Taking one — a press,
+or Enter on the highlighted one — emits `take` with the match and closes the list; the text is left as it was,
+and what the row becomes is yours. The arrow keys move a highlight (none at first); Enter with none highlighted
+does nothing to the list, so the form's own Enter still works; Escape closes the list and keeps text and focus;
+Tab leaves without taking. A `footer` slot is one quiet line under the list. It is a combobox with a listbox, and
+is named like `TextField`: `label` drawn above, or `aria-label` through `ariaLabel` when you draw your own.
+`error` and `invalid` work as on `TextField`.
+
+`fixed` draws a string shaded at the start of the box, wrapping when the box is narrow, so the two read as one
+box; it is not editable and not part of `v-model`, and while it is set nothing is proposed. Backspace with the
+caret at the very start of the box (or in an empty one), or a press on the fixed part, emits `release-fixed`
+with that text and changes nothing itself; you decide what it means (turning the row into one typed text, say).
+
+```vue
+<SuggestField
+  v-model="row.name"
+  :matches="found.map((c) => ({ id: c.id, label: c.name, hint: c.detail }))"
+  :fixed="row.fromList ? row.listName : undefined"
+  :label="t('row.name')"
+  @take="(m) => fillRow(row, m.id)"
+  @release-fixed="(text) => makeFree(row, text)"
+>
+  <template #footer>{{ t('row.typeOn') }}</template>
+</SuggestField>
+```
+
 **An identity code is typed with its country beside it.** `IdentityCodeField` draws the
 two as one field — a choice of the country that issued the code, then the box the code
 is typed in — because they are one value: the same digits in two countries are two

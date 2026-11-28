@@ -223,6 +223,22 @@ export interface BackLink {
 }
 
 /**
+ * One thing a suggesting field proposes under the typed text.
+ *
+ * The host gives the list already filtered and in the order to show; the field never filters
+ * or sorts it. The id is what the host is told when it is taken; a person sees the label and
+ * the hint. Already translated.
+ */
+export interface SuggestMatch {
+  /** Stable identity, and what the host is told when this is taken. */
+  id: string
+  /** The name drawn for it. */
+  label: string
+  /** A quiet line under the name, in muted text. */
+  hint?: string
+}
+
+/**
  * One thing a find field can offer.
  *
  * The key is what the host is told when it is chosen; the person sees only the

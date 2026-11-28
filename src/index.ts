@@ -65,6 +65,7 @@ export { default as BrandMark } from './components/BrandMark.vue'
 export { default as PageHeader } from './components/PageHeader.vue'
 export { default as StateBlock } from './components/StateBlock.vue'
 export { default as FindField } from './components/FindField.vue'
+export { default as SuggestField } from './components/SuggestField.vue'
 export { default as IdentityCodeField } from './components/IdentityCodeField.vue'
 export { default as SegmentedChoice } from './components/SegmentedChoice.vue'
 export { default as ActLine } from './components/ActLine.vue'
@@ -119,5 +120,6 @@ export type {
   ShellLabels,
   StepAction,
   StepItem,
+  SuggestMatch,
   TabItem,
 } from './components/types'
